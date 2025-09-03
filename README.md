@@ -409,7 +409,7 @@ You may use SwitchScope for:
 • Personal and development use
 ```
 
-**For commercial licensing or enterprise support, contact:** [your-email@example.com]
+**For commercial licensing or enterprise support, contact:** [alexan.alekseenko@gmail.com]
 
 ## Support & Community
 
