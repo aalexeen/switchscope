@@ -3,7 +3,7 @@
 > Comprehensive Network Infrastructure Management System
 
 [![License: BSL 1.1](https://img.shields.io/badge/License-BSL%201.1-blue.svg)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://openjdk.org/)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green.svg)](https://spring.io/projects/spring-boot)
 [![Vue](https://img.shields.io/badge/Vue-3.x-4FC08D.svg)](https://vuejs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-blue.svg)](https://postgresql.org/)
@@ -54,7 +54,7 @@ SwitchScope is a modern web-based platform designed to provide complete visibili
 ## Technology Stack
 
 ### Backend
-- **Java 17+** with **Spring Boot 3.x** framework
+- **Java 21** with **Spring Boot 3.x** framework
 - **Spring Security** for authentication and authorization
 - **Spring Data JPA** for database operations
 - **PostgreSQL 13+** database with JSONB support
@@ -131,7 +131,7 @@ Location (IT Closets, Floors, Buildings)
 ## Installation & Quick Start
 
 ### Prerequisites
-- **Java 17** or higher (OpenJDK recommended)
+- **Java 21** or higher (OpenJDK recommended)
 - **Node.js 18+** and **npm 9+**
 - **PostgreSQL 13+** with TimescaleDB extension (optional)
 - **Redis 6+** for optimal performance (optional for development)
@@ -141,7 +141,7 @@ Location (IT Closets, Floors, Buildings)
 
 1. **Clone and start:**
    ```bash
-   git clone https://github.com/your-username/switchscope.git
+   git clone https://github.com/aalexeen/switchscope.git
    cd switchscope
    
    # Start all services
@@ -374,6 +374,10 @@ k6 run tests/performance/load-test.js
    DATABASE_URL=postgresql://switchscope:password@db:5432/switchscope
    REDIS_URL=redis://redis:6379
    JWT_SECRET=your-256-bit-secret-key
+   
+   # Java 21 Virtual Threads settings
+   SPRING_THREADS_VIRTUAL_ENABLED=true
+   JAVA_OPTS="-XX:+UseG1GC -XX:+UseContainerSupport -Xms512m -Xmx4g --enable-preview"
    ```
 
 ### Monitoring & Logging
@@ -411,8 +415,8 @@ You may use SwitchScope for:
 
 ### Getting Help
 - 📖 **Documentation**: [docs.switchscope.io](https://docs.switchscope.io)
-- 🐛 **Issue Tracker**: [GitHub Issues](https://github.com/your-username/switchscope/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-username/switchscope/discussions)
+- 🐛 **Issue Tracker**: [GitHub Issues](https://github.com/aalexeen/switchscope/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/aalexeen/switchscope/discussions)
 - 📧 **Email Support**: [support@switchscope.io](mailto:support@switchscope.io)
 - 💬 **Discord**: [Community Discord Server](https://discord.gg/switchscope)
 
@@ -423,9 +427,9 @@ You may use SwitchScope for:
 - **Compliance Consulting**: HIPAA, SOX, PCI-DSS compliance assistance
 
 ### Roadmap & Feature Requests
-- View our [public roadmap](https://github.com/your-username/switchscope/projects/1)
-- Submit [feature requests](https://github.com/your-username/switchscope/discussions/categories/ideas)
-- Vote on [upcoming features](https://github.com/your-username/switchscope/discussions/categories/polls)
+- View our [public roadmap](https://github.com/aalexeen/switchscope/projects/1)
+- Submit [feature requests](https://github.com/aalexeen/switchscope/discussions/categories/ideas)
+- Vote on [upcoming features](https://github.com/aalexeen/switchscope/discussions/categories/polls)
 
 ## Acknowledgments
 
