@@ -77,3 +77,8 @@ Thumbs.db
 !application.properties.example
 !.env.example
 !README.md
+
+/.gitattributes
+/backend/.mvn/wrapper/maven-wrapper.properties
+/backend/mvnw
+/backend/mvnw.cmd
