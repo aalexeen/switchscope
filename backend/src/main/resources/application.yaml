@@ -1,0 +1,61 @@
+#  https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+spring:
+  application:
+    name: switchscope
+
+  config:
+    import: optional:application-local.yaml
+
+  jpa:
+    show-sql: false
+    open-in-view: false
+    # https://stackoverflow.com/a/67678945/548473
+    #  defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      #  http://docs.jboss.org/hibernate/orm/5.3/userguide/html_single/Hibernate_User_Guide.html#configurations
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 20
+        # https://stackoverflow.com/questions/21257819/what-is-the-difference-between-hibernate-jdbc-fetch-size-and-hibernate-jdbc-batc
+        jdbc.batch_size: 20
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+      url: ${DB_URL:jdbc:postgresql://localhost:5432/switchscope}
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+      driver-class-name: org.postgresql.Driver
+
+  # Jackson Serialization Issue Resolver
+  jackson:
+    mapper.default-view-inclusion: true   # https://stackoverflow.com/a/37942375/548473
+    visibility:
+      field: any
+      getter: none
+      setter: none
+      is-getter: none
+
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    clear-checksums: true
+
+
+logging:
+  level:
+    root: WARN
+    io.switchscope.backend: INFO
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: INFO
+    org.springframework.cache: TRACE
+    liquibase: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
+
+server.servlet:
+  encoding:
+    charset: UTF-8 # Charset of HTTP requests and responses. Added to the "Content-Type" header if not set explicitly
+    enabled: true # Enable http encoding support
+    force: true
+
+springdoc.swagger-ui.path: /
