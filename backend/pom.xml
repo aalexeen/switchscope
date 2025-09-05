@@ -298,9 +298,6 @@
                     <!-- use "mvn liquibase:update -X" in Execute Maven Goal -->
                     <changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</changeLogFile>
                     <propertyFile>src/main/resources/application-local.yaml</propertyFile>
-                    <!--<url>jdbc:h2:tcp://localhost:9092/mem:blacklistremover</url>
-                    <username>sa</username>
-                    <password>sa</password>-->
                     <url>${database.url}</url>
                     <username>${database.username}</username>
                     <password>${database.password}</password>
