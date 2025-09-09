@@ -1,4 +1,4 @@
-#  https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+#  hswitchscope.iottps://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 spring:
   application:
     name: switchscope
@@ -45,7 +45,7 @@ spring:
 logging:
   level:
     root: WARN
-    io.switchscope.backend: INFO
+    net.switchscope.backend: INFO
     org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: INFO
     org.springframework.cache: TRACE
     liquibase: INFO

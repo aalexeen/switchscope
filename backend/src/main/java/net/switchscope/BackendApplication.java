@@ -1,4 +1,4 @@
-package io.switchscope;
+package net.switchscope;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

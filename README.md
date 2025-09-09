@@ -414,10 +414,10 @@ You may use SwitchScope for:
 ## Support & Community
 
 ### Getting Help
-- 📖 **Documentation**: [docs.switchscope.io](https://docs.switchscope.io)
+- 📖 **Documentation**: [docs.switchscope.net](https://docs.switchscope.net)
 - 🐛 **Issue Tracker**: [GitHub Issues](https://github.com/aalexeen/switchscope/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/aalexeen/switchscope/discussions)
-- 📧 **Email Support**: [support@switchscope.io](mailto:support@switchscope.io)
+- 📧 **Email Support**: [support@switchscope.net](mailto:support@switchscope.net)
 - 💬 **Discord**: [Community Discord Server](https://discord.gg/switchscope)
 
 ### Commercial Support
@@ -457,6 +457,6 @@ Thanks to all contributors who help make SwitchScope better! 🙏
 
 Made with ❤️ for network administrators worldwide
 
-[Website](https://switchscope.io) • [Documentation](https://docs.switchscope.io) • [Demo](https://demo.switchscope.io)
+[Website](https://switchscope.net) • [Documentation](https://docs.switchscope.net) • [Demo](https://demo.switchscope.net)
 
 </div>
