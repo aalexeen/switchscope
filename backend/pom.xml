@@ -8,7 +8,7 @@
         <version>3.5.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>io.switchscope</groupId>
+    <groupId>net.switchscope</groupId>
     <artifactId>switchscope-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>SwitchScope Backend</name>
@@ -41,6 +41,7 @@
         <jsoup.version>1.17.2</jsoup.version>
         <liquibase.version>4.33.0</liquibase.version>
         <liquibase-maven-plugin.version>4.33.0</liquibase-maven-plugin.version>
+        <springdoc.version>2.7.0</springdoc.version>
     </properties>
     <dependencies>
         <dependency>
@@ -168,6 +169,17 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>${jsoup.version}</version>
+        </dependency>
+
+        <!--        jackson-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate5-jakarta</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
 
 
