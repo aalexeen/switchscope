@@ -1,0 +1,292 @@
+package net.switchscope.model.component;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import net.switchscope.model.NamedEntity;
+import net.switchscope.validation.NoHtml;
+
+import java.util.*;
+
+/**
+ * Component category entity - high-level grouping of component types
+ * Examples: housing, connectivity, support, module
+ */
+@Entity
+@Table(name = "component_categories")
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ComponentCategoryEntity extends NamedEntity {
+
+    @Column(name = "code", nullable = false, unique = true)
+    @NotBlank
+    @Size(max = 64)
+    @NoHtml
+    private String code; // housing, connectivity, support, module
+
+    @Column(name = "display_name", nullable = false)
+    @NotBlank
+    @Size(max = 128)
+    @NoHtml
+    private String displayName;
+
+    @Column(name = "description")
+    @Size(max = 500)
+    @NoHtml
+    private String description;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+
+    @Column(name = "sort_order")
+    private Integer sortOrder = 0;
+
+    @Column(name = "is_system_category", nullable = false)
+    private boolean systemCategory = false; // Cannot delete system categories
+
+    // UI properties
+    @Column(name = "color_hex")
+    @Size(max = 7)
+    private String colorHex; // Color for UI: #FF5733
+
+    @Column(name = "icon_class")
+    @Size(max = 128)
+    private String iconClass; // CSS class for UI icons
+
+    // Business logic properties
+    @Column(name = "requires_physical_space", nullable = false)
+    private boolean requiresPhysicalSpace = true;
+
+    @Column(name = "can_contain_components", nullable = false)
+    private boolean canContainComponents = false;
+
+    @Column(name = "is_infrastructure", nullable = false)
+    private boolean infrastructure = false; // Housing/support vs active equipment
+
+    @Column(name = "requires_power", nullable = false)
+    private boolean requiresPower = false;
+
+    @Column(name = "generates_heat", nullable = false)
+    private boolean generatesHeat = false;
+
+    @Column(name = "needs_cooling", nullable = false)
+    private boolean needsCooling = false;
+
+    // One-to-many relationship with component types
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ComponentTypeEntity> componentTypes = new ArrayList<>();
+
+    // Custom properties for extensibility
+    @ElementCollection
+    @CollectionTable(name = "component_category_properties",
+                    joinColumns = @JoinColumn(name = "component_category_id"))
+    @MapKeyColumn(name = "property_key")
+    @Column(name = "property_value")
+    private Map<String, String> properties = new HashMap<>();
+
+    // Constructors
+    public ComponentCategoryEntity(String code, String displayName) {
+        this.code = code;
+        this.displayName = displayName;
+        this.name = displayName; // NamedEntity requirement
+    }
+
+    public ComponentCategoryEntity(UUID id, String code, String displayName, String description) {
+        super(id, displayName);
+        this.code = code;
+        this.displayName = displayName;
+        this.description = description;
+    }
+
+    // Component type management
+    public void addComponentType(ComponentTypeEntity componentType) {
+        if (componentType != null && !componentTypes.contains(componentType)) {
+            componentTypes.add(componentType);
+            componentType.setCategory(this);
+        }
+    }
+
+    public void removeComponentType(ComponentTypeEntity componentType) {
+        if (componentType != null && componentTypes.contains(componentType)) {
+            componentTypes.remove(componentType);
+            componentType.setCategory(null);
+        }
+    }
+
+    public List<ComponentTypeEntity> getActiveComponentTypes() {
+        return componentTypes.stream()
+                .filter(ComponentTypeEntity::isActive)
+                .sorted(Comparator.comparing(ComponentTypeEntity::getSortOrder)
+                        .thenComparing(ComponentTypeEntity::getDisplayName))
+                .toList();
+    }
+
+    public boolean hasComponentTypes() {
+        return !componentTypes.isEmpty();
+    }
+
+    public boolean hasActiveComponentTypes() {
+        return componentTypes.stream().anyMatch(ComponentTypeEntity::isActive);
+    }
+
+    // Validation methods
+    public boolean canBeDeleted() {
+        return !systemCategory && !hasActiveComponentTypes();
+    }
+
+    public boolean canBeDeactivated() {
+        return !systemCategory && !hasActiveComponentTypes();
+    }
+
+    // Business logic methods
+    public boolean isHousingCategory() {
+        return "housing".equals(code);
+    }
+
+    public boolean isConnectivityCategory() {
+        return "connectivity".equals(code);
+    }
+
+    public boolean isSupportCategory() {
+        return "support".equals(code);
+    }
+
+    public boolean isModuleCategory() {
+        return "module".equals(code);
+    }
+
+    /**
+     * Check if this category can contain components of another category
+     */
+    public boolean canContainCategory(ComponentCategoryEntity otherCategory) {
+        if (!canContainComponents || otherCategory == null) {
+            return false;
+        }
+
+        // Housing can contain connectivity and support equipment
+        if (isHousingCategory()) {
+            return otherCategory.isConnectivityCategory() ||
+                   otherCategory.isSupportCategory() ||
+                   otherCategory.isModuleCategory();
+        }
+
+        // Connectivity equipment can contain modules
+        if (isConnectivityCategory()) {
+            return otherCategory.isModuleCategory();
+        }
+
+        return false;
+    }
+
+    /**
+     * Get typical power consumption category for this category
+     */
+    public String getTypicalPowerConsumption() {
+        return switch (code.toLowerCase()) {
+            case "housing" -> "none";
+            case "connectivity" -> "high";
+            case "support" -> "variable";
+            case "module" -> "medium";
+            default -> "unknown";
+        };
+    }
+
+    // Property management
+    public void addProperty(String key, String value) {
+        properties.put(key, value);
+    }
+
+    public String getProperty(String key) {
+        return properties.get(key);
+    }
+
+    public String getProperty(String key, String defaultValue) {
+        return properties.getOrDefault(key, defaultValue);
+    }
+
+    public boolean hasProperty(String key) {
+        return properties.containsKey(key);
+    }
+
+    /**
+     * Builder pattern for easier construction
+     */
+    public static class Builder {
+        private ComponentCategoryEntity category;
+
+        public Builder(String code, String displayName) {
+            category = new ComponentCategoryEntity(code, displayName);
+        }
+
+        public Builder description(String description) {
+            category.setDescription(description);
+            return this;
+        }
+
+        public Builder colorHex(String colorHex) {
+            category.setColorHex(colorHex);
+            return this;
+        }
+
+        public Builder iconClass(String iconClass) {
+            category.setIconClass(iconClass);
+            return this;
+        }
+
+        public Builder systemCategory(boolean systemCategory) {
+            category.setSystemCategory(systemCategory);
+            return this;
+        }
+
+        public Builder sortOrder(Integer sortOrder) {
+            category.setSortOrder(sortOrder);
+            return this;
+        }
+
+        public Builder requiresPhysicalSpace(boolean requires) {
+            category.setRequiresPhysicalSpace(requires);
+            return this;
+        }
+
+        public Builder canContainComponents(boolean canContain) {
+            category.setCanContainComponents(canContain);
+            return this;
+        }
+
+        public Builder infrastructure(boolean infrastructure) {
+            category.setInfrastructure(infrastructure);
+            return this;
+        }
+
+        public Builder requiresPower(boolean requires) {
+            category.setRequiresPower(requires);
+            return this;
+        }
+
+        public Builder generatesHeat(boolean generates) {
+            category.setGeneratesHeat(generates);
+            return this;
+        }
+
+        public Builder needsCooling(boolean needs) {
+            category.setNeedsCooling(needs);
+            return this;
+        }
+
+        public ComponentCategoryEntity build() {
+            return category;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "ComponentCategoryEntity[" + code + ":" + displayName +
+               " (" + componentTypes.size() + " types)]";
+    }
+}

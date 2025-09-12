@@ -25,6 +25,11 @@ public abstract class NamedEntity extends BaseEntity {
     @NoHtml
     protected String name;
 
+    @Size(max = 512)
+    @Column(name = "description")
+    @NoHtml
+    private String description;
+
     protected NamedEntity(UUID id, String name) {
         super(id);
         this.name = name;
