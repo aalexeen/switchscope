@@ -2,11 +2,12 @@ package net.switchscope;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.util.Assert;
+import java.util.UUID;
 
 public interface HasId {
-    Integer getId();
+    UUID getId();
 
-    void setId(Integer id);
+    void setId(UUID id);
 
     @JsonIgnore
     default boolean isNew() {
@@ -14,8 +15,8 @@ public interface HasId {
     }
 
     // doesn't work for hibernate lazy proxy
-    default int id() {
+    default boolean id() {
         Assert.notNull(getId(), "Entity must has id");
-        return getId();
+        return getId() == null;
     }
 }

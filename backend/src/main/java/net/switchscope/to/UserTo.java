@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
+import java.util.UUID;
+
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class UserTo extends NamedTo implements HasIdAndEmail {
@@ -21,7 +23,7 @@ public class UserTo extends NamedTo implements HasIdAndEmail {
     @Size(min = 5, max = 32)
     String password;
 
-    public UserTo(Integer id, String name, String email, String password) {
+    public UserTo(UUID id, String name, String email, String password) {
         super(id, name);
         this.email = email;
         this.password = password;

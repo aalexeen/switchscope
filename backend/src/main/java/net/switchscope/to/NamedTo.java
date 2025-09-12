@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class NamedTo extends BaseTo {
@@ -14,7 +16,7 @@ public class NamedTo extends BaseTo {
     @NoHtml
     protected String name;
 
-    public NamedTo(Integer id, String name) {
+    public NamedTo(UUID id, String name) {
         super(id);
         this.name = name;
     }
