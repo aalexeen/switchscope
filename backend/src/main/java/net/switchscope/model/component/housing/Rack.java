@@ -6,14 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.Component;
-import net.switchscope.model.component.ComponentType;
 import net.switchscope.model.installation.Installation;
 import net.switchscope.model.location.Location;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -46,12 +42,12 @@ public class Rack extends Component {
     private String coolingType;
 
     // Constructors
-    public Rack(Integer id, String name, Location location) {
+    public Rack(UUID id, String name, Location location) {
         super(id, name);
         setLocation(location);
     }
 
-    public Rack(Integer id, String name, Location location,
+    public Rack(UUID id, String name, Location location,
                 Integer rackUnitsTotal, RackType rackType) {
         super(id, name);
         setLocation(location);
@@ -59,7 +55,7 @@ public class Rack extends Component {
         this.rackType = rackType;
     }
 
-    public Rack(Integer id, String name, String manufacturer, String model,
+    public Rack(UUID id, String name, String manufacturer, String model,
                 Integer rackUnitsTotal, RackType rackType) {
         super(id, name, manufacturer, model, null);
         this.rackUnitsTotal = rackUnitsTotal;
@@ -74,7 +70,7 @@ public class Rack extends Component {
 
     @Override
     public boolean canHoldOtherComponents() {
-        return true;
+        return false;
     }
 
     @Override
@@ -201,8 +197,8 @@ public class Rack extends Component {
     @Override
     public boolean isValidConfiguration() {
         return super.isValidConfiguration() &&
-               rackUnitsTotal != null && rackUnitsTotal > 0 &&
-               rackType != null;
+                rackUnitsTotal != null && rackUnitsTotal > 0 &&
+                rackType != null;
     }
 
     @Override

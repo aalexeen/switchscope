@@ -13,6 +13,7 @@ import net.switchscope.validation.NoHtml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "locations")
@@ -44,15 +45,15 @@ public class Location extends NamedEntity {
     private List<Device> equipment = new ArrayList<>();
 
     // Constructors
-    public Location(Integer id, String name, LocationType type) {
+    public Location(UUID id, String name, LocationType type) {
         this(id, name, type, null, null);
     }
 
-    public Location(Integer id, String name, LocationType type, String address) {
+    public Location(UUID id, String name, LocationType type, String address) {
         this(id, name, type, address, null);
     }
 
-    public Location(Integer id, String name, LocationType type, String address, Location parentLocation) {
+    public Location(UUID id, String name, LocationType type, String address, Location parentLocation) {
         super(id, name);
         this.type = type;
         this.address = address;
