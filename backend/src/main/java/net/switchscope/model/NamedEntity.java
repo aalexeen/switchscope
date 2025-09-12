@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 
 @MappedSuperclass
 @Getter
@@ -23,7 +25,7 @@ public abstract class NamedEntity extends BaseEntity {
     @NoHtml
     protected String name;
 
-    protected NamedEntity(Integer id, String name) {
+    protected NamedEntity(UUID id, String name) {
         super(id);
         this.name = name;
     }
