@@ -23,19 +23,7 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ComponentTypeEntity extends NamedEntity {
-
-    @Column(name = "code", nullable = false)
-    @NotBlank
-    @Size(max = 64)
-    @NoHtml
-    private String code; // SWITCH, RACK, UPS, etc.
-
-    @Column(name = "display_name", nullable = false)
-    @NotBlank
-    @Size(max = 128)
-    @NoHtml
-    private String displayName;
+public class ComponentTypeEntity extends UIStyledEntity {
 
     // FK to ComponentCategoryEntity
     @ManyToOne(fetch = FetchType.EAGER)
@@ -43,28 +31,8 @@ public class ComponentTypeEntity extends NamedEntity {
     @NotNull
     private ComponentCategoryEntity category;
 
-    @Column(name = "description")
-    @Size(max = 500)
-    @NoHtml
-    private String description;
-
-    @Column(name = "is_active", nullable = false)
-    private boolean active = true;
-
-    @Column(name = "sort_order")
-    private Integer sortOrder = 0;
-
     @Column(name = "is_system_type", nullable = false)
     private boolean systemType = false; // Cannot delete system types
-
-    // UI properties
-    @Column(name = "icon_class")
-    @Size(max = 128)
-    private String iconClass; // CSS class for UI icons
-
-    @Column(name = "color_class")
-    @Size(max = 128)
-    private String colorClass; // CSS class for UI colors
 
     // Physical properties
     @Column(name = "requires_rack_space", nullable = false)
@@ -141,18 +109,15 @@ public class ComponentTypeEntity extends NamedEntity {
 
     // Constructors
     public ComponentTypeEntity(String code, String displayName, ComponentCategoryEntity category) {
-        this.code = code;
-        this.displayName = displayName;
+        super(code, displayName);
         this.category = category;
-        this.name = displayName; // NamedEntity requirement
     }
 
-    public ComponentTypeEntity(UUID id, String code, String displayName, ComponentCategoryEntity category) {
-        super(id, displayName);
-        this.code = code;
-        this.displayName = displayName;
+    public ComponentTypeEntity(UUID id, String code, String displayName, ComponentCategoryEntity category, String description) {
+        super(id, code, displayName, description);
         this.category = category;
     }
+
 
     // Category delegation methods
     public boolean isHousingComponent() {
@@ -178,6 +143,10 @@ public class ComponentTypeEntity extends NamedEntity {
 
     public int getTypicalRackUnits() {
         return typicalRackUnits != null ? typicalRackUnits : 0;
+    }
+
+    public String getComponentTypeName() {
+        return code != null ? code : displayName;
     }
 
     // Networking equipment check

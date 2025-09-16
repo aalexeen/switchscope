@@ -1,13 +1,11 @@
 package net.switchscope.model.component;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.switchscope.model.NamedEntity;
 import net.switchscope.validation.NoHtml;
 
 import java.util.HashMap;
@@ -22,38 +20,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ComponentNatureEntity extends NamedEntity {
-
-    @Column(name = "code", unique = true, nullable = false)
-    @Size(max = 64)
-    @NotNull
-    @NoHtml
-    private String code; // Unique identifier (e.g., "ACTIVE", "PASSIVE", "SUPPORT")
-
-    @Column(name = "display_name", nullable = false)
-    @Size(max = 128)
-    @NotNull
-    @NoHtml
-    private String displayName;
-
-    @Column(name = "description")
-    @Size(max = 500)
-    @NoHtml
-    private String description;
-
-    @Column(name = "is_active", nullable = false)
-    private boolean active = true;
-
-    @Column(name = "sort_order")
-    private Integer sortOrder = 0;
-
-    @Column(name = "color_class")
-    @Size(max = 128)
-    private String colorClass = "primary"; // CSS class for UI colors
-
-    @Column(name = "icon_class")
-    @Size(max = 128)
-    private String iconClass; // CSS class for UI icons
+public class ComponentNatureEntity extends UIStyledEntity {
 
     // Business logic flags
     @Column(name = "requires_management", nullable = false)
@@ -85,16 +52,12 @@ public class ComponentNatureEntity extends NamedEntity {
 
     // Constructors
     public ComponentNatureEntity(String code, String displayName) {
-        this.code = code;
-        this.displayName = displayName;
-        this.name = displayName; // NamedEntity requirement
+        super(code, displayName, "primary"); // default color class
     }
 
     public ComponentNatureEntity(UUID id, String code, String displayName, String description) {
-        super(id, displayName);
-        this.code = code;
-        this.displayName = displayName;
-        this.description = description;
+        super(id, code, displayName, description);
+        this.setColorClass("primary"); // default color class
     }
 
     // Business logic methods
@@ -166,6 +129,11 @@ public class ComponentNatureEntity extends NamedEntity {
             return this;
         }
 
+        public Builder iconClass(String iconClass) {
+            nature.setIconClass(iconClass);
+            return this;
+        }
+
         public Builder requiresManagement(boolean requires) {
             nature.setRequiresManagement(requires);
             return this;
@@ -199,10 +167,5 @@ public class ComponentNatureEntity extends NamedEntity {
         public ComponentNatureEntity build() {
             return nature;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "ComponentNatureEntity[" + code + ":" + displayName + "]";
     }
 }

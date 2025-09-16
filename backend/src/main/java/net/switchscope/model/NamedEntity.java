@@ -30,9 +30,10 @@ public abstract class NamedEntity extends BaseEntity {
     @NoHtml
     private String description;
 
-    protected NamedEntity(UUID id, String name) {
+    protected NamedEntity(UUID id, String name, String description) {
         super(id);
         this.name = name;
+        this.description = description;
     }
 
     @Override
