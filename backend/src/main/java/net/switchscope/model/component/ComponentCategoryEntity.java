@@ -22,61 +22,14 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ComponentCategoryEntity extends NamedEntity {
-
-    @Column(name = "code", nullable = false, unique = true)
-    @NotBlank
-    @Size(max = 64)
-    @NoHtml
-    private String code; // housing, connectivity, support, module
-
-    @Column(name = "display_name", nullable = false)
-    @NotBlank
-    @Size(max = 128)
-    @NoHtml
-    private String displayName;
-
-    @Column(name = "description")
-    @Size(max = 500)
-    @NoHtml
-    private String description;
-
-    @Column(name = "is_active", nullable = false)
-    private boolean active = true;
-
-    @Column(name = "sort_order")
-    private Integer sortOrder = 0;
+public class ComponentCategoryEntity extends UIStyledEntity {
 
     @Column(name = "is_system_category", nullable = false)
     private boolean systemCategory = false; // Cannot delete system categories
 
-    // UI properties
-    @Column(name = "color_hex")
-    @Size(max = 7)
-    private String colorHex; // Color for UI: #FF5733
-
-    @Column(name = "icon_class")
-    @Size(max = 128)
-    private String iconClass; // CSS class for UI icons
-
     // Business logic properties
-    @Column(name = "requires_physical_space", nullable = false)
-    private boolean requiresPhysicalSpace = true;
-
-    @Column(name = "can_contain_components", nullable = false)
-    private boolean canContainComponents = false;
-
     @Column(name = "is_infrastructure", nullable = false)
     private boolean infrastructure = false; // Housing/support vs active equipment
-
-    @Column(name = "requires_power", nullable = false)
-    private boolean requiresPower = false;
-
-    @Column(name = "generates_heat", nullable = false)
-    private boolean generatesHeat = false;
-
-    @Column(name = "needs_cooling", nullable = false)
-    private boolean needsCooling = false;
 
     // One-to-many relationship with component types
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -92,17 +45,13 @@ public class ComponentCategoryEntity extends NamedEntity {
 
     // Constructors
     public ComponentCategoryEntity(String code, String displayName) {
-        this.code = code;
-        this.displayName = displayName;
-        this.name = displayName; // NamedEntity requirement
+        super(code, displayName);
     }
 
     public ComponentCategoryEntity(UUID id, String code, String displayName, String description) {
-        super(id, displayName);
-        this.code = code;
-        this.displayName = displayName;
-        this.description = description;
+        super(id, code, displayName, description);
     }
+
 
     // Component type management
     public void addComponentType(ComponentTypeEntity componentType) {

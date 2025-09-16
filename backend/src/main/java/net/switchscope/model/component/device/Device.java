@@ -1,11 +1,14 @@
 package net.switchscope.model.component.device;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import net.switchscope.model.component.Component;
 import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.catalog.SwitchModel;
 import net.switchscope.model.location.Location;
 import net.switchscope.model.port.Port;
 import net.switchscope.validation.NoHtml;
@@ -21,6 +24,10 @@ import java.util.UUID;
 @Entity
 @DiscriminatorValue("DEVICE")
 public abstract class Device extends Component implements HasPorts {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "switch_model_id")
+    private SwitchModel switchModel;
 
     // Device-specific networking fields
     @Column(name = "management_ip")
@@ -96,6 +103,9 @@ public abstract class Device extends Component implements HasPorts {
     @Column(name = "stack_priority")
     private Integer stackPriority;
 
+    @Column(name = "max_stack_members")
+    private Integer maxStackMembers;
+
     // Performance characteristics
     @Column(name = "switching_capacity_gbps")
     private Double switchingCapacityGbps;
@@ -135,6 +145,46 @@ public abstract class Device extends Component implements HasPorts {
 
     @Column(name = "operating_temperature_max")
     private Integer operatingTemperatureMax;
+
+    @Column(name = "vlan_support", nullable = false)
+    private boolean vlanSupport = false;
+
+    @Column(name = "max_vlans")
+    private Integer maxVlans;
+
+    @Column(name = "spanning_tree_support", nullable = false)
+    private boolean spanningTreeSupport = false;
+
+    @Column(name = "qos_support", nullable = false)
+    private boolean qosSupport = false;
+
+    @Column(name = "port_mirroring", nullable = false)
+    private boolean portMirroring = false;
+
+    @Column(name = "link_aggregation", nullable = false)
+    private boolean linkAggregation = false;
+
+    // VLAN configuration
+    @Column(name = "native_vlan")
+    @Min(1) @Max(4094)
+    private Integer nativeVlan = 1;
+
+    @Column(name = "voice_vlan")
+    @Min(1) @Max(4094)
+    private Integer voiceVlan;
+
+    @Column(name = "packet_buffer_size_mb")
+    private Double packetBufferSizeMb;
+
+    // Switch-specific monitoring
+    @Column(name = "cpu_utilization_percent")
+    private Integer cpuUtilizationPercent;
+
+    @Column(name = "memory_utilization_percent")
+    private Integer memoryUtilizationPercent;
+
+    @Column(name = "temperature_celsius")
+    private Integer temperatureCelsius;
 
     // Relationships
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -275,6 +325,26 @@ public abstract class Device extends Component implements HasPorts {
     // Performance validation
     public boolean hasPerformanceSpecs() {
         return switchingCapacityGbps != null || forwardingRateMpps != null;
+    }
+
+    public boolean isSwitch() {
+        return componentType.getComponentTypeName() != null && "SWITCH".equals(componentType.getComponentTypeName());
+    }
+
+    public boolean isRouter() {
+        return componentType != null && "ROUTER".equals(componentType.getCode());
+    }
+
+    public boolean supportsVlans() {
+        return isSwitch() && Boolean.TRUE.equals(vlanSupport);
+    }
+
+    public String getEffectiveManufacturer() {
+        return switchModel != null ? switchModel.getManufacturer() : manufacturer;
+    }
+
+    public String getEffectiveModel() {
+        return switchModel != null ? switchModel.getModelNumber() : model;
     }
 
     // Enhanced validation
