@@ -1,4 +1,4 @@
-package net.switchscope.model.component.catalog;
+package net.switchscope.model.component.catalog.connectiviy;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.catalog.ComponentModel;
 import net.switchscope.validation.NoHtml;
 
 /**

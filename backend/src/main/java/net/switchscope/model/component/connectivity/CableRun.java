@@ -7,15 +7,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.Component;
-import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.model.component.ComponentTypeEntity;
-import net.switchscope.model.component.catalog.CableRunModel;
+import net.switchscope.model.component.catalog.connectiviy.CableRunModel;
 import net.switchscope.model.installation.InstallableType;
 import net.switchscope.model.location.Location;
 import net.switchscope.validation.NoHtml;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Cable Run entity - represents a specific cable installation between locations
@@ -103,7 +103,8 @@ public class CableRun extends Component {
         joinColumns = @JoinColumn(name = "cable_run_id"),
         inverseJoinColumns = @JoinColumn(name = "location_id")
     )
-    private Set<Location> locations = new HashSet<>();
+    @OrderColumn(name = "location_order") // Важно для сохранения порядка
+    private List<Location> locations = new ArrayList<>();
 
     // Start and end locations (most common case)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -139,11 +140,6 @@ public class CableRun extends Component {
     }
 
     @Override
-    public InstallableType getInstallableType() {
-        return InstallableType.CONNECTIVITY_COMPONENT;
-    }
-
-    @Override
     public Map<String, String> getSpecifications() {
         Map<String, String> specs = new HashMap<>();
 
@@ -161,8 +157,18 @@ public class CableRun extends Component {
 
     // Business methods
     public void addLocation(Location location) {
-        if (location != null) {
+        if (location != null && !locations.contains(location)) {
             locations.add(location);
+        }
+    }
+
+    public void addLocationAtPosition(Location location, int position) {
+        if (location != null && !locations.contains(location)) {
+            if (position >= 0 && position <= locations.size()) {
+                locations.add(position, location);
+            } else {
+                locations.add(location);
+            }
         }
     }
 
@@ -170,6 +176,50 @@ public class CableRun extends Component {
         if (location != null) {
             locations.remove(location);
         }
+    }
+
+    public Location getFirstLocation() {
+        return locations.isEmpty() ? null : locations.get(0);
+    }
+
+    public Location getLastLocation() {
+        return locations.isEmpty() ? null : locations.get(locations.size() - 1);
+    }
+
+    public List<Location> getLocationPath() {
+        return new ArrayList<>(locations); // Возвращаем копию для безопасности
+    }
+
+    public String getOrderedLocationPath() {
+        if (locations.isEmpty()) {
+            return "No locations defined";
+        }
+
+        if (locations.size() == 2) {
+            return locations.get(0).getName() + " → " + locations.get(1).getName();
+        }
+
+        return locations.stream()
+                .map(Location::getName)
+                .collect(Collectors.joining(" → "));
+    }
+
+    public boolean isPointToPoint() {
+        return locations.size() == 2;
+    }
+
+    public boolean isMultiPoint() {
+        return locations.size() > 2;
+    }
+
+    public boolean isValidCablePath() {
+        if (locations.size() < 2) {
+            return false; // Кабель должен соединять минимум 2 локации
+        }
+
+        // Проверка на дубликаты локаций в пути
+        Set<Location> uniqueLocations = new HashSet<>(locations);
+        return uniqueLocations.size() == locations.size();
     }
 
     public void addConnector(Connector connector) {
@@ -184,14 +234,6 @@ public class CableRun extends Component {
             connectors.remove(connector);
             connector.setCableRun(null);
         }
-    }
-
-    public boolean isPointToPoint() {
-        return startLocation != null && endLocation != null && locations.size() == 2;
-    }
-
-    public boolean isMultiPoint() {
-        return locations.size() > 2;
     }
 
     public boolean isPassed() {
@@ -213,15 +255,6 @@ public class CableRun extends Component {
 
     public String getEffectiveCableType() {
         return cableModel != null ? cableModel.getCableType() : cableType;
-    }
-
-    public String getLocationPath() {
-        if (isPointToPoint()) {
-            return startLocation.getName() + " → " + endLocation.getName();
-        } else if (!locations.isEmpty()) {
-            return locations.size() + " locations";
-        }
-        return "No locations defined";
     }
 
     @Override

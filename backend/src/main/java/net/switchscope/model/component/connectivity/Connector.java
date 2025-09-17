@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.Component;
 import net.switchscope.model.component.ComponentTypeEntity;
-import net.switchscope.model.component.catalog.ConnectorModel;
+import net.switchscope.model.component.catalog.connectiviy.ConnectorModel;
 import net.switchscope.model.installation.InstallableType;
 import net.switchscope.validation.NoHtml;
 
@@ -92,11 +92,6 @@ public class Connector extends Component {
     @Override
     public boolean isInstallable() {
         return false; // Connectors are part of cable runs, not independently installable
-    }
-
-    @Override
-    public InstallableType getInstallableType() {
-        return InstallableType.CONNECTIVITY_COMPONENT;
     }
 
     @Override
