@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.HasPortsImpl;
 import net.switchscope.validation.NoHtml;
 
 import java.util.*;
@@ -19,7 +20,7 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AccessPoint extends Device {
+public class AccessPoint extends HasPortsImpl {
 
     // WiFi capabilities
     @Column(name = "wifi_standard")
@@ -100,11 +101,6 @@ public class AccessPoint extends Device {
     }
 
     @Override
-    public boolean hasPorts() {
-        return false; // APs typically don't have multiple switchable ports
-    }
-
-    @Override
     public Map<String, String> getSpecifications() {
         Map<String, String> specs = new HashMap<>();
 
@@ -140,6 +136,17 @@ public class AccessPoint extends Device {
 
     public void removeSsid(String ssid) {
         ssids.remove(ssid);
+    }
+
+    // Helper method to convert Mbps to Gbps for consistency
+    public void setMaxThroughputMbps(Integer maxThroughputMbps) {
+        if (maxThroughputMbps != null) {
+            this.maxThroughputGbps = maxThroughputMbps / 1000.0;
+        }
+    }
+
+    public Integer getMaxThroughputMbps() {
+        return maxThroughputGbps != null ? (int)(maxThroughputGbps * 1000) : null;
     }
 
     @Override

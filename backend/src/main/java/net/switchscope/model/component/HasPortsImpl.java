@@ -1,8 +1,7 @@
-package net.switchscope.model.component.device;
+package net.switchscope.model.component;
 
 import jakarta.persistence.*;
-import net.switchscope.model.component.ComponentStatusEntity;
-import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.device.Device;
 import net.switchscope.model.location.Location;
 import net.switchscope.model.port.Port;
 
@@ -95,7 +94,7 @@ public abstract class HasPortsImpl extends Device implements HasPorts {
     // Device abstract method implementation
     @Override
     public boolean hasPorts() {
-        return true;
+        return getPortCount() > 0; // Динамическая проверка вместо статического true
     }
 
     // Common getters and setters

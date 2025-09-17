@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.HasPortsImpl;
 import net.switchscope.model.component.catalog.SwitchModel;
 import net.switchscope.model.location.Location;
 import net.switchscope.model.port.Port;
