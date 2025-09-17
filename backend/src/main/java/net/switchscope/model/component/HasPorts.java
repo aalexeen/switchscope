@@ -1,4 +1,4 @@
-package net.switchscope.model.component.device;
+package net.switchscope.model.component;
 
 import net.switchscope.model.port.Port;
 import java.util.List;
