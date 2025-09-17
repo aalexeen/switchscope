@@ -1,4 +1,4 @@
-package net.switchscope.model.component;
+package net.switchscope.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -8,7 +8,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.switchscope.model.NamedEntity;
 import net.switchscope.validation.NoHtml;
 
 import java.util.UUID;
@@ -46,8 +45,21 @@ public abstract class BaseCodedEntity extends NamedEntity {
         this.name = displayName; // NamedEntity requirement
     }
 
+    protected BaseCodedEntity(String code, String name, String displayName) {
+        super(null, name, null); // NamedEntity(UUID, name, description)
+        this.code = code;
+        this.displayName = displayName;
+    }
+
+
     protected BaseCodedEntity(UUID id, String code, String displayName, String description) {
         super(id, displayName, description);
+        this.code = code;
+        this.displayName = displayName;
+    }
+
+    protected BaseCodedEntity(String code, String name, String displayName, String description) {
+        super(null, name, description); // NamedEntity(UUID, name, description)
         this.code = code;
         this.displayName = displayName;
     }

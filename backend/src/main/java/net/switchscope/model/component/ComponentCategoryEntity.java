@@ -1,15 +1,11 @@
 package net.switchscope.model.component;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.switchscope.model.NamedEntity;
-import net.switchscope.validation.NoHtml;
+import net.switchscope.model.UIStyledEntity;
 
 import java.util.*;
 

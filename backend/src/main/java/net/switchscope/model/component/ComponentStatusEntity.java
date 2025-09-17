@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.switchscope.model.UIStyledEntity;
 import net.switchscope.validation.NoHtml;
 
 import java.util.*;

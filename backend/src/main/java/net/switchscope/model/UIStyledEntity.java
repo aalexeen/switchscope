@@ -1,4 +1,4 @@
-package net.switchscope.model.component;
+package net.switchscope.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
