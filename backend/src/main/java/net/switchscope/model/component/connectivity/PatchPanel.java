@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.model.component.ComponentTypeEntity;
-import net.switchscope.model.component.catalog.PatchPanelModel;
+import net.switchscope.model.component.catalog.connectiviy.PatchPanelModel;
 import net.switchscope.model.component.HasPortsImpl;
 import net.switchscope.model.installation.InstallableType;
 import net.switchscope.model.location.Location;
@@ -123,12 +123,6 @@ public class PatchPanel extends HasPortsImpl {
                      String serialNumber, ComponentStatusEntity status, Location location,
                      ComponentTypeEntity componentType) {
         super(id, name, manufacturer, model, serialNumber, status, location, componentType);
-    }
-
-    // Component abstract methods implementation
-    @Override
-    public InstallableType getInstallableType() {
-        return InstallableType.CONNECTIVITY_COMPONENT;
     }
 
     // Device abstract methods implementation

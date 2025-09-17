@@ -1,4 +1,4 @@
-package net.switchscope.model.component.catalog;
+package net.switchscope.model.component.catalog.device;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
