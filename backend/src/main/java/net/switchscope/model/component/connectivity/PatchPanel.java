@@ -10,7 +10,6 @@ import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.model.component.catalog.connectiviy.PatchPanelModel;
 import net.switchscope.model.component.HasPortsImpl;
-import net.switchscope.model.installation.InstallableType;
 import net.switchscope.model.location.Location;
 import net.switchscope.validation.NoHtml;
 

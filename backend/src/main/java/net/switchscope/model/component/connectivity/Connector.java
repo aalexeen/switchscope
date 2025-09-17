@@ -9,7 +9,6 @@ import lombok.Setter;
 import net.switchscope.model.component.Component;
 import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.model.component.catalog.connectiviy.ConnectorModel;
-import net.switchscope.model.installation.InstallableType;
 import net.switchscope.validation.NoHtml;
 
 import java.util.HashMap;
