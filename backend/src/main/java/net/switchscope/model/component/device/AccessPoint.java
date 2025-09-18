@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.ComponentTypeEntity;
-import net.switchscope.model.component.HasPortsImpl;
 import net.switchscope.validation.NoHtml;
 
 import java.util.*;

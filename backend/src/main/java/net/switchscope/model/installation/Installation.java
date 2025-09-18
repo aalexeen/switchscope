@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "installations_catalog")
+@Table(name = "installations")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
