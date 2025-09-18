@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  * Cable Run Model Catalog Entry - represents a specific cable type and specifications
  */
 @Entity
-@Table(name = "cable_run_models",
+@Table(name = "cable_run_models_catalog",
        uniqueConstraints = @UniqueConstraint(columnNames = {"manufacturer", "model_number"}))
 @Getter
 @Setter

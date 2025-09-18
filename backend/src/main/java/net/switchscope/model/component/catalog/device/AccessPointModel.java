@@ -16,7 +16,7 @@ import java.util.*;
  * Access Point Model Catalog Entry - represents a specific wireless access point model
  */
 @Entity
-@Table(name = "access_point_models",
+@Table(name = "access_point_models_catalog",
        uniqueConstraints = @UniqueConstraint(columnNames = {"manufacturer", "model_number"}))
 @Getter
 @Setter
