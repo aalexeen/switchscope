@@ -1,7 +1,9 @@
-package net.switchscope.model.component;
+package net.switchscope.model.component.device;
 
 import jakarta.persistence.*;
-import net.switchscope.model.component.device.Device;
+import net.switchscope.model.component.ComponentStatusEntity;
+import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.HasPorts;
 import net.switchscope.model.location.Location;
 import net.switchscope.model.port.Port;
 
@@ -95,15 +97,6 @@ public abstract class HasPortsImpl extends Device implements HasPorts {
     @Override
     public boolean hasPorts() {
         return getPortCount() > 0; // Динамическая проверка вместо статического true
-    }
-
-    // Common getters and setters
-    public Double getMaxThroughputGbps() {
-        return maxThroughputGbps;
-    }
-
-    public void setMaxThroughputGbps(Double maxThroughputGbps) {
-        this.maxThroughputGbps = maxThroughputGbps;
     }
 
     protected void setPorts(List<Port> ports) {
