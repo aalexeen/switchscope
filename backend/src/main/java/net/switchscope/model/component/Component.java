@@ -78,10 +78,6 @@ public abstract class Component extends NamedEntity {
     private LocalDateTime nextMaintenanceDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
-    private Location location;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "installation_id")
     private Installation installation;
 
@@ -94,13 +90,13 @@ public abstract class Component extends NamedEntity {
 
     // Constructors
     protected Component(UUID id, String name, ComponentTypeEntity componentType) {
-        super(id, name);
+        super(id, name, null);
         this.componentType = componentType;
     }
 
     protected Component(UUID id, String name, String manufacturer, String model,
                        String serialNumber, ComponentTypeEntity componentType) {
-        super(id, name);
+        super(id, name, null);
         this.manufacturer = manufacturer;
         this.model = model;
         this.serialNumber = serialNumber;
@@ -108,16 +104,16 @@ public abstract class Component extends NamedEntity {
     }
 
     protected Component(UUID id, String name, String manufacturer, String model,
-                       String serialNumber, ComponentStatusEntity status, Location location,
+                       String serialNumber, ComponentStatusEntity status,
                        ComponentTypeEntity componentType) {
-        super(id, name);
+        super(id, name, null);
         this.manufacturer = manufacturer;
         this.model = model;
         this.serialNumber = serialNumber;
         this.status = status;
-        this.location = location;
         this.componentType = componentType;
     }
+
 
     // Component relationships
     public void addChildComponent(Component child) {
@@ -391,6 +387,28 @@ public abstract class Component extends NamedEntity {
         DiscriminatorValue discriminator = this.getClass().getAnnotation(DiscriminatorValue.class);
         return discriminator != null ? discriminator.value() : this.getClass().getSimpleName();
     }
+
+    // Location access through Installation
+    @Transient
+    public Location getLocation() {
+        return installation != null ? installation.getLocation() : null;
+    }
+
+    @Transient
+    public boolean isInstalled() {
+        return installation != null && installation.isCurrentlyInstalled();
+    }
+
+    @Transient
+    public String getLocationPath() {
+        return installation != null ? installation.getInstallationLocationPath() : "Not installed";
+    }
+
+    @Transient
+    public boolean hasLocationBackupPower() {
+        return installation != null && installation.hasLocationBackupPower();
+    }
+
 
     @Override
     public String toString() {

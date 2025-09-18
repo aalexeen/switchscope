@@ -16,7 +16,7 @@ import java.util.*;
  * Switch Model Catalog Entry - represents a specific switch model from a manufacturer
  */
 @Entity
-@Table(name = "switch_models",
+@Table(name = "switch_models_catalog",
        uniqueConstraints = @UniqueConstraint(columnNames = {"manufacturer", "model_number"}))
 @Getter
 @Setter

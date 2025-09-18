@@ -19,7 +19,7 @@ import java.util.UUID;
  * Contains common attributes shared by all equipment models
  */
 @Entity
-@Table(name = "component_models")
+@Table(name = "component_models_catalog")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "model_class", discriminatorType = DiscriminatorType.STRING)
 @Getter

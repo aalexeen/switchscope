@@ -14,7 +14,7 @@ import net.switchscope.validation.NoHtml;
  * Patch Panel Model Catalog Entry - represents a specific patch panel model
  */
 @Entity
-@Table(name = "patch_panel_models",
+@Table(name = "patch_panel_models_catalog",
        uniqueConstraints = @UniqueConstraint(columnNames = {"manufacturer", "model_number"}))
 @Getter
 @Setter

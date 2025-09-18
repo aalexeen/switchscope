@@ -16,7 +16,7 @@ import java.util.*;
  * Router Model Catalog Entry - represents a specific router model from a manufacturer
  */
 @Entity
-@Table(name = "router_models",
+@Table(name = "router_models_catalog",
        uniqueConstraints = @UniqueConstraint(columnNames = {"manufacturer", "model_number"}))
 @Getter
 @Setter

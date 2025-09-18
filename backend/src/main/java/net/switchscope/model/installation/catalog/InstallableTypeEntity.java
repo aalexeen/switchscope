@@ -14,7 +14,7 @@ import net.switchscope.validation.NoHtml;
  * Dynamic catalog entity for installable component types
  */
 @Entity
-@Table(name = "installable_types",
+@Table(name = "installable_types_catalog",
        uniqueConstraints = @UniqueConstraint(columnNames = {"code"}))
 @Getter
 @Setter

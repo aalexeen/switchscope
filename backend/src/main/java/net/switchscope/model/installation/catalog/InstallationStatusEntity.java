@@ -15,7 +15,7 @@ import java.util.*;
  * Dynamic catalog entity for installation statuses
  */
 @Entity
-@Table(name = "installation_statuses",
+@Table(name = "installation_statuses_catalog",
        uniqueConstraints = @UniqueConstraint(columnNames = {"code"}))
 @Getter
 @Setter
