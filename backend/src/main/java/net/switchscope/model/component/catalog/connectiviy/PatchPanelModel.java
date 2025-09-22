@@ -1,5 +1,6 @@
 package net.switchscope.model.component.catalog.connectiviy;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
@@ -14,8 +15,7 @@ import net.switchscope.validation.NoHtml;
  * Patch Panel Model Catalog Entry - represents a specific patch panel model
  */
 @Entity
-@Table(name = "patch_panel_models_catalog",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"manufacturer", "model_number"}))
+@DiscriminatorValue("PATCH_PANEL_MODEL")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

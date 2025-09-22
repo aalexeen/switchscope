@@ -9,6 +9,7 @@ import lombok.Setter;
 import net.switchscope.model.component.Component;
 import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.model.component.catalog.connectiviy.ConnectorModel;
+import net.switchscope.model.port.Port;
 import net.switchscope.validation.NoHtml;
 
 import java.util.HashMap;
@@ -72,6 +73,10 @@ public class Connector extends Component {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cable_run_id", nullable = false)
     private CableRun cableRun;
+
+    // OneToOne relationship with Port (nullable, mappedBy indicates the owning side is Port)
+    @OneToOne(mappedBy = "connector", fetch = FetchType.LAZY)
+    private Port port;
 
     // Constructors
     public Connector(UUID id, String name, ComponentTypeEntity componentType,
