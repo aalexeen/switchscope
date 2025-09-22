@@ -14,8 +14,7 @@ import net.switchscope.validation.NoHtml;
  * Connector Model Catalog Entry - represents a specific connector type
  */
 @Entity
-@Table(name = "connector_models_catalog",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"manufacturer", "model_number"}))
+@DiscriminatorValue("CONNECTOR_MODEL")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
