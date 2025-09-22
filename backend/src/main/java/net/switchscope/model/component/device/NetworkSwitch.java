@@ -109,9 +109,9 @@ public class NetworkSwitch extends HasPortsImpl {
     }
 
     public NetworkSwitch(UUID id, String name, String manufacturer, String model,
-            String serialNumber, ComponentStatusEntity status, Location location,
+            String serialNumber, ComponentStatusEntity status,
             ComponentTypeEntity componentType) {
-        super(id, name, manufacturer, model, serialNumber, status, location, componentType);
+        super(id, name, manufacturer, model, serialNumber, status, componentType);
     }
 
     // Device abstract method implementations
@@ -152,14 +152,14 @@ public class NetworkSwitch extends HasPortsImpl {
         return supportsPoe && poeBudgetWatts != null && poeBudgetWatts > 0;
     }
 
-    public int getAvailablePoeBudget() {
+    public double getAvailablePoeBudget() {
         if (!hasPoeCapability()) {
             return 0;
         }
 
-        int usedPower = ports.stream()
-                             .filter(Port::isPoeEnabled)
-                             .mapToInt(Port::getPoeConsumptionWatts)
+        double usedPower = ports.stream()
+                             .filter(Port::isPoeCapable)
+                             .mapToDouble(Port::getPoePowerWatts)
                              .sum();
 
         return Math.max(0, poeBudgetWatts - usedPower);

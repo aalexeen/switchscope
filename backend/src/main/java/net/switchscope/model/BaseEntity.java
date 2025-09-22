@@ -37,6 +37,10 @@ public abstract class BaseEntity implements HasId {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     protected OffsetDateTime updatedAt;
 
+    protected BaseEntity(UUID id) {
+        this.id = id;
+    }
+
     //    https://stackoverflow.com/questions/1638723
     @Override
     public boolean equals(Object o) {

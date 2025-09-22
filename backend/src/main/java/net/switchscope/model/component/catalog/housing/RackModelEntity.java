@@ -141,6 +141,10 @@ public class RackModelEntity extends ComponentModel {
         return maxPowerCapacityWatts == null || powerWatts <= maxPowerCapacityWatts;
     }
 
+    public boolean isCoolingTypeAvailable(String coolingType) {
+        return this.coolingType.equals(coolingType);
+    }
+
     // Category helpers
     public String getRackCategory() {
         if (wallMountable && !floorStanding) return "WALL_MOUNT";

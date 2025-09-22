@@ -36,6 +36,10 @@ public abstract class NamedEntity extends BaseEntity {
         this.description = description;
     }
 
+    public NamedEntity(UUID id, String name) {
+        this(id, name, null);
+    }
+
     @Override
     public String toString() {
         return super.toString() + '[' + name + ']';

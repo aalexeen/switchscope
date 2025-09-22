@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.switchscope.model.UIStyledEntity;
 
 import java.util.*;
 
@@ -91,28 +90,25 @@ public class ComponentCategoryEntity extends UIStyledEntity {
 
     // Business logic methods
     public boolean isHousingCategory() {
-        return "housing".equals(code);
+        return "housing".equals(getCode());
     }
 
     public boolean isConnectivityCategory() {
-        return "connectivity".equals(code);
+        return "connectivity".equals(getCode());
     }
 
     public boolean isSupportCategory() {
-        return "support".equals(code);
+        return "support".equals(getCode());
     }
 
     public boolean isModuleCategory() {
-        return "module".equals(code);
+        return "module".equals(getCode());
     }
 
     /**
      * Check if this category can contain components of another category
      */
     public boolean canContainCategory(ComponentCategoryEntity otherCategory) {
-        if (!canContainComponents || otherCategory == null) {
-            return false;
-        }
 
         // Housing can contain connectivity and support equipment
         if (isHousingCategory()) {
@@ -133,7 +129,7 @@ public class ComponentCategoryEntity extends UIStyledEntity {
      * Get typical power consumption category for this category
      */
     public String getTypicalPowerConsumption() {
-        return switch (code.toLowerCase()) {
+        return switch (getCode().toLowerCase()) {
             case "housing" -> "none";
             case "connectivity" -> "high";
             case "support" -> "variable";
@@ -174,8 +170,8 @@ public class ComponentCategoryEntity extends UIStyledEntity {
             return this;
         }
 
-        public Builder colorHex(String colorHex) {
-            category.setColorHex(colorHex);
+        public Builder colorClass(String colorClass) {
+            category.setColorClass(colorClass);
             return this;
         }
 
@@ -194,33 +190,8 @@ public class ComponentCategoryEntity extends UIStyledEntity {
             return this;
         }
 
-        public Builder requiresPhysicalSpace(boolean requires) {
-            category.setRequiresPhysicalSpace(requires);
-            return this;
-        }
-
-        public Builder canContainComponents(boolean canContain) {
-            category.setCanContainComponents(canContain);
-            return this;
-        }
-
         public Builder infrastructure(boolean infrastructure) {
             category.setInfrastructure(infrastructure);
-            return this;
-        }
-
-        public Builder requiresPower(boolean requires) {
-            category.setRequiresPower(requires);
-            return this;
-        }
-
-        public Builder generatesHeat(boolean generates) {
-            category.setGeneratesHeat(generates);
-            return this;
-        }
-
-        public Builder needsCooling(boolean needs) {
-            category.setNeedsCooling(needs);
             return this;
         }
 
@@ -231,7 +202,7 @@ public class ComponentCategoryEntity extends UIStyledEntity {
 
     @Override
     public String toString() {
-        return "ComponentCategoryEntity[" + code + ":" + displayName +
+        return "ComponentCategoryEntity[" + getCode() + ":" + getDisplayName() +
                " (" + componentTypes.size() + " types)]";
     }
 }

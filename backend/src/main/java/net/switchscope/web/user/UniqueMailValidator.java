@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 
+import java.util.UUID;
+
 @Component
 @AllArgsConstructor
 public class UniqueMailValidator implements org.springframework.validation.Validator {
@@ -30,10 +32,10 @@ public class UniqueMailValidator implements org.springframework.validation.Valid
             repository.findByEmailIgnoreCase(user.getEmail())
                     .ifPresent(dbUser -> {
                         if (request.getMethod().equals("PUT")) {  // UPDATE
-                            int dbId = dbUser.id();
+                            UUID dbId = dbUser.getId();
 
                             // it is ok, if update ourselves
-                            if (user.getId() != null && dbId == user.id()) return;
+                            if (user.getId() != null && dbId == user.getId()) return;
 
                             // Workaround for update with user.id=null in request body
                             // ValidationUtil.assureIdConsistent called after this validation

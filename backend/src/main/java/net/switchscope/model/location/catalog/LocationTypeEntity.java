@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.switchscope.model.BaseCodedEntity;
+import net.switchscope.model.component.BaseCodedEntity;
 import net.switchscope.validation.NoHtml;
 
 import java.util.HashSet;

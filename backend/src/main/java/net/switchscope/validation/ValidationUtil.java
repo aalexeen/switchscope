@@ -4,6 +4,8 @@ import net.switchscope.error.IllegalRequestDataException;
 import lombok.experimental.UtilityClass;
 import net.switchscope.HasId;
 
+import java.util.UUID;
+
 
 @UtilityClass
 public class ValidationUtil {
@@ -15,10 +17,10 @@ public class ValidationUtil {
     }
 
     //  Conservative when you reply, but accept liberally (http://stackoverflow.com/a/32728226/548473)
-    public static void assureIdConsistent(HasId bean, int id) {
+    public static void assureIdConsistent(HasId bean, UUID id) {
         if (bean.isNew()) {
             bean.setId(id);
-        } else if (bean.id() != id) {
+        } else if (bean.getId() != id) {
             throw new IllegalRequestDataException(bean.getClass().getSimpleName() + " must has id=" + id);
         }
     }

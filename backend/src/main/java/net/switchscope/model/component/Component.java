@@ -400,7 +400,7 @@ public abstract class Component extends NamedEntity {
     }
 
     @Transient
-    public String getLocationPath() {
+    public String getLocationAddress() {
         return installation != null ? installation.getInstallationLocationPath() : "Not installed";
     }
 

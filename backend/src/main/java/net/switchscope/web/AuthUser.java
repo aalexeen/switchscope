@@ -5,6 +5,8 @@ import net.switchscope.model.User;
 import lombok.Getter;
 import org.springframework.lang.NonNull;
 
+import java.util.UUID;
+
 @Getter
 public class AuthUser extends org.springframework.security.core.userdetails.User {
 
@@ -15,8 +17,8 @@ public class AuthUser extends org.springframework.security.core.userdetails.User
         this.user = user;
     }
 
-    public int id() {
-        return user.id();
+    public UUID id() {
+        return user.getId();
     }
 
     public boolean hasRole(Role role) {

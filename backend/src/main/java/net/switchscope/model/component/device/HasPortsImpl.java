@@ -36,14 +36,14 @@ public abstract class HasPortsImpl extends Device implements HasPorts {
     }
 
     protected HasPortsImpl(UUID id, String name, String manufacturer, String model,
-                          String serialNumber, ComponentTypeEntity componentType) {
+            String serialNumber, ComponentTypeEntity componentType) {
         super(id, name, manufacturer, model, serialNumber, componentType);
     }
 
     protected HasPortsImpl(UUID id, String name, String manufacturer, String model,
-                          String serialNumber, ComponentStatusEntity status, Location location,
-                          ComponentTypeEntity componentType) {
-        super(id, name, manufacturer, model, serialNumber, status, location, componentType);
+            String serialNumber, ComponentStatusEntity status,
+            ComponentTypeEntity componentType) {
+        super(id, name, manufacturer, model, serialNumber, status, componentType);
     }
 
     // HasPorts interface implementation (common for all port-enabled devices)
@@ -71,25 +71,25 @@ public abstract class HasPortsImpl extends Device implements HasPorts {
     @Override
     public Port getPortByNumber(int portNumber) {
         return ports.stream()
-                .filter(port -> port.getPortNumber() == portNumber)
-                .findFirst()
-                .orElse(null);
+                    .filter(port -> port.getPortNumber() == portNumber)
+                    .findFirst()
+                    .orElse(null);
     }
 
     @Override
     public List<Port> getAvailablePorts() {
         return ports.stream()
-                .filter(Port::isAvailable)
-                .toList();
+                    .filter(Port::isAvailable)
+                    .toList();
     }
 
     @Override
-    public int getPortCount() {
+    public Integer getPortCount() {
         return ports.size();
     }
 
     @Override
-    public int getAvailablePortCount() {
+    public Integer getAvailablePortCount() {
         return (int) ports.stream().filter(Port::isAvailable).count();
     }
 

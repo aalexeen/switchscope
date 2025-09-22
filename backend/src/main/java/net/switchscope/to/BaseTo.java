@@ -23,6 +23,9 @@ public abstract class BaseTo implements HasId {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     protected OffsetDateTime updatedAt;
 
+    public BaseTo(UUID id) {
+        this.id = id;
+    }
 
     @Override
     public String toString() {

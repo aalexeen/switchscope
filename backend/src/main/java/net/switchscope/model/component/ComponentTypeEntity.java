@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.switchscope.model.UIStyledEntity;
 
 import java.util.*;
 
@@ -143,13 +142,13 @@ public class ComponentTypeEntity extends UIStyledEntity {
     }
 
     public String getComponentTypeName() {
-        return code != null ? code : displayName;
+        return getCode() != null ? getCode() : getDisplayName();
     }
 
     // Networking equipment check
     public boolean isNetworkingEquipment() {
         return isConnectivityComponent() &&
-               ("SWITCH".equals(code) || "ROUTER".equals(code) || "PATCH_PANEL".equals(code));
+               ("SWITCH".equals(getCode()) || "ROUTER".equals(getCode()) || "PATCH_PANEL".equals(getCode()));
     }
 
     // Containment logic
@@ -195,12 +194,12 @@ public class ComponentTypeEntity extends UIStyledEntity {
 
     // Validation
     public boolean canBeDeleted() {
-        return !systemType && active;
+        return !systemType && isActive();
     }
 
     public boolean isValidConfiguration() {
-        boolean basicValid = code != null && !code.trim().isEmpty() &&
-                           displayName != null && !displayName.trim().isEmpty() &&
+        boolean basicValid = getCode() != null && !getCode().trim().isEmpty() &&
+                           getDisplayName() != null && !getDisplayName().trim().isEmpty() &&
                            category != null;
 
         if (!basicValid) {
@@ -373,7 +372,7 @@ public class ComponentTypeEntity extends UIStyledEntity {
 
     @Override
     public String toString() {
-        return "ComponentTypeEntity[" + code + ":" + displayName +
+        return "ComponentTypeEntity[" + getCode() + ":" + getDisplayName() +
                " (" + (category != null ? category.getCode() : "no-category") + ")]";
     }
 }
