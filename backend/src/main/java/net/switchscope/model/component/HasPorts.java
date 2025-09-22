@@ -43,13 +43,13 @@ public interface HasPorts {
      * Get total number of ports
      * @return port count
      */
-    int getPortCount();
+    Integer getPortCount();
 
     /**
      * Get number of available ports
      * @return available port count
      */
-    int getAvailablePortCount();
+    Integer getAvailablePortCount();
 
     /**
      * Check if component has any ports

@@ -49,8 +49,8 @@ public class CableRun extends Component {
     private String cableCategory;
 
     // Installation details
-    @Column(name = "installation_date")
-    private LocalDate installationDate;
+    /*@Column(name = "installation_date")
+    private LocalDate installationDate;*/
 
     @Column(name = "installation_method")
     @Size(max = 64)

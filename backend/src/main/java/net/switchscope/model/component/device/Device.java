@@ -5,6 +5,8 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 import net.switchscope.model.component.Component;
 import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.model.component.ComponentTypeEntity;
@@ -20,6 +22,8 @@ import java.util.UUID;
  */
 @Entity
 @DiscriminatorValue("DEVICE")
+@Getter
+@Setter
 public abstract class Device extends Component {
 
     // Basic network management (common for all devices)
@@ -132,9 +136,9 @@ public abstract class Device extends Component {
     }
 
     protected Device(UUID id, String name, String manufacturer, String model,
-            String serialNumber, ComponentStatusEntity status, Location location,
+            String serialNumber, ComponentStatusEntity status,
             ComponentTypeEntity componentType) {
-        super(id, name, manufacturer, model, serialNumber, status, location, componentType);
+        super(id, name, manufacturer, model, serialNumber, status, componentType);
     }
 
     // Implementation of Component abstract methods

@@ -31,9 +31,9 @@ public class PatchPanel extends HasPortsImpl {
     private PatchPanelModel patchPanelModel;
 
     // Panel specifications
-    @Column(name = "port_count")
+    /*@Column(name = "port_count")
     @Min(1) @Max(144)
-    private Integer portCount;
+    private Integer portCount;*/
 
     @Column(name = "panel_type")
     @Size(max = 64)
@@ -118,12 +118,6 @@ public class PatchPanel extends HasPortsImpl {
         super(id, name, manufacturer, model, serialNumber, componentType);
     }
 
-    public PatchPanel(UUID id, String name, String manufacturer, String model,
-                     String serialNumber, ComponentStatusEntity status, Location location,
-                     ComponentTypeEntity componentType) {
-        super(id, name, manufacturer, model, serialNumber, status, location, componentType);
-    }
-
     // Device abstract methods implementation
     @Override
     public boolean isManaged() {
@@ -144,7 +138,7 @@ public class PatchPanel extends HasPortsImpl {
     public Map<String, String> getSpecifications() {
         Map<String, String> specs = new HashMap<>();
 
-        if (portCount != null) specs.put("Port Count", portCount.toString());
+        if (getPortCount() != null) specs.put("Port Count", Integer.toString(getPortCount()));
         if (panelType != null) specs.put("Panel Type", panelType);
         if (connectorType != null) specs.put("Connector Type", connectorType);
         if (categoryRating != null) specs.put("Category", categoryRating);
@@ -177,8 +171,8 @@ public class PatchPanel extends HasPortsImpl {
     }
 
     public boolean isHighDensity() {
-        return portCount != null && rackUnits != null &&
-               (portCount / (double) rackUnits) >= 24.0;
+        return getPortCount() != null && rackUnits != null &&
+               (getPortCount() / (double) rackUnits) >= 24.0;
     }
 
     public boolean requiresRackSpace() {
@@ -198,8 +192,8 @@ public class PatchPanel extends HasPortsImpl {
     }
 
     public String getPortDensityInfo() {
-        if (portCount != null && rackUnits != null) {
-            double density = portCount / (double) rackUnits;
+        if (getPortCount() != null && rackUnits != null) {
+            double density = getPortCount() / (double) rackUnits;
             return String.format("%.1f ports/U", density);
         }
         return "Unknown density";
@@ -212,7 +206,7 @@ public class PatchPanel extends HasPortsImpl {
             return false;
         }
 
-        if (portCount != null && portCount <= 0) {
+        if (getPortCount() != null && getPortCount() <= 0) {
             return false;
         }
 
@@ -222,7 +216,7 @@ public class PatchPanel extends HasPortsImpl {
 
         // If we have a model, verify consistency
         if (patchPanelModel != null) {
-            if (portCount != null && !portCount.equals(patchPanelModel.getPortCount())) {
+            if (getPortCount() != null && !getPortCount().equals(patchPanelModel.getPortCount())) {
                 return false;
             }
             if (rackUnits != null && !rackUnits.equals(patchPanelModel.getRackUnits())) {
@@ -237,7 +231,7 @@ public class PatchPanel extends HasPortsImpl {
     public String toString() {
         return "PatchPanel:" + getId() + "[" + getName() +
                (getModel() != null ? ", " + getModel() : "") +
-               (portCount != null ? ", " + portCount + " ports" : "") +
+               (getPortCount() != null ? ", " + getPortCount() + " ports" : "") +
                (rackUnits != null ? ", " + rackUnits + "U" : "") +
                (panelType != null ? ", " + panelType : "") + "]";
     }

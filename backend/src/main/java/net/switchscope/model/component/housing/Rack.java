@@ -41,7 +41,7 @@ public class Rack extends Component {
     @Column(name = "actual_height_inches")
     private Double actualHeightInches;
 
-    // Door and panel configuration - now dynamic strings
+    // Door and panel configuration
     @Column(name = "front_door_type")
     @Size(max = 32)
     @NoHtml
@@ -77,7 +77,7 @@ public class Rack extends Component {
     @NoHtml
     private String pduType;
 
-    // Cooling configuration - now dynamic string
+    // Cooling configuration
     @Column(name = "cooling_type")
     @Size(max = 32)
     @NoHtml
@@ -160,7 +160,7 @@ public class Rack extends Component {
     private void initializeFromRackType() {
         if (rackType != null) {
             if (rackUnitsTotal == null) {
-                rackUnitsTotal = rackType.getTypicalCapacity();
+                rackUnitsTotal = rackType.getTypicalCapacityU();
             }
             if (actualWidthInches == null) {
                 actualWidthInches = rackType.getStandardWidthInches();
@@ -176,21 +176,18 @@ public class Rack extends Component {
             }
 
             // Set features based on rack type capabilities
-            hasFrontDoor = rackType.isHasFrontDoor();
-            hasRearDoor = rackType.isHasRearDoor();
-            hasSidePanels = rackType.isHasSidePanels();
             hasLocks = rackType.isHasLocks();
             hasCableTrays = rackType.isHasCableManagement();
 
             // Set default types from rack type
-            if (frontDoorType == null) {
+            /*if (frontDoorType == null) {
                 frontDoorType = rackType.getDefaultFrontDoorType();
             }
             if (rearDoorType == null) {
                 rearDoorType = rackType.getDefaultRearDoorType();
-            }
+            }*/
             if (coolingType == null) {
-                coolingType = rackType.getDefaultCoolingType();
+                coolingType = rackType.getCoolingType();
             }
         }
     }
@@ -206,7 +203,6 @@ public class Rack extends Component {
         Map<String, String> specs = new HashMap<>();
 
         specs.put("Total Rack Units", String.valueOf(rackUnitsTotal));
-        specs.put("Rack Type", rackType != null ? rackType.getDisplayName() : "N/A");
         specs.put("Dimensions", getDimensionsDescription());
         specs.put("Front Door", frontDoorType != null ? frontDoorType : "N/A");
         specs.put("Rear Door", rearDoorType != null ? rearDoorType : "N/A");
@@ -235,60 +231,54 @@ public class Rack extends Component {
         return specs;
     }
 
-    // Validation methods for dynamic configuration
+    // Validation methods for configuration
     public boolean isValidFrontDoorType() {
-        return frontDoorType == null || rackType == null ||
-               rackType.isDoorTypeAvailable(frontDoorType);
+        return frontDoorType == null || isValidDoorType(frontDoorType);
     }
 
     public boolean isValidRearDoorType() {
-        return rearDoorType == null || rackType == null ||
-               rackType.isDoorTypeAvailable(rearDoorType);
+        return rearDoorType == null || isValidDoorType(rearDoorType);
     }
 
-    public boolean isValidCoolingType() {
+    private boolean isValidDoorType(String doorType) {
+        return doorType != null && (
+            "PERFORATED".equals(doorType) ||
+            "GLASS".equals(doorType) ||
+            "SOLID".equals(doorType) ||
+            "NONE".equals(doorType)
+        );
+    }
+
+    public boolean isValidCoolingType(String coolingType) {
         return coolingType == null || rackType == null ||
                rackType.isCoolingTypeAvailable(coolingType);
     }
 
-    public boolean isValidPduType() {
-        return pduType == null || rackType == null ||
-               rackType.isPduTypeAvailable(pduType);
+    private boolean isValidPduType() {
+        return pduType == null || (
+            "BASIC".equals(pduType) ||
+            "SWITCHED".equals(pduType) ||
+            "METERED".equals(pduType) ||
+            "SMART".equals(pduType)
+        );
     }
 
-    public boolean isValidLockType() {
-        return lockType == null || rackType == null ||
-               rackType.isLockTypeAvailable(lockType);
+    private boolean isValidLockType() {
+        return lockType == null || (
+            "KEY".equals(lockType) ||
+            "COMBINATION".equals(lockType) ||
+            "ELECTRONIC".equals(lockType) ||
+            "HANDLE".equals(lockType)
+        );
     }
 
-    public boolean isValidCableManagementType() {
-        return cableManagementType == null || rackType == null ||
-               rackType.isCableManagementTypeAvailable(cableManagementType);
-    }
-
-    // Configuration options from rack type
-    public Set<String> getAvailableFrontDoorTypes() {
-        return rackType != null ? rackType.getAvailableDoorTypes() : Set.of();
-    }
-
-    public Set<String> getAvailableRearDoorTypes() {
-        return rackType != null ? rackType.getAvailableDoorTypes() : Set.of();
-    }
-
-    public Set<String> getAvailableCoolingTypes() {
-        return rackType != null ? rackType.getAvailableCoolingTypes() : Set.of();
-    }
-
-    public Set<String> getAvailablePduTypes() {
-        return rackType != null ? rackType.getAvailablePduTypes() : Set.of();
-    }
-
-    public Set<String> getAvailableLockTypes() {
-        return rackType != null ? rackType.getAvailableLockTypes() : Set.of();
-    }
-
-    public Set<String> getAvailableCableManagementTypes() {
-        return rackType != null ? rackType.getAvailableCableManagementTypes() : Set.of();
+    private boolean isValidCableManagementType() {
+        return cableManagementType == null || (
+            "VERTICAL_MANAGERS".equals(cableManagementType) ||
+            "HORIZONTAL_MANAGERS".equals(cableManagementType) ||
+            "CABLE_TRAYS".equals(cableManagementType) ||
+            "FINGER_DUCTS".equals(cableManagementType)
+        );
     }
 
     // Helper method to get active installations housed in this rack
@@ -372,22 +362,22 @@ public class Rack extends Component {
         return (double) getOccupiedSpace() / rackUnitsTotal * 100.0;
     }
 
-    // Enhanced rack type methods
-    public boolean supportsStandardRackUnits() {
+    // Enhanced rack type methods (using RackModelEntity)
+    /*public boolean supportsStandardRackUnits() {
         return rackType != null && rackType.supportsStandardRackUnits();
-    }
+    }*/
 
-    public boolean isSuitableForNetworkEquipment() {
+    /*public boolean isSuitableForNetworkEquipment() {
         return rackType != null && rackType.isSuitableForNetworkEquipment();
-    }
+    }*/
 
-    public boolean isSuitableForServerEquipment() {
+    /*public boolean isSuitableForServerEquipment() {
         return rackType != null && rackType.isSuitableForServerEquipment();
-    }
+    }*/
 
-    public boolean isSuitableForStorageEquipment() {
+    /*public boolean isSuitableForStorageEquipment() {
         return rackType != null && rackType.isSuitableForStorageEquipment();
-    }
+    }*/
 
     public boolean isWallMountable() {
         return rackType != null && rackType.isWallMountable();
@@ -406,9 +396,9 @@ public class Rack extends Component {
     }
 
     // Equipment compatibility validation
-    public boolean canAccommodateEquipmentType(String equipmentTypeCode) {
+    /*public boolean canAccommodateEquipmentType(String equipmentTypeCode) {
         return rackType != null && rackType.isCompatibleWithEquipmentType(equipmentTypeCode);
-    }
+    }*/
 
     public boolean canSupportWeight(double additionalWeightKg) {
         if (maxLoadWeightKg == null) return true;
@@ -449,15 +439,15 @@ public class Rack extends Component {
     }
 
     // Installation requirements
-    public boolean requiresFloorAnchoring() {
+    /*public boolean requiresFloorAnchoring() {
         return rackType != null && rackType.isRequiresFloorAnchoring() && !isWallMountable();
-    }
+    }*/
 
     public boolean requiresElectricalConnection() {
         return hasPdu || hasFans || hasEnvironmentalMonitoring();
     }
 
-    public List<String> getInstallationRequirements() {
+    /*public List<String> getInstallationRequirements() {
         List<String> requirements = new ArrayList<>();
 
         if (requiresFloorAnchoring()) {
@@ -466,12 +456,12 @@ public class Rack extends Component {
         if (requiresElectricalConnection()) {
             requirements.add("Electrical connection required");
         }
-        if (rackType != null) {
-            requirements.addAll(rackType.getInstallationRequirements());
+        if (rackType != null && rackType.getAssemblyTimeHours() != null && rackType.getAssemblyTimeHours() > 4) {
+            requirements.add("Extended assembly time (" + rackType.getAssemblyTimeHours() + " hours)");
         }
 
         return requirements;
-    }
+    }*/
 
     // Dimensions and space calculations
     public String getDimensionsDescription() {
@@ -517,7 +507,7 @@ public class Rack extends Component {
                 (powerCapacityWatts == null || powerCapacityWatts > 0) &&
                 isValidFrontDoorType() &&
                 isValidRearDoorType() &&
-                isValidCoolingType() &&
+                isValidCoolingType(coolingType) &&
                 isValidPduType() &&
                 isValidLockType() &&
                 isValidCableManagementType();
@@ -526,7 +516,7 @@ public class Rack extends Component {
     @Override
     public String toString() {
         return "Rack:" + getId() + "[" + getName() +
-               ", " + (rackType != null ? rackType.getCode() : "no-type") +
+               ", " + (rackType != null ? rackType.getModelDesignation() : "no-type") +
                ", " + getOccupiedSpace() + "/" + rackUnitsTotal + "U]";
     }
 }

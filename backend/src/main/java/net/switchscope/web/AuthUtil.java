@@ -4,6 +4,8 @@ import net.switchscope.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.UUID;
+
 import static java.util.Objects.requireNonNull;
 
 public class AuthUtil {
@@ -23,7 +25,7 @@ public class AuthUtil {
         return get().getUser();
     }
 
-    public static int authId() {
+    public static UUID authId() {
         return get().id();
     }
 }

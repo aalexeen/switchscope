@@ -1,4 +1,4 @@
-package net.switchscope.model;
+package net.switchscope.model.component;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.switchscope.model.NamedEntity;
 import net.switchscope.validation.NoHtml;
 
 import java.util.UUID;
