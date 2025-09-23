@@ -22,7 +22,7 @@ import java.util.UUID;
 public abstract class BaseEntity implements HasId {
 
     @Id
-    @UuidGenerator
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "id", updatable = false, nullable = false)
     @Schema(accessMode = Schema.AccessMode.READ_ONLY) // https://stackoverflow.com/a/28025008/548473
     protected UUID id;
