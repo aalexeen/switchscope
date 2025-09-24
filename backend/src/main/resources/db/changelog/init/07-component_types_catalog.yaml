@@ -1,0 +1,171 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-component-types-catalog
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: component_types_catalog
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: display_name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: color_class
+                  type: VARCHAR(128)
+              - column:
+                  name: icon_class
+                  type: VARCHAR(128)
+              - column:
+                  name: is_system_type
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: typical_rack_units
+                  type: INTEGER
+              - column:
+                  name: requires_physical_space
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: can_contain_components
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_installable
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: requires_management
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: supports_snmp
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: has_firmware
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: can_have_ip_address
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: processes_network_traffic
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: requires_power
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: typical_power_consumption_watts
+                  type: INTEGER
+              - column:
+                  name: generates_heat
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: needs_cooling
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: recommended_maintenance_interval_months
+                  type: INTEGER
+              - column:
+                  name: typical_lifespan_years
+                  type: INTEGER
+        - addUniqueConstraint:
+            tableName: component_types_catalog
+            columnNames: code
+            constraintName: UK_CODE
+        - createIndex:
+            tableName: component_types_catalog
+            indexName: idx_base_active_sort
+            columns:
+              - column:
+                  name: is_active
+              - column:
+                  name: sort_order
+                  descending: false
+        - addForeignKeyConstraint:
+            baseTableName: component_types_catalog
+            baseColumnNames: category_id
+            constraintName: fk_component_types_category
+            referencedTableName: component_categories_catalog
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            baseTableName: component_types_catalog
+            baseColumnNames: nature_id
+            constraintName: fk_component_types_nature
+            referencedTableName: component_natures_catalog
+            referencedColumnNames: id
+            onDelete: RESTRICT

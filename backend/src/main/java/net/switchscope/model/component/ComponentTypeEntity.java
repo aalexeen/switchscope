@@ -14,7 +14,7 @@ import java.util.*;
  * Examples: SWITCH, ROUTER (in connectivity), RACK, CHASSIS (in housing)
  */
 @Entity
-@Table(name = "component_types",
+@Table(name = "component_types_catalog",
        uniqueConstraints = @UniqueConstraint(columnNames = {"code", "category_id"}))
 @Getter
 @Setter
