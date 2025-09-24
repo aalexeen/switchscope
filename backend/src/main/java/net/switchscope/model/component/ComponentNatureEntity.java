@@ -16,7 +16,7 @@ import java.util.UUID;
  * Dynamic component nature entity replacing the hardcoded ComponentNature enum
  */
 @Entity
-@Table(name = "component_natures")
+@Table(name = "component_natures_catalog")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -41,7 +41,7 @@ public class ComponentNatureEntity extends UIStyledEntity {
     @Column(name = "power_consumption_category")
     @Size(max = 64)
     @NoHtml
-    private String powerConsumptionCategory; // none, low, medium, high, variable
+    private String powerConsumptionCategory = "none"; // none, low, medium, high, variable
 
     @ElementCollection
     @CollectionTable(name = "component_nature_properties",

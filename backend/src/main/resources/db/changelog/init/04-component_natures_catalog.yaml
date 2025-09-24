@@ -1,0 +1,107 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-component-natures-catalog
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: component_natures_catalog
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: display_name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: color_class
+                  type: VARCHAR(128)
+              - column:
+                  name: icon_class
+                  type: VARCHAR(128)
+              - column:
+                  name: requires_management
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: can_have_ip_address
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: has_firmware
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: processes_network_traffic
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: supports_snmp_monitoring
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: power_consumption_category
+                  type: VARCHAR(64)
+                  defaultValue: "none"
+        - addUniqueConstraint:
+            tableName: component_natures_catalog
+            columnNames: code
+            constraintName: UK_CODE
+        - createIndex:
+            tableName: component_natures_catalog
+            indexName: idx_base_active_sort
+            columns:
+              - column:
+                  name: is_active
+              - column:
+                  name: sort_order
+                  descending: false

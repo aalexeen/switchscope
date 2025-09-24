@@ -1,7 +1,6 @@
 package net.switchscope.model.component;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -17,12 +16,14 @@ import java.util.UUID;
  * Base class for coded entities with common attributes
  */
 @MappedSuperclass
+@Table(indexes = @Index(name = "idx_base_active_sort", columnList = "is_active,sort_order"),
+uniqueConstraints = {@UniqueConstraint(columnNames = {"code"}, name = "uk_code")})
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseCodedEntity extends NamedEntity {
 
-    @Column(name = "code", unique = true, nullable = false)
+    @Column(name = "code", nullable = false)
     @Size(max = 64)
     @NotNull
     @NoHtml

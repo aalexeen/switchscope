@@ -14,7 +14,7 @@ import java.util.*;
  * Dynamic component status entity replacing the hardcoded ComponentStatus enum
  */
 @Entity
-@Table(name = "component_statuses")
+@Table(name = "component_statuses_catalog")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

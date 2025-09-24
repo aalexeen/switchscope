@@ -13,7 +13,7 @@ import java.util.*;
  * Examples: housing, connectivity, support, module
  */
 @Entity
-@Table(name = "component_categories")
+@Table(name = "component_categories_catalog")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
