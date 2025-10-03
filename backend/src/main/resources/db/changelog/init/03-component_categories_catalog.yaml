@@ -84,3 +84,37 @@ databaseChangeLog:
               - column:
                   name: sort_order
                   descending: false
+
+  - changeSet:
+      id: create-component-category-properties
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: component_category_properties
+            columns:
+              - column:
+                  name: component_category_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: property_key
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: property_value
+                  type: TEXT
+        - addForeignKeyConstraint:
+            baseTableName: component_category_properties
+            baseColumnNames: component_category_id
+            constraintName: fk_component_category_properties
+            referencedTableName: component_categories_catalog
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - createIndex:
+            tableName: component_category_properties
+            indexName: idx_component_category_properties
+            columns:
+              - column:
+                  name: component_category_id

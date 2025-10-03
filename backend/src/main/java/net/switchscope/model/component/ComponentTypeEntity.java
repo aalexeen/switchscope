@@ -15,7 +15,7 @@ import java.util.*;
  */
 @Entity
 @Table(name = "component_types_catalog",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"code", "category_id"}))
+       uniqueConstraints = {@UniqueConstraint(columnNames = {"code", "category_id"}, name = "uk_code_category")})
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,8 +37,8 @@ public class ComponentTypeEntity extends UIStyledEntity {
     @Column(name = "typical_rack_units")
     private Integer typicalRackUnits;
 
-    @Column(name = "requires_physical_space", nullable = false)
-    private boolean requiresPhysicalSpace = true;
+    /*@Column(name = "requires_physical_space", nullable = false)
+    private boolean requiresPhysicalSpace = true;*/
 
     @Column(name = "can_contain_components", nullable = false)
     private boolean canContainComponents = false;
