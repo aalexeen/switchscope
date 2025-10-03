@@ -59,7 +59,18 @@ databaseChangeLog:
                   name: icon_class
                   type: VARCHAR(128)
               - column:
+                  name: category_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
                   name: is_system_type
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: requires_rack_space
                   type: BOOLEAN
                   defaultValueBoolean: false
                   constraints:
@@ -67,12 +78,6 @@ databaseChangeLog:
               - column:
                   name: typical_rack_units
                   type: INTEGER
-              - column:
-                  name: requires_physical_space
-                  type: BOOLEAN
-                  defaultValueBoolean: true
-                  constraints:
-                    nullable: false
               - column:
                   name: can_contain_components
                   type: BOOLEAN
@@ -144,8 +149,8 @@ databaseChangeLog:
                   type: INTEGER
         - addUniqueConstraint:
             tableName: component_types_catalog
-            columnNames: code
-            constraintName: UK_CODE
+            columnNames: code, category_id
+            constraintName: UK_CODE_CATEGORY
         - createIndex:
             tableName: component_types_catalog
             indexName: idx_base_active_sort
@@ -155,6 +160,12 @@ databaseChangeLog:
               - column:
                   name: sort_order
                   descending: false
+        - createIndex:
+            tableName: component_types_catalog
+            indexName: idx_component_types_category
+            columns:
+              - column:
+                  name: category_id
         - addForeignKeyConstraint:
             baseTableName: component_types_catalog
             baseColumnNames: category_id
@@ -162,10 +173,99 @@ databaseChangeLog:
             referencedTableName: component_categories_catalog
             referencedColumnNames: id
             onDelete: RESTRICT
+
+  - changeSet:
+      id: create-component-type-allowed-child-types
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: component_type_allowed_child_types
+            columns:
+              - column:
+                  name: parent_type_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: child_type_code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
-            baseTableName: component_types_catalog
-            baseColumnNames: nature_id
-            constraintName: fk_component_types_nature
-            referencedTableName: component_natures_catalog
+            baseTableName: component_type_allowed_child_types
+            baseColumnNames: parent_type_id
+            constraintName: fk_allowed_child_types_parent
+            referencedTableName: component_types_catalog
             referencedColumnNames: id
-            onDelete: RESTRICT
+            onDelete: CASCADE
+        - createIndex:
+            tableName: component_type_allowed_child_types
+            indexName: idx_allowed_child_types_parent
+            columns:
+              - column:
+                  name: parent_type_id
+
+  - changeSet:
+      id: create-component-type-allowed-child-categories
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: component_type_allowed_child_categories
+            columns:
+              - column:
+                  name: parent_type_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: child_category_code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: component_type_allowed_child_categories
+            baseColumnNames: parent_type_id
+            constraintName: fk_allowed_child_categories_parent
+            referencedTableName: component_types_catalog
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - createIndex:
+            tableName: component_type_allowed_child_categories
+            indexName: idx_allowed_child_categories_parent
+            columns:
+              - column:
+                  name: parent_type_id
+
+  - changeSet:
+      id: create-component-type-properties
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: component_type_properties
+            columns:
+              - column:
+                  name: component_type_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: property_key
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: property_value
+                  type: TEXT
+        - addForeignKeyConstraint:
+            baseTableName: component_type_properties
+            baseColumnNames: component_type_id
+            constraintName: fk_component_type_properties
+            referencedTableName: component_types_catalog
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - createIndex:
+            tableName: component_type_properties
+            indexName: idx_component_type_properties
+            columns:
+              - column:
+                  name: component_type_id
