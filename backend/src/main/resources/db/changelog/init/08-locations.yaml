@@ -1,0 +1,183 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-locations-table
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: locations
+            columns:
+              # Base entity fields (from NamedEntity)
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+
+              # Location type reference
+              - column:
+                  name: location_type_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              # Address
+              - column:
+                  name: address
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: true
+
+              # Self-reference for parent-child hierarchy
+              - column:
+                  name: parent_location_id
+                  type: UUID
+                  constraints:
+                    nullable: true
+
+              # Capacity overrides
+              - column:
+                  name: capacity_children
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: capacity_equipment
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Physical identification
+              - column:
+                  name: floor_number
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: room_number
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: coordinates
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: access_requirements
+                  type: VARCHAR(256)
+                  constraints:
+                    nullable: true
+
+              # Climate and environment
+              - column:
+                  name: temperature_range
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: humidity_range
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+
+              # Power and infrastructure
+              - column:
+                  name: power_capacity_watts
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: available_rack_units
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: has_ups
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: has_generator
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        # Foreign key for location_type_id
+        - addForeignKeyConstraint:
+            baseTableName: locations
+            baseColumnNames: location_type_id
+            constraintName: fk_location_type
+            referencedTableName: location_types_catalog
+            referencedColumnNames: id
+            onDelete: RESTRICT
+
+        # Foreign key for parent_location_id (self-reference)
+        - addForeignKeyConstraint:
+            baseTableName: locations
+            baseColumnNames: parent_location_id
+            constraintName: fk_location_parent
+            referencedTableName: locations
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        # Indexes
+        - createIndex:
+            tableName: locations
+            indexName: idx_location_type_id
+            columns:
+              - column:
+                  name: location_type_id
+
+        - createIndex:
+            tableName: locations
+            indexName: idx_location_parent_id
+            columns:
+              - column:
+                  name: parent_location_id
+
+        - createIndex:
+            tableName: locations
+            indexName: idx_location_floor_room
+            columns:
+              - column:
+                  name: floor_number
+              - column:
+                  name: room_number
+
+        - createIndex:
+            tableName: locations
+            indexName: idx_location_name
+            columns:
+              - column:
+                  name: name

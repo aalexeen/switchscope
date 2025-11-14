@@ -150,7 +150,7 @@ databaseChangeLog:
         - addUniqueConstraint:
             tableName: component_types_catalog
             columnNames: code, category_id
-            constraintName: UK_CODE_CATEGORY
+            constraintName: uk_code_category
         - createIndex:
             tableName: component_types_catalog
             indexName: idx_base_active_sort

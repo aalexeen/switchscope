@@ -52,7 +52,7 @@ public class ComponentStatusEntity extends UIStyledEntity {
 
     // Next possible statuses (many-to-many relationship)
     @ManyToMany
-    @JoinTable(name = "status_transitions",
+    @JoinTable(name = "component_status_transitions",
                joinColumns = @JoinColumn(name = "from_status_id"),
                inverseJoinColumns = @JoinColumn(name = "to_status_id"))
     private Set<ComponentStatusEntity> nextPossibleStatuses = new HashSet<>();
