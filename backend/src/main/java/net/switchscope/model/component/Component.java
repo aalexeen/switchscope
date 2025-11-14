@@ -23,7 +23,8 @@ import java.util.UUID;
  * Updated to work with strict ComponentTypeEntity and ComponentStatusEntity references
  */
 @Entity
-@Table(name = "components")
+@Table(name = "components",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"manufacturer", "serial_number"}, name = "uk_manufacturer_serial")})
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "component_class", discriminatorType = DiscriminatorType.STRING)
 @Getter
@@ -31,7 +32,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Component extends NamedEntity {
 
-    @Column(name = "manufacturer")
+    @Column(name = "manufacturer", nullable = false)
     @Size(max = 128)
     @NoHtml
     private String manufacturer;
@@ -41,7 +42,7 @@ public abstract class Component extends NamedEntity {
     @NoHtml
     private String model;
 
-    @Column(name = "serial_number", unique = true)
+    @Column(name = "serial_number", nullable = false)
     @Size(max = 128)
     @NoHtml
     private String serialNumber;
@@ -53,9 +54,9 @@ public abstract class Component extends NamedEntity {
 
     // FK to ComponentStatusEntity (replacing enum)
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "status_id", nullable = false)
+    @JoinColumn(name = "component_status_id", nullable = false)
     @NotNull
-    private ComponentStatusEntity status;
+    private ComponentStatusEntity componentStatus;
 
     // FK to ComponentTypeEntity
     @ManyToOne(fetch = FetchType.EAGER)
@@ -67,9 +68,6 @@ public abstract class Component extends NamedEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "component_nature_id")
     private ComponentNatureEntity componentNature;
-
-    @Column(name = "installation_date")
-    private LocalDateTime installationDate;
 
     @Column(name = "last_maintenance_date")
     private LocalDateTime lastMaintenanceDate;
@@ -95,7 +93,7 @@ public abstract class Component extends NamedEntity {
     }
 
     protected Component(UUID id, String name, String manufacturer, String model,
-                       String serialNumber, ComponentTypeEntity componentType) {
+            String serialNumber, ComponentTypeEntity componentType) {
         super(id, name, null);
         this.manufacturer = manufacturer;
         this.model = model;
@@ -104,13 +102,13 @@ public abstract class Component extends NamedEntity {
     }
 
     protected Component(UUID id, String name, String manufacturer, String model,
-                       String serialNumber, ComponentStatusEntity status,
-                       ComponentTypeEntity componentType) {
+            String serialNumber, ComponentStatusEntity status,
+            ComponentTypeEntity componentType) {
         super(id, name, null);
         this.manufacturer = manufacturer;
         this.model = model;
         this.serialNumber = serialNumber;
-        this.status = status;
+        this.componentStatus = status;
         this.componentType = componentType;
     }
 
@@ -135,9 +133,9 @@ public abstract class Component extends NamedEntity {
         return componentType == null || !componentType.isCanContainComponents();
     }
 
-    public boolean requiresPhysicalSpace() {
+/*    public boolean requiresPhysicalSpace() {
         return componentType != null && componentType.isRequiresPhysicalSpace();
-    }
+    }*/
 
     public boolean requiresRackSpace() {
         return componentType != null && componentType.isRequiresRackSpace();
@@ -206,24 +204,25 @@ public abstract class Component extends NamedEntity {
 
     // Abstract methods that must be implemented by concrete components
     public abstract boolean isInstallable();
+
     public abstract Map<String, String> getSpecifications();
 
     // Status-related methods
     public boolean isOperational() {
-        return status != null && status.isOperational();
+        return componentStatus != null && componentStatus.isOperational();
     }
 
     public boolean requiresMaintenance() {
-        return (status != null && "MAINTENANCE".equals(status.getCode())) ||
-               (nextMaintenanceDate != null && nextMaintenanceDate.isBefore(LocalDateTime.now()));
+        return (componentStatus != null && "MAINTENANCE".equals(componentStatus.getCode())) ||
+                (nextMaintenanceDate != null && nextMaintenanceDate.isBefore(LocalDateTime.now()));
     }
 
     public boolean isAvailable() {
-        return status != null && status.isAvailable();
+        return componentStatus != null && componentStatus.isAvailable();
     }
 
     public boolean requiresAttention() {
-        return status != null && status.requiresAttention();
+        return componentStatus != null && componentStatus.requiresAttention();
     }
 
     // Hierarchy methods
@@ -252,8 +251,8 @@ public abstract class Component extends NamedEntity {
     // Enhanced validation that considers component type
     public boolean isValidConfiguration() {
         boolean basicValid = name != null && !name.trim().isEmpty() &&
-                           status != null &&
-                           componentType != null;
+                componentStatus != null &&
+                componentType != null;
 
         if (!basicValid) {
             return false;
@@ -289,40 +288,40 @@ public abstract class Component extends NamedEntity {
     // Maintenance methods
     public int getRecommendedMaintenanceIntervalMonths() {
         return componentType != null ?
-               componentType.getRecommendedMaintenanceIntervalMonths() : 12;
+                componentType.getRecommendedMaintenanceIntervalMonths() : 12;
     }
 
     public int getTypicalLifespanYears() {
         return componentType != null ?
-               componentType.getTypicalLifespanYears() : 10;
+                componentType.getTypicalLifespanYears() : 10;
     }
 
     // Power consumption
     public String getPowerConsumptionCategory() {
         return componentType != null ?
-               componentType.getPowerConsumptionCategory() : "unknown";
+                componentType.getPowerConsumptionCategory() : "unknown";
     }
 
     public Integer getTypicalPowerConsumptionWatts() {
         return componentType != null ?
-               componentType.getTypicalPowerConsumptionWatts() : null;
+                componentType.getTypicalPowerConsumptionWatts() : null;
     }
 
     // Status transition
     public boolean canTransitionToStatus(ComponentStatusEntity newStatus) {
-        return status != null && status.canTransitionTo(newStatus);
+        return componentStatus != null && componentStatus.canTransitionTo(newStatus);
     }
 
     public List<ComponentStatusEntity> getNextPossibleStatuses() {
-        if (status != null) {
-            return new ArrayList<>(status.getNextPossibleStatuses());
+        if (componentStatus != null) {
+            return new ArrayList<>(componentStatus.getNextPossibleStatuses());
         }
         return new ArrayList<>();
     }
 
     // UI helpers
     public String getStatusColorClass() {
-        return status != null ? status.getColorClass() : "secondary";
+        return componentStatus != null ? componentStatus.getColorClass() : "secondary";
     }
 
     public String getTypeIconClass() {
@@ -352,8 +351,8 @@ public abstract class Component extends NamedEntity {
             desc.append(" ").append(model);
         }
 
-        if (status != null) {
-            desc.append(" [").append(status.getDisplayName()).append("]");
+        if (componentStatus != null) {
+            desc.append(" [").append(componentStatus.getDisplayName()).append("]");
         }
 
         return desc.toString();
@@ -368,12 +367,12 @@ public abstract class Component extends NamedEntity {
     @Transient
     public String getComponentCategoryCode() {
         return componentType != null && componentType.getCategory() != null ?
-               componentType.getCategory().getCode() : null;
+                componentType.getCategory().getCode() : null;
     }
 
     @Transient
     public String getStatusCode() {
-        return status != null ? status.getCode() : null;
+        return componentStatus != null ? componentStatus.getCode() : null;
     }
 
     @Transient
@@ -400,6 +399,11 @@ public abstract class Component extends NamedEntity {
     }
 
     @Transient
+    public LocalDateTime getInstallationDate() {
+        return installation != null ? installation.getInstalledAt() : null;
+    }
+
+    @Transient
     public String getLocationAddress() {
         return installation != null ? installation.getInstallationLocationPath() : "Not installed";
     }
@@ -413,7 +417,7 @@ public abstract class Component extends NamedEntity {
     @Override
     public String toString() {
         return getClass().getSimpleName() + ":" + id + "[" + name + ", " +
-               (model != null ? model : "no-model") + ", " +
-               (componentType != null ? componentType.getCode() : "no-type") + "]";
+                (model != null ? model : "no-model") + ", " +
+                (componentType != null ? componentType.getCode() : "no-type") + "]";
     }
 }
