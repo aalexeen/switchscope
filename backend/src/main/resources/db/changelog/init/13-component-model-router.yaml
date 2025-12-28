@@ -1,0 +1,126 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-router-model-columns
+      author: AALEXEEN
+      changes:
+        # RouterModel specific columns
+        - addColumn:
+            tableName: component_models_catalog
+            columns:
+              # Router classification
+              - column:
+                  name: router_class
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: target_deployment
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+
+              # Interface specifications
+              - column:
+                  name: ethernet_ports
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: gigabit_ethernet_ports
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: serial_wan_ports
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Performance specifications
+              - column:
+                  name: routing_throughput_gbps
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: firewall_throughput_gbps
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: vpn_throughput_mbps
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: true
+
+              # Routing capabilities
+              - column:
+                  name: supports_bgp
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_ospf
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_nat
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_firewall
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_ipsec_vpn
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_vpn_tunnels
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+  # ElementCollection table for WAN interfaces
+  - changeSet:
+      id: create-router-model-wan-interfaces
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: router_model_wan_interfaces
+            columns:
+              - column:
+                  name: router_model_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: interface_type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: router_model_wan_interfaces
+            baseColumnNames: router_model_id
+            constraintName: fk_router_model_wan_interfaces
+            referencedTableName: component_models_catalog
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: router_model_wan_interfaces
+            indexName: idx_router_wan_interfaces_model_id
+            columns:
+              - column:
+                  name: router_model_id
+

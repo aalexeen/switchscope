@@ -82,3 +82,4 @@ Thumbs.db
 /backend/.mvn/wrapper/maven-wrapper.properties
 /backend/mvnw
 /backend/mvnw.cmd
+/.vscode/settings.json

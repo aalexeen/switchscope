@@ -19,7 +19,8 @@ import java.util.UUID;
  * Contains common attributes shared by all equipment models
  */
 @Entity
-@Table(name = "component_models_catalog")
+@Table(name = "component_models_catalog",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"manufacturer", "model_number"}, name = "uk_component_model_manufacturer_model"))
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "model_class", discriminatorType = DiscriminatorType.STRING)
 @Getter

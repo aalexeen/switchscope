@@ -1,0 +1,147 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-access-point-model-columns
+      author: AALEXEEN
+      changes:
+        # AccessPointModel specific columns
+        - addColumn:
+            tableName: component_models_catalog
+            columns:
+              # WiFi specifications
+              - column:
+                  name: wifi_standard
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: wifi_generation
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_clients
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Band support
+              - column:
+                  name: dual_band
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_5ghz
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_6ghz
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+
+              # Performance specifications
+              - column:
+                  name: max_throughput_mbps
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Coverage specifications
+              - column:
+                  name: indoor_coverage_sqm
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: outdoor_coverage_sqm
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Physical specifications
+              - column:
+                  name: weight_g
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: ip_rating
+                  type: VARCHAR(8)
+                  constraints:
+                    nullable: true
+
+              # PoE specifications
+              - column:
+                  name: poe_required
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+
+              # Security features
+              - column:
+                  name: supports_wpa3
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_enterprise_auth
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+
+              # Advanced features
+              - column:
+                  name: supports_mesh
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_mu_mimo
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_beamforming
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+
+              # Management capabilities
+              - column:
+                  name: controller_managed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: cloud_managed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+
+              # Environment
+              - column:
+                  name: indoor_use
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+              - column:
+                  name: outdoor_use
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+

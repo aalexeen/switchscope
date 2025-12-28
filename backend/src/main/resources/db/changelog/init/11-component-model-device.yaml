@@ -1,0 +1,126 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-device-model-columns
+      author: AALEXEEN
+      changes:
+        # DeviceModel (MappedSuperclass) columns - shared by Switch, Router, AccessPoint
+        - addColumn:
+            tableName: component_models_catalog
+            columns:
+              # Device-specific identification
+              - column:
+                  name: product_family
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: series
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+
+              # Power specifications
+              - column:
+                  name: power_consumption_watts
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_power_consumption_watts
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: power_input_type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: redundant_power_supply
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+
+              # Management capabilities
+              - column:
+                  name: management_interfaces
+                  type: VARCHAR(256)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: snmp_versions
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_ssh
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_telnet
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+              - column:
+                  name: web_management
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+
+              # Environmental specifications
+              - column:
+                  name: fanless
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: noise_level_db
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+  # ElementCollection table for device specifications
+  - changeSet:
+      id: create-device-model-specifications
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: device_model_specifications
+            columns:
+              - column:
+                  name: device_model_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: spec_name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: spec_value
+                  type: TEXT
+                  constraints:
+                    nullable: true
+
+        - addForeignKeyConstraint:
+            baseTableName: device_model_specifications
+            baseColumnNames: device_model_id
+            constraintName: fk_device_model_specs
+            referencedTableName: component_models_catalog
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: device_model_specifications
+            indexName: idx_device_model_specs_model_id
+            columns:
+              - column:
+                  name: device_model_id
+

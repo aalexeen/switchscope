@@ -1,0 +1,102 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-patch-panel-model-columns
+      author: AALEXEEN
+      changes:
+        # PatchPanelModel specific columns
+        - addColumn:
+            tableName: component_models_catalog
+            columns:
+              # Panel specifications
+              - column:
+                  name: port_count
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: panel_type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: connector_type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+
+              # Physical characteristics
+              - column:
+                  name: mounting_type
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: termination_type
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: port_layout
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: port_density
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+
+              # Performance specifications
+              - column:
+                  name: category_rating
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_frequency_mhz
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: shielded
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+
+              # Construction
+              - column:
+                  name: housing_material
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: finish_color
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: cable_management
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: cable_management_type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+
+              # Labeling and identification
+              - column:
+                  name: port_labeling
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: label_type
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+

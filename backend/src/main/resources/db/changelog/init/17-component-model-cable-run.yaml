@@ -1,0 +1,86 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-cable-run-model-columns
+      author: AALEXEEN
+      changes:
+        # CableRunModel specific columns
+        - addColumn:
+            tableName: component_models_catalog
+            columns:
+              # Cable type and category
+              - column:
+                  name: cable_type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: cable_category
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+
+              # Physical specifications
+              - column:
+                  name: conductor_gauge
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: conductor_count
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: jacket_type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: shielding_type
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+
+              # Performance specifications
+              - column:
+                  name: max_bandwidth_gbps
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_distance_meters
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: attenuation_db_per_100m
+                  type: DECIMAL(10,4)
+                  constraints:
+                    nullable: true
+
+              # Environmental specifications
+              - column:
+                  name: plenum_rated
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: fire_retardant
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+
+              # Installation specifications
+              - column:
+                  name: bend_radius_mm
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: pulling_tension_lbs
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
