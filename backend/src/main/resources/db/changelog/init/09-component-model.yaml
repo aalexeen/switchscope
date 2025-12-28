@@ -1,0 +1,296 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-component-models-catalog
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: component_models_catalog
+            columns:
+              # Base entity fields (from NamedEntity)
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+
+              # Discriminator column for Single Table Inheritance
+              - column:
+                  name: model_class
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+
+              # Basic model identification
+              - column:
+                  name: manufacturer
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: model_number
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: part_number
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: sku
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+
+              # Component type reference
+              - column:
+                  name: component_type_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              # Model status and lifecycle
+              - column:
+                  name: active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: discontinued
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_of_life
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: release_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: discontinue_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+
+              # Documentation and support
+              - column:
+                  name: datasheet_url
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: manual_url
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: support_url
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: true
+
+              # Warranty and lifecycle
+              - column:
+                  name: warranty_years
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: expected_lifespan_years
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: maintenance_interval_months
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Physical characteristics
+              - column:
+                  name: weight_kg
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: dimensions_mm
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+
+              # Environmental specifications - operating
+              - column:
+                  name: operating_temperature_min
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: operating_temperature_max
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: operating_humidity_min
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: operating_humidity_max
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Environmental specifications - storage
+              - column:
+                  name: storage_temperature_min
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: storage_temperature_max
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Certifications and compliance
+              - column:
+                  name: certifications
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: compliance_standards
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: true
+
+              # Pricing and availability
+              - column:
+                  name: msrp
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: list_price
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: currency_code
+                  type: VARCHAR(3)
+                  defaultValue: "USD"
+                  constraints:
+                    nullable: true
+
+              # Catalog management
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: verified
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: verification_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: notes
+                  type: VARCHAR(2048)
+                  constraints:
+                    nullable: true
+
+        # Foreign key for component_type_id
+        - addForeignKeyConstraint:
+            baseTableName: component_models_catalog
+            baseColumnNames: component_type_id
+            constraintName: fk_component_model_type
+            referencedTableName: component_types_catalog
+            referencedColumnNames: id
+            onDelete: RESTRICT
+
+        # Unique constraint for manufacturer + model_number
+        - addUniqueConstraint:
+            tableName: component_models_catalog
+            columnNames: manufacturer, model_number
+            constraintName: uk_component_model_manufacturer_model
+
+        # Indexes
+        - createIndex:
+            tableName: component_models_catalog
+            indexName: idx_component_model_type
+            columns:
+              - column:
+                  name: component_type_id
+
+        - createIndex:
+            tableName: component_models_catalog
+            indexName: idx_component_model_manufacturer
+            columns:
+              - column:
+                  name: manufacturer
+
+        - createIndex:
+            tableName: component_models_catalog
+            indexName: idx_component_model_active
+            columns:
+              - column:
+                  name: active
+              - column:
+                  name: discontinued
+              - column:
+                  name: end_of_life
+
+        - createIndex:
+            tableName: component_models_catalog
+            indexName: idx_component_model_class
+            columns:
+              - column:
+                  name: model_class
+
+        - createIndex:
+            tableName: component_models_catalog
+            indexName: idx_component_model_name
+            columns:
+              - column:
+                  name: name
+

@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-connector-model-columns
+      author: AALEXEEN
+      changes:
+        # ConnectorModel specific columns
+        - addColumn:
+            tableName: component_models_catalog
+            columns:
+              # Connector type and specifications
+              - column:
+                  name: connector_standard
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: gender
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: true
+
+              # Physical characteristics
+              - column:
+                  name: plating_material
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+
+              # Performance specifications
+              - column:
+                  name: insertion_loss_db
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: return_loss_db
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: mating_cycles
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Compatibility
+              - column:
+                  name: compatible_cable_types
+                  type: VARCHAR(256)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: keyed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+

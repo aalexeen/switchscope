@@ -1,0 +1,181 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-switch-model-columns
+      author: AALEXEEN
+      changes:
+        # SwitchModel specific columns
+        - addColumn:
+            tableName: component_models_catalog
+            columns:
+              # Switch classification
+              - column:
+                  name: switch_class
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: switch_tier
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_stackable
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_stack_units
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Physical specifications
+              - column:
+                  name: rack_units
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: form_factor
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+
+              # Port specifications
+              - column:
+                  name: total_ports
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: gigabit_ports
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: fast_ethernet_ports
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: ten_gig_ports
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: sfp_ports
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: sfp_plus_ports
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: console_ports
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # PoE specifications
+              - column:
+                  name: supports_poe
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: poe_budget_watts
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: poe_standard
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+
+              # Performance specifications
+              - column:
+                  name: switching_capacity_gbps
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: forwarding_rate_mpps
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: mac_address_table_size
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: buffer_size_mb
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: latency_microseconds
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: true
+
+              # Network features
+              - column:
+                  name: max_vlans
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_spanning_tree
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_link_aggregation
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_qos
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_igmp_snooping
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_port_mirroring
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_voice_vlan
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supports_acl
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: layer3_routing
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+

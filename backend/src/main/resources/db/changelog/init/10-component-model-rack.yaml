@@ -1,0 +1,126 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-rack-model-columns
+      author: AALEXEEN
+      changes:
+        # RackModelEntity specific columns
+        - addColumn:
+            tableName: component_models_catalog
+            columns:
+              # Physical characteristics
+              - column:
+                  name: standard_width_inches
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: standard_depth_inches
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: typical_capacity_u
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_capacity_u
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Type characteristics
+              - column:
+                  name: is_wall_mountable
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_floor_standing
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_enclosed
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_open_frame
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_outdoor_rated
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+
+              # Physical constraints
+              - column:
+                  name: max_weight_capacity_kg
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_power_capacity_watts
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Environmental features
+              - column:
+                  name: has_ventilation
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+              - column:
+                  name: has_cable_management
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+              - column:
+                  name: has_power_distribution
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+              - column:
+                  name: has_cooling_system
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: true
+
+              # Security features
+              - column:
+                  name: has_locks
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: true
+
+              # Installation characteristics
+              - column:
+                  name: assembly_time_hours
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: door_type
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: cooling_type
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+
