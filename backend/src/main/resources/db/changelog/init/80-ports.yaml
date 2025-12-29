@@ -1,0 +1,343 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-ports
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: ports
+            columns:
+              # =============================================
+              # BaseEntity fields
+              # =============================================
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+
+              # =============================================
+              # NamedEntity fields
+              # =============================================
+              - column:
+                  name: name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+
+              # =============================================
+              # Port entity fields (discriminator + relationships)
+              # =============================================
+
+              # Discriminator column for Single Table Inheritance
+              - column:
+                  name: port_type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+
+              # Device relationship (ManyToOne)
+              - column:
+                  name: equipment_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              # Connector relationship (OneToOne, nullable)
+              - column:
+                  name: connector_id
+                  type: UUID
+                  constraints:
+                    nullable: true
+
+              # =============================================
+              # Port - Basic port characteristics
+              # =============================================
+              - column:
+                  name: port_number
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: port_label
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+
+              # =============================================
+              # Port - Status and state
+              # =============================================
+              - column:
+                  name: status
+                  type: VARCHAR(32)
+                  defaultValue: "DOWN"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: admin_status
+                  type: VARCHAR(32)
+                  defaultValue: "UP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: operational_status
+                  type: VARCHAR(32)
+                  defaultValue: "DOWN"
+                  constraints:
+                    nullable: false
+
+              # =============================================
+              # Port - Speed and duplex
+              # =============================================
+              - column:
+                  name: speed_mbps
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_speed_mbps
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: duplex_mode
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: auto_negotiation
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+              # =============================================
+              # Port - Physical characteristics
+              # =============================================
+              - column:
+                  name: connector_type
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: medium_type
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+
+              # =============================================
+              # Port - VLAN and network configuration
+              # =============================================
+              - column:
+                  name: access_vlan
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: native_vlan
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: port_mode
+                  type: VARCHAR(16)
+                  defaultValue: "ACCESS"
+                  constraints:
+                    nullable: true
+
+              # =============================================
+              # Port - Power over Ethernet
+              # =============================================
+              - column:
+                  name: poe_enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: poe_class
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: poe_power_watts
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: poe_max_power_watts
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+
+              # =============================================
+              # Port - Traffic statistics
+              # =============================================
+              - column:
+                  name: bytes_in
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: true
+              - column:
+                  name: bytes_out
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: true
+              - column:
+                  name: packets_in
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: true
+              - column:
+                  name: packets_out
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: true
+              - column:
+                  name: errors_in
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: true
+              - column:
+                  name: errors_out
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: true
+              - column:
+                  name: discards_in
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: true
+              - column:
+                  name: discards_out
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: true
+
+              # =============================================
+              # Port - Timestamps
+              # =============================================
+              - column:
+                  name: last_change
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: last_activity
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: stats_last_reset
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+
+              # =============================================
+              # Port - Configuration and notes
+              # =============================================
+              - column:
+                  name: configuration_notes
+                  type: VARCHAR(1024)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: monitoring_enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        # =============================================
+        # Foreign Keys
+        # =============================================
+
+        # FK to components (Device is a Component)
+        - addForeignKeyConstraint:
+            baseTableName: ports
+            baseColumnNames: equipment_id
+            constraintName: fk_port_equipment
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        # FK to components (Connector is a Component)
+        - addForeignKeyConstraint:
+            baseTableName: ports
+            baseColumnNames: connector_id
+            constraintName: fk_port_connector
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        # =============================================
+        # Indexes
+        # =============================================
+        - createIndex:
+            tableName: ports
+            indexName: idx_port_equipment
+            columns:
+              - column:
+                  name: equipment_id
+
+        - createIndex:
+            tableName: ports
+            indexName: idx_port_connector
+            columns:
+              - column:
+                  name: connector_id
+
+        - createIndex:
+            tableName: ports
+            indexName: idx_port_type
+            columns:
+              - column:
+                  name: port_type
+
+        - createIndex:
+            tableName: ports
+            indexName: idx_port_status
+            columns:
+              - column:
+                  name: status
+              - column:
+                  name: operational_status
+
+        - createIndex:
+            tableName: ports
+            indexName: idx_port_equipment_number
+            columns:
+              - column:
+                  name: equipment_id
+              - column:
+                  name: port_number
+
+        # Unique constraint: equipment_id + port_number
+        - addUniqueConstraint:
+            tableName: ports
+            columnNames: equipment_id, port_number
+            constraintName: uk_port_equipment_number
+

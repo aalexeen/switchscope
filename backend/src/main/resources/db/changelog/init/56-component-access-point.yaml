@@ -1,0 +1,206 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-access-point-columns
+      author: AALEXEEN
+      comment: "Add AccessPoint specific columns to components table (inherits from HasPortsImpl -> Device -> Component)"
+      changes:
+        # ============================================================
+        # AccessPoint specific fields
+        # Discriminator value: "ACCESS_POINT"
+        # Inheritance chain: AccessPoint -> HasPortsImpl -> Device -> Component -> NamedEntity -> BaseEntity
+        # ============================================================
+
+        # WiFi capabilities
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: wifi_standard
+                  type: VARCHAR(64)
+                  remarks: "WiFi standard: 802.11ac, 802.11ax (WiFi 6), etc."
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: max_clients
+                  type: INTEGER
+                  remarks: "Maximum concurrent clients"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_dual_band
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Supports 2.4GHz and 5GHz"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_5ghz
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_6ghz
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "WiFi 6E support"
+                  constraints:
+                    nullable: false
+
+        # Power over Ethernet
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: poe_required
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  remarks: "Requires PoE for power"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: poe_consumption_watts
+                  type: INTEGER
+                  remarks: "PoE power consumption in watts"
+                  constraints:
+                    nullable: true
+
+        # Coverage and performance
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: coverage_radius_meters
+                  type: INTEGER
+                  remarks: "Coverage radius in meters"
+                  constraints:
+                    nullable: true
+
+        # Security features
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_wpa3
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "WPA3 security support"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_enterprise_auth
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "802.1X enterprise authentication"
+                  constraints:
+                    nullable: false
+
+        # Controller management
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: controller_managed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Managed by wireless controller"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: controller_ip
+                  type: VARCHAR(45)
+                  remarks: "Wireless controller IP address"
+                  constraints:
+                    nullable: true
+
+        # ============================================================
+        # Indexes
+        # ============================================================
+        - createIndex:
+            tableName: components
+            indexName: idx_component_ap_wifi_standard
+            columns:
+              - column:
+                  name: wifi_standard
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_ap_controller
+            columns:
+              - column:
+                  name: controller_managed
+              - column:
+                  name: controller_ip
+
+  # ============================================================
+  # Access Point SSIDs ElementCollection table
+  # ============================================================
+  - changeSet:
+      id: create-access-point-ssids-table
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: access_point_ssids
+            columns:
+              - column:
+                  name: access_point_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ssid_name
+                  type: VARCHAR(64)
+                  remarks: "SSID name"
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: access_point_ssids
+            baseColumnNames: access_point_id
+            constraintName: fk_access_point_ssids_ap
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: access_point_ssids
+            indexName: idx_access_point_ssids_ap
+            columns:
+              - column:
+                  name: access_point_id
+
+        - createIndex:
+            tableName: access_point_ssids
+            indexName: idx_access_point_ssids_name
+            columns:
+              - column:
+                  name: ssid_name
+

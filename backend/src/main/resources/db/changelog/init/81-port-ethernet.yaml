@@ -1,0 +1,62 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-ethernet-port-columns
+      author: AALEXEEN
+      comment: "Add EthernetPort specific columns to ports table (inherits from Port -> NamedEntity -> BaseEntity)"
+      changes:
+        # =============================================
+        # EthernetPort specific fields
+        # Discriminator value: "ETHERNET"
+        # Inheritance chain: EthernetPort -> Port -> NamedEntity -> BaseEntity
+        # =============================================
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: ethernet_standard
+                  type: VARCHAR(64)
+                  remarks: "Ethernet standard: 10BASE-T, 100BASE-TX, 1000BASE-T, etc."
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: mdi_mdix_mode
+                  type: VARCHAR(16)
+                  remarks: "MDI/MDIX mode: MDI, MDIX, AUTO"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: cable_length_meters
+                  type: INTEGER
+                  remarks: "Detected cable length in meters"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: link_partner_info
+                  type: VARCHAR(256)
+                  remarks: "Information about the link partner"
+                  constraints:
+                    nullable: true
+
+        # =============================================
+        # Indexes for EthernetPort fields
+        # =============================================
+        - createIndex:
+            tableName: ports
+            indexName: idx_port_ethernet_standard
+            columns:
+              - column:
+                  name: ethernet_standard
+

@@ -1,0 +1,263 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-device-columns
+      author: AALEXEEN
+      comment: "Add Device specific columns to components table (inherits from Component -> NamedEntity -> BaseEntity)"
+      changes:
+        # ============================================================
+        # Device specific fields (abstract class)
+        # Discriminator value: "DEVICE"
+        # Inheritance chain: Device -> Component -> NamedEntity -> BaseEntity
+        # ============================================================
+
+        # Basic network management
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: management_ip
+                  type: VARCHAR(45)
+                  remarks: "Management IP address (IPv4 or IPv6)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: subnet_mask
+                  type: VARCHAR(45)
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: default_gateway
+                  type: VARCHAR(45)
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: management_vlan
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+        # Device firmware and software
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: firmware_version
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: software_version
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: boot_loader_version
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+
+        # Device credentials and access
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: admin_username
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: snmp_community_read
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: snmp_community_write
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: snmp_version
+                  type: VARCHAR(16)
+                  defaultValue: "v2c"
+                  remarks: "SNMP version: v1, v2c, v3"
+                  constraints:
+                    nullable: true
+
+        # Monitoring and management
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: is_monitored
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: monitoring_interval_seconds
+                  type: INTEGER
+                  defaultValueNumeric: 300
+                  remarks: "Monitoring interval in seconds (default 5 minutes)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: last_ping_time
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: last_ping_success
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: uptime_seconds
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+
+        # Physical characteristics
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: console_port_type
+                  type: VARCHAR(32)
+                  remarks: "Console port type: RJ45, USB, Serial"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_redundant_power
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: device_operating_temp_min
+                  type: INTEGER
+                  remarks: "Minimum operating temperature in Celsius"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: device_operating_temp_max
+                  type: INTEGER
+                  remarks: "Maximum operating temperature in Celsius"
+                  constraints:
+                    nullable: true
+
+        # Device monitoring metrics
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cpu_utilization_percent
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: memory_utilization_percent
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: temperature_celsius
+                  type: INTEGER
+                  remarks: "Current device temperature"
+                  constraints:
+                    nullable: true
+
+        # ============================================================
+        # Indexes
+        # ============================================================
+        - createIndex:
+            tableName: components
+            indexName: idx_component_management_ip
+            columns:
+              - column:
+                  name: management_ip
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_monitored
+            columns:
+              - column:
+                  name: is_monitored
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_last_ping
+            columns:
+              - column:
+                  name: last_ping_time
+              - column:
+                  name: last_ping_success
+

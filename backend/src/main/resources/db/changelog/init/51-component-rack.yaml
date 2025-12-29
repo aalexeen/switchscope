@@ -1,0 +1,331 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-rack-columns
+      author: AALEXEEN
+      comment: "Add Rack specific columns to components table (inherits from Component -> NamedEntity -> BaseEntity)"
+      changes:
+        # ============================================================
+        # Rack specific fields
+        # Discriminator value: "RACK"
+        # Inheritance chain: Rack -> Component -> NamedEntity -> BaseEntity
+        # ============================================================
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: rack_units_total
+                  type: INTEGER
+                  defaultValueNumeric: 42
+                  remarks: "Total rack units capacity (standard 42U)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: rack_type_id
+                  type: UUID
+                  remarks: "FK to component_models_catalog (RackModelEntity)"
+                  constraints:
+                    nullable: true
+
+        # Physical configuration
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: actual_width_inches
+                  type: DOUBLE
+                  remarks: "Actual rack width in inches"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: actual_depth_inches
+                  type: DOUBLE
+                  remarks: "Actual rack depth in inches"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: actual_height_inches
+                  type: DOUBLE
+                  remarks: "Actual rack height in inches"
+                  constraints:
+                    nullable: true
+
+        # Door and panel configuration
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: front_door_type
+                  type: VARCHAR(32)
+                  defaultValue: "PERFORATED"
+                  remarks: "Front door type: PERFORATED, GLASS, SOLID, NONE"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: rear_door_type
+                  type: VARCHAR(32)
+                  defaultValue: "PERFORATED"
+                  remarks: "Rear door type: PERFORATED, GLASS, SOLID, NONE"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_side_panels
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_front_door
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_rear_door
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        # Power and infrastructure
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: power_outlets
+                  type: INTEGER
+                  remarks: "Number of power outlets (0-50)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: power_capacity_watts
+                  type: INTEGER
+                  remarks: "Total power capacity in watts"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_pdu
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Has Power Distribution Unit"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: pdu_type
+                  type: VARCHAR(64)
+                  remarks: "PDU type: BASIC, SWITCHED, METERED, SMART"
+                  constraints:
+                    nullable: true
+
+        # Cooling configuration
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cooling_type
+                  type: VARCHAR(32)
+                  defaultValue: "PASSIVE"
+                  remarks: "Cooling type: PASSIVE, ACTIVE, LIQUID"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_fans
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: fan_count
+                  type: INTEGER
+                  remarks: "Number of fans (0-20)"
+                  constraints:
+                    nullable: true
+
+        # Security features
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_locks
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: lock_type
+                  type: VARCHAR(32)
+                  remarks: "Lock type: KEY, COMBINATION, ELECTRONIC, HANDLE"
+                  constraints:
+                    nullable: true
+
+        # Environmental monitoring
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_temperature_monitoring
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_humidity_monitoring
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_power_monitoring
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        # Cable management
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cable_management_type
+                  type: VARCHAR(64)
+                  remarks: "Cable management: VERTICAL_MANAGERS, HORIZONTAL_MANAGERS, CABLE_TRAYS, FINGER_DUCTS"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: has_cable_trays
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        # Installation details
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: is_floor_anchored
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: floor_anchor_type
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: true
+
+        # Weight and capacity
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: empty_weight_kg
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: max_load_weight_kg
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+
+        # ============================================================
+        # Foreign Keys
+        # ============================================================
+        - addForeignKeyConstraint:
+            baseTableName: components
+            baseColumnNames: rack_type_id
+            constraintName: fk_rack_type
+            referencedTableName: component_models_catalog
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        # ============================================================
+        # Indexes
+        # ============================================================
+        - createIndex:
+            tableName: components
+            indexName: idx_component_rack_type
+            columns:
+              - column:
+                  name: rack_type_id
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_rack_units
+            columns:
+              - column:
+                  name: rack_units_total
+

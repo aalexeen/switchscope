@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-has-ports-columns
+      author: AALEXEEN
+      comment: "Add HasPortsImpl specific columns to components table (MappedSuperclass extending Device)"
+      changes:
+        # ============================================================
+        # HasPortsImpl specific fields (MappedSuperclass)
+        # Inheritance chain: HasPortsImpl -> Device -> Component -> NamedEntity -> BaseEntity
+        # Note: ports are stored in 'ports' table via equipment_id FK
+        # ============================================================
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: max_throughput_gbps
+                  type: DOUBLE
+                  remarks: "Maximum throughput in Gbps"
+                  constraints:
+                    nullable: true
+
+        # ============================================================
+        # Indexes
+        # ============================================================
+        - createIndex:
+            tableName: components
+            indexName: idx_component_throughput
+            columns:
+              - column:
+                  name: max_throughput_gbps
+

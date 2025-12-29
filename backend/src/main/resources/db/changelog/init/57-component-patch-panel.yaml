@@ -1,0 +1,253 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-patch-panel-columns
+      author: AALEXEEN
+      comment: "Add PatchPanel specific columns to components table (inherits from HasPortsImpl -> Device -> Component)"
+      changes:
+        # ============================================================
+        # PatchPanel specific fields
+        # Discriminator value: "PATCH_PANEL"
+        # Inheritance chain: PatchPanel -> HasPortsImpl -> Device -> Component -> NamedEntity -> BaseEntity
+        # Note: PatchPanel is a passive device (isManaged() returns false)
+        # ============================================================
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: patch_panel_model_id
+                  type: UUID
+                  remarks: "FK to component_models_catalog (PatchPanelModel)"
+                  constraints:
+                    nullable: true
+
+        # Panel specifications
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: panel_type
+                  type: VARCHAR(64)
+                  remarks: "Panel type: COPPER, FIBER, HYBRID, COAX"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: panel_connector_type
+                  type: VARCHAR(64)
+                  remarks: "Connector type: RJ45, LC, SC, etc."
+                  constraints:
+                    nullable: true
+
+        # Rack positioning
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: panel_rack_units
+                  type: INTEGER
+                  remarks: "Rack units required (1-10)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: rack_position
+                  type: INTEGER
+                  remarks: "Position in rack (from bottom)"
+                  constraints:
+                    nullable: true
+
+        # Panel identification and labeling
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: panel_label
+                  type: VARCHAR(64)
+                  remarks: "Physical label on panel"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: port_labeling_scheme
+                  type: VARCHAR(64)
+                  remarks: "Port labeling scheme: 1-24, A1-C8, etc."
+                  constraints:
+                    nullable: true
+
+        # Installation and configuration
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: mounting_type
+                  type: VARCHAR(32)
+                  remarks: "Mounting type: FRONT_MOUNT, REAR_MOUNT, SWING_OUT"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: termination_type
+                  type: VARCHAR(32)
+                  remarks: "Termination type: 110_BLOCK, KRONE, LSA, FIBER_ADAPTER"
+                  constraints:
+                    nullable: true
+
+        # Performance characteristics
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: category_rating
+                  type: VARCHAR(16)
+                  remarks: "Category rating: CAT5E, CAT6, CAT6A"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: shielded
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Shielded (STP) panel"
+                  constraints:
+                    nullable: false
+
+        # Cable management
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: panel_cable_management
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Has integrated cable management"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: panel_cable_mgmt_type
+                  type: VARCHAR(64)
+                  remarks: "Cable management type"
+                  constraints:
+                    nullable: true
+
+        # Documentation
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: panel_installation_notes
+                  type: VARCHAR(1024)
+                  remarks: "Installation notes"
+                  constraints:
+                    nullable: true
+
+        # ============================================================
+        # Foreign Keys
+        # ============================================================
+        - addForeignKeyConstraint:
+            baseTableName: components
+            baseColumnNames: patch_panel_model_id
+            constraintName: fk_patch_panel_model
+            referencedTableName: component_models_catalog
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        # ============================================================
+        # Indexes
+        # ============================================================
+        - createIndex:
+            tableName: components
+            indexName: idx_component_patch_panel_model
+            columns:
+              - column:
+                  name: patch_panel_model_id
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_panel_type
+            columns:
+              - column:
+                  name: panel_type
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_category_rating
+            columns:
+              - column:
+                  name: category_rating
+
+  # ============================================================
+  # Patch Panel to Cable Runs ManyToMany table
+  # ============================================================
+  - changeSet:
+      id: create-patch-panel-cable-runs-table
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: patch_panel_cable_runs
+            columns:
+              - column:
+                  name: patch_panel_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cable_run_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: patch_panel_cable_runs
+            columnNames: patch_panel_id, cable_run_id
+            constraintName: pk_patch_panel_cable_runs
+
+        - addForeignKeyConstraint:
+            baseTableName: patch_panel_cable_runs
+            baseColumnNames: patch_panel_id
+            constraintName: fk_pp_cable_runs_panel
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: patch_panel_cable_runs
+            baseColumnNames: cable_run_id
+            constraintName: fk_pp_cable_runs_cable
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: patch_panel_cable_runs
+            indexName: idx_pp_cable_runs_panel
+            columns:
+              - column:
+                  name: patch_panel_id
+
+        - createIndex:
+            tableName: patch_panel_cable_runs
+            indexName: idx_pp_cable_runs_cable
+            columns:
+              - column:
+                  name: cable_run_id
+

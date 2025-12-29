@@ -1,0 +1,99 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-fiber-port-columns
+      author: AALEXEEN
+      comment: "Add FiberPort specific columns to ports table (inherits from Port -> NamedEntity -> BaseEntity)"
+      changes:
+        # =============================================
+        # FiberPort specific fields
+        # Discriminator value: "FIBER"
+        # Inheritance chain: FiberPort -> Port -> NamedEntity -> BaseEntity
+        # =============================================
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: fiber_type
+                  type: VARCHAR(32)
+                  remarks: "Fiber type: SINGLE_MODE, MULTI_MODE"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: wavelength_nm
+                  type: INTEGER
+                  remarks: "Wavelength in nanometers"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: fiber_standard
+                  type: VARCHAR(64)
+                  remarks: "Fiber standard: 1000BASE-SX, 1000BASE-LX, 10GBASE-SR, etc."
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: transmission_distance_km
+                  type: DOUBLE
+                  remarks: "Maximum transmission distance in kilometers"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: tx_power_dbm
+                  type: DOUBLE
+                  remarks: "Transmit power in dBm"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: rx_power_dbm
+                  type: DOUBLE
+                  remarks: "Receive power in dBm"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: ports
+            columns:
+              - column:
+                  name: optical_loss_db
+                  type: DOUBLE
+                  remarks: "Optical signal loss in dB"
+                  constraints:
+                    nullable: true
+
+        # =============================================
+        # Indexes for FiberPort fields
+        # =============================================
+        - createIndex:
+            tableName: ports
+            indexName: idx_port_fiber_type
+            columns:
+              - column:
+                  name: fiber_type
+
+        - createIndex:
+            tableName: ports
+            indexName: idx_port_fiber_standard
+            columns:
+              - column:
+                  name: fiber_standard
+

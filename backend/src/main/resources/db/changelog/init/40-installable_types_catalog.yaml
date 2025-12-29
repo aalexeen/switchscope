@@ -1,0 +1,167 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-installable-types-catalog
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: installable_types_catalog
+            columns:
+              # ============================================================
+              # BaseEntity fields
+              # ============================================================
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+
+              # ============================================================
+              # NamedEntity fields
+              # ============================================================
+              - column:
+                  name: name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+
+              # ============================================================
+              # BaseCodedEntity fields
+              # ============================================================
+              - column:
+                  name: code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: display_name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: INTEGER
+                  defaultValueNumeric: 0
+
+              # ============================================================
+              # InstallableTypeEntity specific fields
+              # ============================================================
+
+              # Configuration flags
+              - column:
+                  name: requires_rack_position
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: has_standard_rack_units
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: supports_power_management
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: requires_environmental_control
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+              # Installation characteristics
+              - column:
+                  name: typical_installation_time_minutes
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+              - column:
+                  name: requires_shutdown
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: hot_swappable
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+              # Physical characteristics
+              - column:
+                  name: default_rack_units
+                  type: INTEGER
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_weight_kg
+                  type: DOUBLE
+                  constraints:
+                    nullable: true
+
+              # Associated entity class for polymorphism
+              - column:
+                  name: entity_class
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+
+              # Installation priority
+              - column:
+                  name: installation_priority
+                  type: INTEGER
+                  defaultValueNumeric: 5
+                  constraints:
+                    nullable: true
+
+        # Unique constraint for code
+        - addUniqueConstraint:
+            tableName: installable_types_catalog
+            columnNames: code
+            constraintName: uk_installable_type_code
+
+        # Indexes
+        - createIndex:
+            tableName: installable_types_catalog
+            indexName: idx_installable_type_active_sort
+            columns:
+              - column:
+                  name: is_active
+              - column:
+                  name: sort_order
+                  descending: false
+
+        - createIndex:
+            tableName: installable_types_catalog
+            indexName: idx_installable_type_entity_class
+            columns:
+              - column:
+                  name: entity_class
+

@@ -1,0 +1,26 @@
+databaseChangeLog:
+  # ============================================================
+  # This file resolves the circular dependency between
+  # installations and components tables:
+  #   - installations.housing_component_id -> components.id
+  #   - components.installation_id -> installations.id
+  #
+  # Order of creation:
+  #   42-installations.yaml - creates installations table (without FK to components)
+  #   50-components.yaml - creates components table (with FK to installations)
+  #   90-installation-component-fk.yaml - adds FK from installations to components
+  # ============================================================
+
+  - changeSet:
+      id: add-installation-housing-component-fk
+      author: AALEXEEN
+      comment: "Add FK from installations.housing_component_id to components.id"
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: installations
+            baseColumnNames: housing_component_id
+            constraintName: fk_installation_housing_component
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: SET NULL
+

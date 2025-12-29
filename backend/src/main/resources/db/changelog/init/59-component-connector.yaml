@@ -1,0 +1,164 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-connector-columns
+      author: AALEXEEN
+      comment: "Add Connector specific columns to components table (inherits from Component -> NamedEntity -> BaseEntity)"
+      changes:
+        # ============================================================
+        # Connector specific fields
+        # Discriminator value: "CONNECTOR"
+        # Inheritance chain: Connector -> Component -> NamedEntity -> BaseEntity
+        # Note: Connectors are attached to CableRuns and can connect to Ports
+        # ============================================================
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: connector_model_id
+                  type: UUID
+                  remarks: "FK to component_models_catalog (ConnectorModel)"
+                  constraints:
+                    nullable: true
+
+        # Connector specifications
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: conn_connector_type
+                  type: VARCHAR(64)
+                  remarks: "Connector type (from model or manual override)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: connector_position
+                  type: VARCHAR(32)
+                  remarks: "Position on cable: START, END, INTERMEDIATE"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: gender
+                  type: VARCHAR(16)
+                  remarks: "Connector gender: MALE, FEMALE"
+                  constraints:
+                    nullable: true
+
+        # Physical identification
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: connector_label
+                  type: VARCHAR(64)
+                  remarks: "Physical label on connector"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: color_code
+                  type: VARCHAR(16)
+                  remarks: "Color coding for identification"
+                  constraints:
+                    nullable: true
+
+        # Installation and condition
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: termination_quality
+                  type: VARCHAR(32)
+                  remarks: "Termination quality: GOOD, ACCEPTABLE, POOR, REWORK_NEEDED"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: connector_installation_notes
+                  type: VARCHAR(512)
+                  remarks: "Installation notes"
+                  constraints:
+                    nullable: true
+
+        # Relationship to cable run
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cable_run_id
+                  type: UUID
+                  remarks: "FK to components (CableRun) - required relationship"
+                  constraints:
+                    nullable: true
+
+        # ============================================================
+        # Foreign Keys
+        # ============================================================
+        - addForeignKeyConstraint:
+            baseTableName: components
+            baseColumnNames: connector_model_id
+            constraintName: fk_connector_model
+            referencedTableName: component_models_catalog
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        - addForeignKeyConstraint:
+            baseTableName: components
+            baseColumnNames: cable_run_id
+            constraintName: fk_connector_cable_run
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        # ============================================================
+        # Indexes
+        # ============================================================
+        - createIndex:
+            tableName: components
+            indexName: idx_component_connector_model
+            columns:
+              - column:
+                  name: connector_model_id
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_connector_type
+            columns:
+              - column:
+                  name: conn_connector_type
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_connector_position
+            columns:
+              - column:
+                  name: connector_position
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_cable_run
+            columns:
+              - column:
+                  name: cable_run_id
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_termination_quality
+            columns:
+              - column:
+                  name: termination_quality
+

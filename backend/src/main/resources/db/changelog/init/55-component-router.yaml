@@ -1,0 +1,214 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-router-columns
+      author: AALEXEEN
+      comment: "Add Router specific columns to components table (inherits from HasPortsImpl -> Device -> Component)"
+      changes:
+        # ============================================================
+        # Router specific fields
+        # Discriminator value: "ROUTER"
+        # Inheritance chain: Router -> HasPortsImpl -> Device -> Component -> NamedEntity -> BaseEntity
+        # ============================================================
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: max_routes
+                  type: INTEGER
+                  remarks: "Maximum routing table size"
+                  constraints:
+                    nullable: true
+
+        # Routing protocol support
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_bgp
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Border Gateway Protocol support"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_ospf
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Open Shortest Path First support"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_eigrp
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Enhanced Interior Gateway Routing Protocol support"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_rip
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Routing Information Protocol support"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_static_routing
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+        # NAT capabilities
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_nat
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Network Address Translation support"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: max_nat_sessions
+                  type: INTEGER
+                  remarks: "Maximum concurrent NAT sessions"
+                  constraints:
+                    nullable: true
+
+        # VPN capabilities
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_ipsec_vpn
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "IPSec VPN support"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: max_vpn_tunnels
+                  type: INTEGER
+                  remarks: "Maximum VPN tunnels"
+                  constraints:
+                    nullable: true
+
+        # Firewall and security
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_acl
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Access Control List support"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_firewall
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Stateful firewall support"
+                  constraints:
+                    nullable: false
+
+        # Performance
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: routing_throughput_gbps
+                  type: DOUBLE
+                  remarks: "Routing throughput in Gbps"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: packets_per_second
+                  type: BIGINT
+                  remarks: "Packets per second capacity"
+                  constraints:
+                    nullable: true
+
+        # ============================================================
+        # Indexes
+        # ============================================================
+        - createIndex:
+            tableName: components
+            indexName: idx_component_router_protocols
+            columns:
+              - column:
+                  name: supports_bgp
+              - column:
+                  name: supports_ospf
+
+  # ============================================================
+  # Router WAN Interfaces ElementCollection table
+  # ============================================================
+  - changeSet:
+      id: create-router-wan-interfaces-table
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: router_wan_interfaces
+            columns:
+              - column:
+                  name: router_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: interface_type
+                  type: VARCHAR(64)
+                  remarks: "WAN interface type: Ethernet, Serial, T1, etc."
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: router_wan_interfaces
+            baseColumnNames: router_id
+            constraintName: fk_router_wan_interfaces_router
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: router_wan_interfaces
+            indexName: idx_router_wan_interfaces_router
+            columns:
+              - column:
+                  name: router_id
+
