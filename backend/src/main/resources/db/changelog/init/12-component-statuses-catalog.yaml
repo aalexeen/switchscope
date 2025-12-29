@@ -63,51 +63,59 @@ databaseChangeLog:
                   type: VARCHAR(64)
               - column:
                   name: is_available
+                  type: BOOLEAN
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
               - column:
                   name: is_operational
+                  type: BOOLEAN
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
               - column:
                   name: can_accept_installations
+                  type: BOOLEAN
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
               - column:
                   name: requires_attention
+                  type: BOOLEAN
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
               - column:
                   name: is_physically_present
+                  type: BOOLEAN
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
               - column:
                   name: is_in_inventory
+                  type: BOOLEAN
                   defaultValueBoolean: true
                   constraints:
                     nullable: false
               - column:
                   name: is_in_transition
+                  type: BOOLEAN
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
               - column:
                   name: can_be_reserved
+                  type: BOOLEAN
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
         - addUniqueConstraint:
             tableName: component_statuses_catalog
             columnNames: code
-            constraintName: UK_CODE
+            constraintName: UK_COMPONENT_STATUSES_CODE
         - createIndex:
             tableName: component_statuses_catalog
-            indexName: idx_base_active_sort
+            indexName: idx_component_statuses_active_sort
             columns:
               - column:
                   name: is_active

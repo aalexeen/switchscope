@@ -11,7 +11,6 @@ databaseChangeLog:
             tableName: user_role
             file: ../csv/02-user-roles.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile:  true
             columns:
               - column:

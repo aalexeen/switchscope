@@ -80,6 +80,7 @@ Thumbs.db
 
 /.gitattributes
 /backend/.mvn/wrapper/maven-wrapper.properties
+/backend/.mvn/maven.config
 /backend/mvnw
 /backend/mvnw.cmd
 /.vscode/settings.json

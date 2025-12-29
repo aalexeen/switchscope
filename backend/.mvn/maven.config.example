@@ -1,0 +1,3 @@
+-Ddatabase.url=jdbc:postgresql://localhost:5432/switchscope?currentSchema=switchscope
+-Ddatabase.username=your_username
+-Ddatabase.password=your_password
