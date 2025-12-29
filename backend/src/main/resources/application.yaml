@@ -59,3 +59,11 @@ server.servlet:
     force: true
 
 springdoc.swagger-ui.path: /
+
+# Application-specific settings
+app:
+  encryption:
+    # Key for encrypting sensitive data (device passwords, etc.)
+    # IMPORTANT: Set via environment variable in production: APP_ENCRYPTION_KEY
+    # Must be at least 16 characters, recommended 32 characters for AES-256
+    key: ${APP_ENCRYPTION_KEY:change-me-in-production-32chars}

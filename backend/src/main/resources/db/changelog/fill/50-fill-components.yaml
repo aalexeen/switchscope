@@ -68,6 +68,7 @@ databaseChangeLog:
               - column: { header: software_version, name: software_version, type: VARCHAR }
               - column: { header: boot_loader_version, name: boot_loader_version, type: VARCHAR }
               - column: { header: admin_username, name: admin_username, type: VARCHAR }
+              - column: { header: admin_password, name: admin_password, type: VARCHAR }
               - column: { header: snmp_community_read, name: snmp_community_read, type: VARCHAR }
               - column: { header: snmp_community_write, name: snmp_community_write, type: VARCHAR }
               - column: { header: snmp_version, name: snmp_version, type: VARCHAR }

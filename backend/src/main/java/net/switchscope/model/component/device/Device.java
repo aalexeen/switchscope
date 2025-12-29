@@ -1,6 +1,7 @@
 package net.switchscope.model.component.device;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.Pattern;
@@ -66,6 +67,10 @@ public abstract class Device extends Component {
     @Size(max = 64)
     @NoHtml
     private String adminUsername;
+
+    @Column(name = "admin_password")
+    @Convert(converter = net.switchscope.config.EncryptedStringConverter.class)
+    private String adminPassword;
 
     @Column(name = "snmp_community_read")
     @Size(max = 128)
