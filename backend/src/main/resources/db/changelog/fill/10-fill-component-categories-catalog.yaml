@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-component-categories-catalog
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: component_categories_catalog
+            file: ../csv/10-component-categories-catalog.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              - column:
+                  header: id
+                  name: id
+                  type: uuid
+              - column:
+                  header: name
+                  name: name
+                  type: varchar
+              - column:
+                  header: description
+                  name: description
+                  type: varchar
+              - column:
+                  header: code
+                  name: code
+                  type: varchar
+              - column:
+                  header: display_name
+                  name: display_name
+                  type: varchar
+              - column:
+                  header: is_active
+                  name: is_active
+                  type: boolean
+              - column:
+                  header: sort_order
+                  name: sort_order
+                  type: numeric
+              - column:
+                  header: color_class
+                  name: color_class
+                  type: varchar
+              - column:
+                  header: icon_class
+                  name: icon_class
+                  type: varchar
+              - column:
+                  header: is_system_category
+                  name: is_system_category
+                  type: boolean
+              - column:
+                  header: is_infrastructure
+                  name: is_infrastructure
+                  type: boolean
+      rollback:
+        - sql:
+            sql: DELETE FROM component_categories_catalog;
+

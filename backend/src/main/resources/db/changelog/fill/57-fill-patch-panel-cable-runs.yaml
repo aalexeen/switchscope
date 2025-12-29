@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-patch-panel-cable-runs
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: patch_panel_cable_runs
+            file: ../csv/57-patch-panel-cable-runs.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              - column: { header: patch_panel_id, name: patch_panel_id, type: UUID }
+              - column: { header: cable_run_id, name: cable_run_id, type: UUID }
+      rollback:
+        - delete:
+            tableName: patch_panel_cable_runs
+
+

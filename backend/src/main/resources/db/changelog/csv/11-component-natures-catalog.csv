@@ -1,0 +1,7 @@
+id;name;description;code;display_name;is_active;sort_order;color_class;icon_class;requires_management;can_have_ip_address;has_firmware;processes_network_traffic;supports_snmp_monitoring;power_consumption_category
+'01932f00-0002-7000-8000-000000000001';'Active Device';'Powered devices that actively process network traffic';'ACTIVE';'Active';true;1;'text-success';'bi-activity';true;true;true;true;true;'high'
+'01932f00-0002-7000-8000-000000000002';'Passive Device';'Non-powered infrastructure components';'PASSIVE';'Passive';true;2;'text-secondary';'bi-dash-circle';false;false;false;false;false;'none'
+'01932f00-0002-7000-8000-000000000003';'Hybrid Device';'Devices with both active and passive characteristics';'HYBRID';'Hybrid';true;3;'text-info';'bi-shuffle';true;false;false;true;false;'medium'
+'01932f00-0002-7000-8000-000000000004';'Smart Passive';'Passive devices with monitoring capabilities';'SMART_PASSIVE';'Smart Passive';true;4;'text-primary';'bi-eye';false;false;false;false;true;'low'
+'01932f00-0002-7000-8000-000000000005';'Power Equipment';'Power-related infrastructure';'POWER_EQUIPMENT';'Power Equipment';true;5;'text-warning';'bi-lightning';true;true;true;false;true;'critical'
+

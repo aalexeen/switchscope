@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-cable-run-locations
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: cable_run_locations
+            file: ../csv/58-cable-run-locations.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              - column: { header: cable_run_id, name: cable_run_id, type: UUID }
+              - column: { header: location_id, name: location_id, type: UUID }
+              - column: { header: location_order, name: location_order, type: INTEGER }
+      rollback:
+        - delete:
+            tableName: cable_run_locations
+
+

@@ -1,0 +1,16 @@
+id;name;description;code;display_name;is_active;sort_order;requires_rack_position;has_standard_rack_units;supports_power_management;requires_environmental_control;typical_installation_time_minutes;requires_shutdown;hot_swappable;default_rack_units;max_weight_kg;entity_class;installation_priority
+'01932f00-0040-7000-8000-000000000001';'Network Switch Installation';'Installation of network switch equipment';'NETWORK_SWITCH';'Network Switch';true;1;true;true;true;true;30;false;false;1;15;'SwitchEntity';1
+'01932f00-0040-7000-8000-000000000002';'Router Installation';'Installation of network router';'ROUTER';'Router';true;2;true;true;true;true;45;false;false;1;20;'RouterEntity';1
+'01932f00-0040-7000-8000-000000000003';'Access Point Installation';'Installation of wireless access point';'ACCESS_POINT';'Access Point';true;3;false;false;true;false;15;false;true;0;2;'AccessPointEntity';3
+'01932f00-0040-7000-8000-000000000004';'Firewall Installation';'Installation of network firewall';'FIREWALL';'Firewall';true;4;true;true;true;true;60;true;false;1;25;'FirewallEntity';1
+'01932f00-0040-7000-8000-000000000005';'Server Rack Installation';'Installation of server rack enclosure';'RACK';'Server Rack';true;10;false;false;false;true;240;false;false;42;200;'RackEntity';5
+'01932f00-0040-7000-8000-000000000006';'Wall Cabinet Installation';'Installation of wall-mounted cabinet';'WALL_CABINET';'Wall Cabinet';true;11;false;false;false;false;120;false;false;12;50;'WallCabinetEntity';5
+'01932f00-0040-7000-8000-000000000007';'Patch Panel Installation';'Installation of copper patch panel';'PATCH_PANEL';'Patch Panel';true;20;true;true;false;false;20;false;false;1;3;'PatchPanelEntity';4
+'01932f00-0040-7000-8000-000000000008';'Fiber Patch Panel Installation';'Installation of fiber optic patch panel';'FIBER_PATCH_PANEL';'Fiber Patch Panel';true;21;true;true;false;false;30;false;false;1;3;'FiberPatchPanelEntity';4
+'01932f00-0040-7000-8000-000000000009';'Cable Run Installation';'Installation of structured cabling';'CABLE_RUN';'Cable Run';true;22;false;false;false;false;60;false;false;0;5;'CableRunEntity';4
+'01932f00-0040-7000-8000-000000000010';'UPS Installation';'Installation of uninterruptible power supply';'UPS';'UPS';true;30;true;true;true;false;90;true;false;2;50;'UpsEntity';2
+'01932f00-0040-7000-8000-000000000011';'PDU Installation';'Installation of power distribution unit';'PDU';'PDU';true;31;true;false;true;false;30;true;false;0;10;'PduEntity';2
+'01932f00-0040-7000-8000-000000000012';'SFP Module Installation';'Installation of SFP transceiver module';'SFP';'SFP Module';true;40;false;false;false;false;5;false;true;0;0.1;'SfpModuleEntity';3
+'01932f00-0040-7000-8000-000000000013';'Cable Manager Installation';'Installation of cable management panel';'CABLE_MANAGER';'Cable Manager';true;50;true;true;false;false;15;false;false;1;2;'CableManagerEntity';5
+
+

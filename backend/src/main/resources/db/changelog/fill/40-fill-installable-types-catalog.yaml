@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-installable-types-catalog
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: installable_types_catalog
+            file: ../csv/40-installable-types-catalog.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              # Base entity fields
+              - column: { header: id, name: id, type: UUID }
+              - column: { header: name, name: name, type: VARCHAR }
+              - column: { header: description, name: description, type: TEXT }
+              - column: { header: code, name: code, type: VARCHAR }
+              - column: { header: display_name, name: display_name, type: VARCHAR }
+              - column: { header: is_active, name: is_active, type: BOOLEAN }
+              - column: { header: sort_order, name: sort_order, type: INTEGER }
+              # InstallableType specific fields
+              - column: { header: requires_rack_position, name: requires_rack_position, type: BOOLEAN }
+              - column: { header: has_standard_rack_units, name: has_standard_rack_units, type: BOOLEAN }
+              - column: { header: supports_power_management, name: supports_power_management, type: BOOLEAN }
+              - column: { header: requires_environmental_control, name: requires_environmental_control, type: BOOLEAN }
+              - column: { header: typical_installation_time_minutes, name: typical_installation_time_minutes, type: INTEGER }
+              - column: { header: requires_shutdown, name: requires_shutdown, type: BOOLEAN }
+              - column: { header: hot_swappable, name: hot_swappable, type: BOOLEAN }
+              - column: { header: default_rack_units, name: default_rack_units, type: INTEGER }
+              - column: { header: max_weight_kg, name: max_weight_kg, type: DOUBLE }
+              - column: { header: entity_class, name: entity_class, type: VARCHAR }
+              - column: { header: installation_priority, name: installation_priority, type: INTEGER }
+      rollback:
+        - delete:
+            tableName: installable_types_catalog
+
+

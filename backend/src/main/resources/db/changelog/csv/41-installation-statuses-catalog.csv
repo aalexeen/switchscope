@@ -1,0 +1,15 @@
+id;name;description;code;display_name;is_active;sort_order;is_physically_present;is_operational;requires_attention;is_final_status;is_error_status;color_category;icon_class;status_order;auto_transition_minutes;allows_equipment_operation;allows_maintenance;requires_documentation;notifies_stakeholders
+'01932f00-0041-7000-8000-000000000001';'Planned';'Installation is planned but not yet scheduled';'PLANNED';'Planned';true;1;false;false;false;false;false;'secondary';'bi-calendar';10;;false;false;true;false
+'01932f00-0041-7000-8000-000000000002';'Scheduled';'Installation is scheduled for a specific date';'SCHEDULED';'Scheduled';true;2;false;false;false;false;false;'info';'bi-calendar-check';20;;false;false;true;true
+'01932f00-0041-7000-8000-000000000003';'In Progress';'Installation is currently being performed';'IN_PROGRESS';'In Progress';true;3;false;false;true;false;false;'warning';'bi-gear-wide-connected';30;;false;false;true;true
+'01932f00-0041-7000-8000-000000000004';'Installed';'Equipment is physically installed';'INSTALLED';'Installed';true;4;true;false;false;false;false;'primary';'bi-check-circle';40;;false;true;true;false
+'01932f00-0041-7000-8000-000000000005';'Testing';'Equipment is installed and being tested';'TESTING';'Testing';true;5;true;false;true;false;false;'info';'bi-speedometer2';50;;false;true;true;false
+'01932f00-0041-7000-8000-000000000006';'Operational';'Equipment is fully operational';'OPERATIONAL';'Operational';true;6;true;true;false;false;false;'success';'bi-check-circle-fill';60;;true;true;false;false
+'01932f00-0041-7000-8000-000000000007';'Maintenance';'Equipment is under scheduled maintenance';'MAINTENANCE';'Maintenance';true;7;true;false;true;false;false;'warning';'bi-tools';70;;false;true;true;true
+'01932f00-0041-7000-8000-000000000008';'Degraded';'Equipment is operational but with issues';'DEGRADED';'Degraded';true;8;true;true;true;false;false;'warning';'bi-exclamation-triangle';75;;true;true;true;true
+'01932f00-0041-7000-8000-000000000009';'Failed';'Equipment has failed and is non-operational';'FAILED';'Failed';true;9;true;false;true;false;true;'danger';'bi-x-circle';80;;false;true;true;true
+'01932f00-0041-7000-8000-000000000010';'Decommissioning';'Equipment is being removed from service';'DECOMMISSIONING';'Decommissioning';true;10;true;false;true;false;false;'secondary';'bi-box-arrow-down';85;;false;true;true;true
+'01932f00-0041-7000-8000-000000000011';'Removed';'Equipment has been physically removed';'REMOVED';'Removed';true;11;false;false;false;true;false;'dark';'bi-trash';90;;false;false;true;false
+'01932f00-0041-7000-8000-000000000012';'Cancelled';'Installation was cancelled before completion';'CANCELLED';'Cancelled';true;12;false;false;false;true;false;'secondary';'bi-x-lg';95;;false;false;true;true
+
+
