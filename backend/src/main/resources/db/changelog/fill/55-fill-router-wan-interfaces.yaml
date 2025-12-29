@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-router-wan-interfaces
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: router_wan_interfaces
+            file: ../csv/55-router-wan-interfaces.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              - column: { header: router_id, name: router_id, type: UUID }
+              - column: { header: interface_type, name: interface_type, type: VARCHAR }
+      rollback:
+        - delete:
+            tableName: router_wan_interfaces
+
+

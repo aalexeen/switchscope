@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-device-model-specifications
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: device_model_specifications
+            file: ../csv/32-device-model-specifications.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              - column: { header: device_model_id, name: device_model_id, type: UUID }
+              - column: { header: spec_name, name: spec_name, type: VARCHAR }
+              - column: { header: spec_value, name: spec_value, type: TEXT }
+      rollback:
+        - delete:
+            tableName: device_model_specifications
+
+

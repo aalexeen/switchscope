@@ -1,0 +1,8 @@
+id;name;description;code;display_name;is_active;sort_order;color_class;icon_class;is_system_category;is_infrastructure
+'01932f00-0001-7000-8000-000000000001';'Networking Equipment';'Active network devices that process and route traffic';'NETWORKING';'Networking';true;1;'text-primary';'bi-hdd-network';true;true
+'01932f00-0001-7000-8000-000000000002';'Housing';'Physical enclosures and mounting equipment';'HOUSING';'Housing & Enclosures';true;2;'text-secondary';'bi-box';true;true
+'01932f00-0001-7000-8000-000000000003';'Connectivity';'Cables, connectors, and passive patch panels';'CONNECTIVITY';'Connectivity';true;3;'text-success';'bi-plug';true;true
+'01932f00-0001-7000-8000-000000000004';'Power';'Power distribution and UPS equipment';'POWER';'Power Systems';true;4;'text-warning';'bi-lightning-charge';true;true
+'01932f00-0001-7000-8000-000000000005';'Modules';'Expansion modules, SFPs, and add-on cards';'MODULE';'Modules & Add-ons';true;5;'text-info';'bi-cpu';false;false
+'01932f00-0001-7000-8000-000000000006';'Support';'Mounting hardware and cable management';'SUPPORT';'Support Equipment';true;6;'text-muted';'bi-tools';false;false
+

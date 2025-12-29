@@ -1,0 +1,14 @@
+id;name;description;code;display_name;is_active;sort_order;hierarchy_level;can_have_children;can_hold_equipment;requires_address;is_physical_location;is_rack_like;is_room_like;is_building_like;max_children_count;max_equipment_count;default_rack_units;color_category;icon_class;map_symbol;requires_access_control;requires_climate_control;requires_power_management;requires_monitoring
+'01932f00-0020-7000-8000-000000000001';'Region';'Geographic region or territory';'REGION';'Region';true;1;10;true;false;false;false;false;false;false;;;0;'primary';'bi-globe';'🌍';false;false;false;false
+'01932f00-0020-7000-8000-000000000002';'City';'City or metropolitan area';'CITY';'City';true;2;20;true;false;true;false;false;false;false;;;0;'primary';'bi-building';'🏙️';false;false;false;false
+'01932f00-0020-7000-8000-000000000003';'Campus';'Office campus or industrial park';'CAMPUS';'Campus';true;3;30;true;false;true;true;false;false;true;;;0;'info';'bi-buildings';'🏢';true;false;false;true
+'01932f00-0020-7000-8000-000000000004';'Building';'Physical building structure';'BUILDING';'Building';true;4;40;true;false;true;true;false;false;true;;;0;'info';'bi-building';'🏛️';true;false;false;true
+'01932f00-0020-7000-8000-000000000005';'Floor';'Building floor or level';'FLOOR';'Floor';true;5;50;true;false;false;true;false;false;false;;;0;'secondary';'bi-layers';'📊';true;false;false;true
+'01932f00-0020-7000-8000-000000000006';'Data Center';'Dedicated data center facility';'DATA_CENTER';'Data Center';true;6;45;true;true;true;true;false;true;true;;500;0;'danger';'bi-hdd-rack';'🖥️';true;true;true;true
+'01932f00-0020-7000-8000-000000000007';'Server Room';'Dedicated server/network room';'SERVER_ROOM';'Server Room';true;7;60;true;true;false;true;false;true;false;;100;0;'warning';'bi-door-closed';'🚪';true;true;true;true
+'01932f00-0020-7000-8000-000000000008';'Network Closet';'Small network equipment closet';'NETWORK_CLOSET';'Network Closet';true;8;65;true;true;false;true;false;true;false;;20;0;'warning';'bi-door-open';'🚪';true;false;true;true
+'01932f00-0020-7000-8000-000000000009';'Rack';'Equipment rack or cabinet';'RACK';'Rack';true;9;70;true;true;false;true;true;false;false;;50;42;'success';'bi-server';'📦';true;true;true;true
+'01932f00-0020-7000-8000-000000000010';'Wall Mount';'Wall-mounted equipment location';'WALL_MOUNT';'Wall Mount';true;10;75;false;true;false;true;true;false;false;;10;6;'secondary';'bi-box';'📎';false;false;false;false
+'01932f00-0020-7000-8000-000000000011';'Desk';'Desktop or workstation location';'DESK';'Desk';true;11;80;false;true;false;true;false;false;false;;5;0;'light';'bi-laptop';'💻';false;false;false;false
+'01932f00-0020-7000-8000-000000000012';'Outdoor';'Outdoor equipment location';'OUTDOOR';'Outdoor';true;12;55;true;true;false;true;false;false;false;;;0;'dark';'bi-tree';'🌳';false;false;false;true
+

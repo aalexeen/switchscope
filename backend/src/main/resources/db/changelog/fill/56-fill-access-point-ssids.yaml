@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-access-point-ssids
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: access_point_ssids
+            file: ../csv/56-access-point-ssids.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              - column: { header: access_point_id, name: access_point_id, type: UUID }
+              - column: { header: ssid_name, name: ssid_name, type: VARCHAR }
+      rollback:
+        - delete:
+            tableName: access_point_ssids
+
+

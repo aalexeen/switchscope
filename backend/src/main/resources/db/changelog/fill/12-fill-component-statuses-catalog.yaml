@@ -1,0 +1,119 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-component-statuses-catalog
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: component_statuses_catalog
+            file: ../csv/12-component-statuses-catalog.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              - column:
+                  header: id
+                  name: id
+                  type: uuid
+              - column:
+                  header: name
+                  name: name
+                  type: varchar
+              - column:
+                  header: description
+                  name: description
+                  type: varchar
+              - column:
+                  header: code
+                  name: code
+                  type: varchar
+              - column:
+                  header: display_name
+                  name: display_name
+                  type: varchar
+              - column:
+                  header: is_active
+                  name: is_active
+                  type: boolean
+              - column:
+                  header: sort_order
+                  name: sort_order
+                  type: numeric
+              - column:
+                  header: color_class
+                  name: color_class
+                  type: varchar
+              - column:
+                  header: icon_class
+                  name: icon_class
+                  type: varchar
+              - column:
+                  header: lifecycle_phase
+                  name: lifecycle_phase
+                  type: varchar
+              - column:
+                  header: is_available
+                  name: is_available
+                  type: boolean
+              - column:
+                  header: is_operational
+                  name: is_operational
+                  type: boolean
+              - column:
+                  header: can_accept_installations
+                  name: can_accept_installations
+                  type: boolean
+              - column:
+                  header: requires_attention
+                  name: requires_attention
+                  type: boolean
+              - column:
+                  header: is_physically_present
+                  name: is_physically_present
+                  type: boolean
+              - column:
+                  header: is_in_inventory
+                  name: is_in_inventory
+                  type: boolean
+              - column:
+                  header: is_in_transition
+                  name: is_in_transition
+                  type: boolean
+              - column:
+                  header: can_be_reserved
+                  name: can_be_reserved
+                  type: boolean
+      rollback:
+        - sql:
+            sql: DELETE FROM component_statuses_catalog;
+
+  - changeSet:
+      id: fill-component-status-transitions
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: component_status_transitions
+            file: ../csv/12-component-status-transitions.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              - column:
+                  header: from_status_id
+                  name: from_status_id
+                  type: uuid
+              - column:
+                  header: to_status_id
+                  name: to_status_id
+                  type: uuid
+      rollback:
+        - sql:
+            sql: DELETE FROM component_status_transitions;
+

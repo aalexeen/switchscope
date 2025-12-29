@@ -9,7 +9,7 @@ databaseChangeLog:
             quotchar: ''''
             usePreparedStatements: true
             tableName: user_role
-            file: ../csv/user_role.csv
+            file: ../csv/02-user-roles.csv
             commentLineStartsWith: //
             schemaName: public
             relativeToChangelogFile:  true

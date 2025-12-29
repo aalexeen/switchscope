@@ -1,0 +1,181 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-components
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: components
+            file: ../csv/50-components.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              # Base entity fields
+              - column: { header: id, name: id, type: UUID }
+              - column: { header: name, name: name, type: VARCHAR }
+              - column: { header: description, name: description, type: TEXT }
+              - column: { header: component_class, name: component_class, type: VARCHAR }
+              - column: { header: manufacturer, name: manufacturer, type: VARCHAR }
+              - column: { header: model, name: model, type: VARCHAR }
+              - column: { header: serial_number, name: serial_number, type: VARCHAR }
+              - column: { header: part_number, name: part_number, type: VARCHAR }
+              - column: { header: component_status_id, name: component_status_id, type: UUID }
+              - column: { header: component_type_id, name: component_type_id, type: UUID }
+              - column: { header: component_nature_id, name: component_nature_id, type: UUID }
+              - column: { header: installation_id, name: installation_id, type: UUID }
+              - column: { header: parent_component_id, name: parent_component_id, type: UUID }
+              - column: { header: last_maintenance_date, name: last_maintenance_date, type: TIMESTAMP }
+              - column: { header: next_maintenance_date, name: next_maintenance_date, type: TIMESTAMP }
+              # Rack fields
+              - column: { header: rack_units_total, name: rack_units_total, type: INTEGER }
+              - column: { header: rack_type_id, name: rack_type_id, type: UUID }
+              - column: { header: actual_width_inches, name: actual_width_inches, type: DOUBLE }
+              - column: { header: actual_depth_inches, name: actual_depth_inches, type: DOUBLE }
+              - column: { header: actual_height_inches, name: actual_height_inches, type: DOUBLE }
+              - column: { header: front_door_type, name: front_door_type, type: VARCHAR }
+              - column: { header: rear_door_type, name: rear_door_type, type: VARCHAR }
+              - column: { header: has_side_panels, name: has_side_panels, type: BOOLEAN }
+              - column: { header: has_front_door, name: has_front_door, type: BOOLEAN }
+              - column: { header: has_rear_door, name: has_rear_door, type: BOOLEAN }
+              - column: { header: power_outlets, name: power_outlets, type: INTEGER }
+              - column: { header: power_capacity_watts, name: power_capacity_watts, type: INTEGER }
+              - column: { header: has_pdu, name: has_pdu, type: BOOLEAN }
+              - column: { header: pdu_type, name: pdu_type, type: VARCHAR }
+              - column: { header: cooling_type, name: cooling_type, type: VARCHAR }
+              - column: { header: has_fans, name: has_fans, type: BOOLEAN }
+              - column: { header: fan_count, name: fan_count, type: INTEGER }
+              - column: { header: has_locks, name: has_locks, type: BOOLEAN }
+              - column: { header: lock_type, name: lock_type, type: VARCHAR }
+              - column: { header: has_temperature_monitoring, name: has_temperature_monitoring, type: BOOLEAN }
+              - column: { header: has_humidity_monitoring, name: has_humidity_monitoring, type: BOOLEAN }
+              - column: { header: has_power_monitoring, name: has_power_monitoring, type: BOOLEAN }
+              - column: { header: cable_management_type, name: cable_management_type, type: VARCHAR }
+              - column: { header: has_cable_trays, name: has_cable_trays, type: BOOLEAN }
+              - column: { header: is_floor_anchored, name: is_floor_anchored, type: BOOLEAN }
+              - column: { header: floor_anchor_type, name: floor_anchor_type, type: VARCHAR }
+              - column: { header: empty_weight_kg, name: empty_weight_kg, type: DOUBLE }
+              - column: { header: max_load_weight_kg, name: max_load_weight_kg, type: DOUBLE }
+              # Device fields
+              - column: { header: management_ip, name: management_ip, type: VARCHAR }
+              - column: { header: subnet_mask, name: subnet_mask, type: VARCHAR }
+              - column: { header: default_gateway, name: default_gateway, type: VARCHAR }
+              - column: { header: management_vlan, name: management_vlan, type: INTEGER }
+              - column: { header: firmware_version, name: firmware_version, type: VARCHAR }
+              - column: { header: software_version, name: software_version, type: VARCHAR }
+              - column: { header: boot_loader_version, name: boot_loader_version, type: VARCHAR }
+              - column: { header: admin_username, name: admin_username, type: VARCHAR }
+              - column: { header: snmp_community_read, name: snmp_community_read, type: VARCHAR }
+              - column: { header: snmp_community_write, name: snmp_community_write, type: VARCHAR }
+              - column: { header: snmp_version, name: snmp_version, type: VARCHAR }
+              - column: { header: is_monitored, name: is_monitored, type: BOOLEAN }
+              - column: { header: monitoring_interval_seconds, name: monitoring_interval_seconds, type: INTEGER }
+              - column: { header: last_ping_time, name: last_ping_time, type: TIMESTAMP }
+              - column: { header: last_ping_success, name: last_ping_success, type: BOOLEAN }
+              - column: { header: uptime_seconds, name: uptime_seconds, type: BIGINT }
+              - column: { header: console_port_type, name: console_port_type, type: VARCHAR }
+              - column: { header: has_redundant_power, name: has_redundant_power, type: BOOLEAN }
+              - column: { header: device_operating_temp_min, name: device_operating_temp_min, type: INTEGER }
+              - column: { header: device_operating_temp_max, name: device_operating_temp_max, type: INTEGER }
+              - column: { header: cpu_utilization_percent, name: cpu_utilization_percent, type: INTEGER }
+              - column: { header: memory_utilization_percent, name: memory_utilization_percent, type: INTEGER }
+              - column: { header: temperature_celsius, name: temperature_celsius, type: INTEGER }
+              - column: { header: max_throughput_gbps, name: max_throughput_gbps, type: DOUBLE }
+              # Switch fields
+              - column: { header: switch_model_id, name: switch_model_id, type: UUID }
+              - column: { header: max_ports, name: max_ports, type: INTEGER }
+              - column: { header: supports_poe, name: supports_poe, type: BOOLEAN }
+              - column: { header: poe_budget_watts, name: poe_budget_watts, type: INTEGER }
+              - column: { header: supports_stacking, name: supports_stacking, type: BOOLEAN }
+              - column: { header: stack_id, name: stack_id, type: INTEGER }
+              - column: { header: stack_priority, name: stack_priority, type: INTEGER }
+              - column: { header: max_stack_members, name: max_stack_members, type: INTEGER }
+              - column: { header: switching_capacity_gbps, name: switching_capacity_gbps, type: DOUBLE }
+              - column: { header: forwarding_rate_mpps, name: forwarding_rate_mpps, type: DOUBLE }
+              - column: { header: mac_address_table_size, name: mac_address_table_size, type: INTEGER }
+              - column: { header: vlan_support, name: vlan_support, type: BOOLEAN }
+              - column: { header: max_vlans, name: max_vlans, type: INTEGER }
+              - column: { header: spanning_tree_support, name: spanning_tree_support, type: BOOLEAN }
+              - column: { header: qos_support, name: qos_support, type: BOOLEAN }
+              - column: { header: port_mirroring, name: port_mirroring, type: BOOLEAN }
+              - column: { header: link_aggregation, name: link_aggregation, type: BOOLEAN }
+              - column: { header: switch_native_vlan, name: switch_native_vlan, type: INTEGER }
+              - column: { header: voice_vlan, name: voice_vlan, type: INTEGER }
+              - column: { header: packet_buffer_size_mb, name: packet_buffer_size_mb, type: DOUBLE }
+              # Router fields
+              - column: { header: max_routes, name: max_routes, type: INTEGER }
+              - column: { header: supports_bgp, name: supports_bgp, type: BOOLEAN }
+              - column: { header: supports_ospf, name: supports_ospf, type: BOOLEAN }
+              - column: { header: supports_eigrp, name: supports_eigrp, type: BOOLEAN }
+              - column: { header: supports_rip, name: supports_rip, type: BOOLEAN }
+              - column: { header: supports_static_routing, name: supports_static_routing, type: BOOLEAN }
+              - column: { header: supports_nat, name: supports_nat, type: BOOLEAN }
+              - column: { header: max_nat_sessions, name: max_nat_sessions, type: INTEGER }
+              - column: { header: supports_ipsec_vpn, name: supports_ipsec_vpn, type: BOOLEAN }
+              - column: { header: max_vpn_tunnels, name: max_vpn_tunnels, type: INTEGER }
+              - column: { header: supports_acl, name: supports_acl, type: BOOLEAN }
+              - column: { header: supports_firewall, name: supports_firewall, type: BOOLEAN }
+              - column: { header: routing_throughput_gbps, name: routing_throughput_gbps, type: DOUBLE }
+              - column: { header: packets_per_second, name: packets_per_second, type: BIGINT }
+              # Access Point fields
+              - column: { header: wifi_standard, name: wifi_standard, type: VARCHAR }
+              - column: { header: max_clients, name: max_clients, type: INTEGER }
+              - column: { header: supports_dual_band, name: supports_dual_band, type: BOOLEAN }
+              - column: { header: supports_5ghz, name: supports_5ghz, type: BOOLEAN }
+              - column: { header: supports_6ghz, name: supports_6ghz, type: BOOLEAN }
+              - column: { header: poe_required, name: poe_required, type: BOOLEAN }
+              - column: { header: poe_consumption_watts, name: poe_consumption_watts, type: INTEGER }
+              - column: { header: coverage_radius_meters, name: coverage_radius_meters, type: INTEGER }
+              - column: { header: supports_wpa3, name: supports_wpa3, type: BOOLEAN }
+              - column: { header: supports_enterprise_auth, name: supports_enterprise_auth, type: BOOLEAN }
+              - column: { header: controller_managed, name: controller_managed, type: BOOLEAN }
+              - column: { header: controller_ip, name: controller_ip, type: VARCHAR }
+              # Patch Panel fields
+              - column: { header: patch_panel_model_id, name: patch_panel_model_id, type: UUID }
+              - column: { header: panel_type, name: panel_type, type: VARCHAR }
+              - column: { header: panel_connector_type, name: panel_connector_type, type: VARCHAR }
+              - column: { header: panel_rack_units, name: panel_rack_units, type: INTEGER }
+              - column: { header: rack_position, name: rack_position, type: INTEGER }
+              - column: { header: panel_label, name: panel_label, type: VARCHAR }
+              - column: { header: port_labeling_scheme, name: port_labeling_scheme, type: VARCHAR }
+              - column: { header: mounting_type, name: mounting_type, type: VARCHAR }
+              - column: { header: termination_type, name: termination_type, type: VARCHAR }
+              - column: { header: category_rating, name: category_rating, type: VARCHAR }
+              - column: { header: shielded, name: shielded, type: BOOLEAN }
+              - column: { header: panel_cable_management, name: panel_cable_management, type: BOOLEAN }
+              - column: { header: panel_cable_mgmt_type, name: panel_cable_mgmt_type, type: VARCHAR }
+              - column: { header: panel_installation_notes, name: panel_installation_notes, type: VARCHAR }
+              # Cable Run fields
+              - column: { header: cable_model_id, name: cable_model_id, type: UUID }
+              - column: { header: cable_length_meters, name: cable_length_meters, type: DOUBLE }
+              - column: { header: cable_type, name: cable_type, type: VARCHAR }
+              - column: { header: cable_category, name: cable_category, type: VARCHAR }
+              - column: { header: installation_method, name: installation_method, type: VARCHAR }
+              - column: { header: cable_pathway, name: cable_pathway, type: VARCHAR }
+              - column: { header: tested, name: tested, type: BOOLEAN }
+              - column: { header: test_date, name: test_date, type: DATE }
+              - column: { header: test_result, name: test_result, type: VARCHAR }
+              - column: { header: test_notes, name: test_notes, type: VARCHAR }
+              - column: { header: cable_id, name: cable_id, type: VARCHAR }
+              - column: { header: circuit_id, name: circuit_id, type: VARCHAR }
+              - column: { header: cable_installation_notes, name: cable_installation_notes, type: VARCHAR }
+              - column: { header: start_location_id, name: start_location_id, type: UUID }
+              - column: { header: end_location_id, name: end_location_id, type: UUID }
+              # Connector fields
+              - column: { header: connector_model_id, name: connector_model_id, type: UUID }
+              - column: { header: conn_connector_type, name: conn_connector_type, type: VARCHAR }
+              - column: { header: connector_position, name: connector_position, type: VARCHAR }
+              - column: { header: gender, name: gender, type: VARCHAR }
+              - column: { header: connector_label, name: connector_label, type: VARCHAR }
+              - column: { header: color_code, name: color_code, type: VARCHAR }
+              - column: { header: termination_quality, name: termination_quality, type: VARCHAR }
+              - column: { header: connector_installation_notes, name: connector_installation_notes, type: VARCHAR }
+              - column: { header: cable_run_id, name: cable_run_id, type: UUID }
+      rollback:
+        - delete:
+            tableName: components
+
+

@@ -1,0 +1,12 @@
+id;name;description;code;display_name;is_active;sort_order;color_class;icon_class;lifecycle_phase;is_available;is_operational;can_accept_installations;requires_attention;is_physically_present;is_in_inventory;is_in_transition;can_be_reserved
+'01932f00-0003-7000-8000-000000000001';'New';'Newly received, not yet deployed';'NEW';'New';true;1;'text-info';'bi-box-seam';'PROCUREMENT';true;false;false;false;true;true;false;true
+'01932f00-0003-7000-8000-000000000002';'In Stock';'Available in inventory for deployment';'IN_STOCK';'In Stock';true;2;'text-secondary';'bi-archive';'STORAGE';true;false;false;false;true;true;false;true
+'01932f00-0003-7000-8000-000000000003';'Reserved';'Reserved for planned deployment';'RESERVED';'Reserved';true;3;'text-warning';'bi-bookmark-check';'PLANNING';false;false;false;false;true;true;false;false
+'01932f00-0003-7000-8000-000000000004';'Deploying';'Currently being installed or configured';'DEPLOYING';'Deploying';true;4;'text-primary';'bi-gear';'DEPLOYMENT';false;false;false;true;true;false;true;false
+'01932f00-0003-7000-8000-000000000005';'Active';'Operational and in production use';'ACTIVE';'Active';true;5;'text-success';'bi-check-circle';'PRODUCTION';false;true;true;false;true;false;false;false
+'01932f00-0003-7000-8000-000000000006';'Maintenance';'Temporarily offline for maintenance';'MAINTENANCE';'Under Maintenance';true;6;'text-orange';'bi-wrench';'MAINTENANCE';false;false;false;true;true;false;false;false
+'01932f00-0003-7000-8000-000000000007';'Degraded';'Operating with reduced capacity or issues';'DEGRADED';'Degraded';true;7;'text-warning';'bi-exclamation-triangle';'PRODUCTION';false;true;false;true;true;false;false;false
+'01932f00-0003-7000-8000-000000000008';'Failed';'Non-operational, requires repair or replacement';'FAILED';'Failed';true;8;'text-danger';'bi-x-circle';'FAILURE';false;false;false;true;true;false;false;false
+'01932f00-0003-7000-8000-000000000009';'Decommissioning';'Being removed from service';'DECOMMISSIONING';'Decommissioning';true;9;'text-muted';'bi-arrow-down-circle';'RETIREMENT';false;false;false;false;true;false;true;false
+'01932f00-0003-7000-8000-000000000010';'Retired';'Removed from service, pending disposal';'RETIRED';'Retired';true;10;'text-dark';'bi-archive-fill';'DISPOSAL';false;false;false;false;false;true;false;false
+

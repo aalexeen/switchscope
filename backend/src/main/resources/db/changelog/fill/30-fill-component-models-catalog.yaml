@@ -1,0 +1,119 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-component-models-catalog
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: true
+            tableName: component_models_catalog
+            file: ../csv/30-component-models-catalog.csv
+            commentLineStartsWith: //
+            schemaName: public
+            relativeToChangelogFile: true
+            columns:
+              # ============================================================
+              # Base entity fields (from NamedEntity)
+              # ============================================================
+              - column: { header: id, name: id, type: UUID }
+              - column: { header: name, name: name, type: VARCHAR }
+              - column: { header: description, name: description, type: TEXT }
+
+              # ============================================================
+              # ComponentModel base fields
+              # ============================================================
+              - column: { header: model_class, name: model_class, type: VARCHAR }
+              - column: { header: manufacturer, name: manufacturer, type: VARCHAR }
+              - column: { header: model_number, name: model_number, type: VARCHAR }
+              - column: { header: part_number, name: part_number, type: VARCHAR }
+              - column: { header: sku, name: sku, type: VARCHAR }
+              - column: { header: component_type_id, name: component_type_id, type: UUID }
+              - column: { header: active, name: active, type: BOOLEAN }
+              - column: { header: discontinued, name: discontinued, type: BOOLEAN }
+              - column: { header: end_of_life, name: end_of_life, type: BOOLEAN }
+              - column: { header: release_date, name: release_date, type: TIMESTAMP }
+              - column: { header: discontinue_date, name: discontinue_date, type: TIMESTAMP }
+              - column: { header: datasheet_url, name: datasheet_url, type: VARCHAR }
+              - column: { header: manual_url, name: manual_url, type: VARCHAR }
+              - column: { header: support_url, name: support_url, type: VARCHAR }
+              - column: { header: warranty_years, name: warranty_years, type: INTEGER }
+              - column: { header: expected_lifespan_years, name: expected_lifespan_years, type: INTEGER }
+              - column: { header: maintenance_interval_months, name: maintenance_interval_months, type: INTEGER }
+              - column: { header: weight_kg, name: weight_kg, type: DOUBLE }
+              - column: { header: dimensions_mm, name: dimensions_mm, type: VARCHAR }
+              - column: { header: operating_temperature_min, name: operating_temperature_min, type: INTEGER }
+              - column: { header: operating_temperature_max, name: operating_temperature_max, type: INTEGER }
+              - column: { header: operating_humidity_min, name: operating_humidity_min, type: INTEGER }
+              - column: { header: operating_humidity_max, name: operating_humidity_max, type: INTEGER }
+              - column: { header: storage_temperature_min, name: storage_temperature_min, type: INTEGER }
+              - column: { header: storage_temperature_max, name: storage_temperature_max, type: INTEGER }
+              - column: { header: certifications, name: certifications, type: VARCHAR }
+              - column: { header: compliance_standards, name: compliance_standards, type: VARCHAR }
+              - column: { header: msrp, name: msrp, type: DOUBLE }
+              - column: { header: list_price, name: list_price, type: DOUBLE }
+              - column: { header: currency_code, name: currency_code, type: VARCHAR }
+              - column: { header: verified, name: verified, type: BOOLEAN }
+              - column: { header: notes, name: notes, type: VARCHAR }
+
+              # ============================================================
+              # RackModelEntity specific fields
+              # ============================================================
+              - column: { header: standard_width_inches, name: standard_width_inches, type: DOUBLE }
+              - column: { header: standard_depth_inches, name: standard_depth_inches, type: DOUBLE }
+              - column: { header: typical_capacity_u, name: typical_capacity_u, type: INTEGER }
+              - column: { header: max_capacity_u, name: max_capacity_u, type: INTEGER }
+              - column: { header: is_wall_mountable, name: is_wall_mountable, type: BOOLEAN }
+              - column: { header: is_floor_standing, name: is_floor_standing, type: BOOLEAN }
+              - column: { header: is_enclosed, name: is_enclosed, type: BOOLEAN }
+              - column: { header: is_open_frame, name: is_open_frame, type: BOOLEAN }
+              - column: { header: is_outdoor_rated, name: is_outdoor_rated, type: BOOLEAN }
+              - column: { header: max_weight_capacity_kg, name: max_weight_capacity_kg, type: DOUBLE }
+              - column: { header: max_power_capacity_watts, name: max_power_capacity_watts, type: INTEGER }
+              - column: { header: has_ventilation, name: has_ventilation, type: BOOLEAN }
+              - column: { header: has_cable_management, name: has_cable_management, type: BOOLEAN }
+              - column: { header: has_power_distribution, name: has_power_distribution, type: BOOLEAN }
+              - column: { header: has_cooling_system, name: has_cooling_system, type: BOOLEAN }
+              - column: { header: has_locks, name: has_locks, type: BOOLEAN }
+              - column: { header: assembly_time_hours, name: assembly_time_hours, type: INTEGER }
+              - column: { header: door_type, name: door_type, type: VARCHAR }
+              - column: { header: cooling_type, name: cooling_type, type: VARCHAR }
+
+              # ============================================================
+              # SwitchModel specific fields
+              # ============================================================
+              - column: { header: switch_class, name: switch_class, type: VARCHAR }
+              - column: { header: switch_tier, name: switch_tier, type: VARCHAR }
+              - column: { header: is_stackable, name: is_stackable, type: BOOLEAN }
+              - column: { header: max_stack_units, name: max_stack_units, type: INTEGER }
+              - column: { header: rack_units, name: rack_units, type: INTEGER }
+              - column: { header: form_factor, name: form_factor, type: VARCHAR }
+              - column: { header: total_ports, name: total_ports, type: INTEGER }
+              - column: { header: gigabit_ports, name: gigabit_ports, type: INTEGER }
+              - column: { header: fast_ethernet_ports, name: fast_ethernet_ports, type: INTEGER }
+              - column: { header: ten_gig_ports, name: ten_gig_ports, type: INTEGER }
+              - column: { header: sfp_ports, name: sfp_ports, type: INTEGER }
+              - column: { header: sfp_plus_ports, name: sfp_plus_ports, type: INTEGER }
+              - column: { header: console_ports, name: console_ports, type: INTEGER }
+              - column: { header: supports_poe, name: supports_poe, type: BOOLEAN }
+              - column: { header: poe_budget_watts, name: poe_budget_watts, type: INTEGER }
+              - column: { header: poe_standard, name: poe_standard, type: VARCHAR }
+              - column: { header: switching_capacity_gbps, name: switching_capacity_gbps, type: DECIMAL }
+              - column: { header: forwarding_rate_mpps, name: forwarding_rate_mpps, type: DECIMAL }
+              - column: { header: mac_address_table_size, name: mac_address_table_size, type: INTEGER }
+              - column: { header: buffer_size_mb, name: buffer_size_mb, type: DECIMAL }
+              - column: { header: latency_microseconds, name: latency_microseconds, type: DECIMAL }
+              - column: { header: max_vlans, name: max_vlans, type: INTEGER }
+              - column: { header: supports_spanning_tree, name: supports_spanning_tree, type: BOOLEAN }
+              - column: { header: supports_link_aggregation, name: supports_link_aggregation, type: BOOLEAN }
+              - column: { header: supports_qos, name: supports_qos, type: BOOLEAN }
+              - column: { header: supports_igmp_snooping, name: supports_igmp_snooping, type: BOOLEAN }
+              - column: { header: supports_port_mirroring, name: supports_port_mirroring, type: BOOLEAN }
+              - column: { header: supports_voice_vlan, name: supports_voice_vlan, type: BOOLEAN }
+              - column: { header: supports_acl, name: supports_acl, type: BOOLEAN }
+              - column: { header: layer3_routing, name: layer3_routing, type: BOOLEAN }
+      rollback:
+        - delete:
+            tableName: component_models_catalog
+
