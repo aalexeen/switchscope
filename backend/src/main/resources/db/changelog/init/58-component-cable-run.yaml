@@ -1,0 +1,304 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-cable-run-columns
+      author: AALEXEEN
+      comment: "Add CableRun specific columns to components table (inherits from Component -> NamedEntity -> BaseEntity)"
+      changes:
+        # ============================================================
+        # CableRun specific fields
+        # Discriminator value: "CABLE_RUN"
+        # Inheritance chain: CableRun -> Component -> NamedEntity -> BaseEntity
+        # ============================================================
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cable_model_id
+                  type: UUID
+                  remarks: "FK to component_models_catalog (CableRunModel)"
+                  constraints:
+                    nullable: true
+
+        # Cable specifications
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cable_length_meters
+                  type: DOUBLE
+                  remarks: "Cable length in meters (0.1 - 10000.0)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cable_type
+                  type: VARCHAR(64)
+                  remarks: "Cable type (from model or manual override)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cable_category
+                  type: VARCHAR(32)
+                  remarks: "Cable category: CAT5E, CAT6, CAT6A, OM3, OS2, etc."
+                  constraints:
+                    nullable: true
+
+        # Installation details
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: installation_method
+                  type: VARCHAR(64)
+                  remarks: "Installation method: PULLED, BLOWN, DIRECT_BURIAL, AERIAL"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cable_pathway
+                  type: VARCHAR(128)
+                  remarks: "Cable pathway: CONDUIT, TRAY, RACEWAY, J_HOOKS"
+                  constraints:
+                    nullable: true
+
+        # Testing and certification
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: tested
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Cable has been tested"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: test_date
+                  type: DATE
+                  remarks: "Date of last test"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: test_result
+                  type: VARCHAR(32)
+                  remarks: "Test result: PASS, FAIL, MARGINAL"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: test_notes
+                  type: VARCHAR(512)
+                  remarks: "Test notes and observations"
+                  constraints:
+                    nullable: true
+
+        # Documentation
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cable_id
+                  type: VARCHAR(64)
+                  remarks: "Physical label/marking on cable"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: circuit_id
+                  type: VARCHAR(64)
+                  remarks: "Logical circuit identifier"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: cable_installation_notes
+                  type: VARCHAR(1024)
+                  remarks: "Installation notes"
+                  constraints:
+                    nullable: true
+
+        # Location relationships
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: start_location_id
+                  type: UUID
+                  remarks: "FK to locations (start point)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: end_location_id
+                  type: UUID
+                  remarks: "FK to locations (end point)"
+                  constraints:
+                    nullable: true
+
+        # ============================================================
+        # Foreign Keys
+        # ============================================================
+        - addForeignKeyConstraint:
+            baseTableName: components
+            baseColumnNames: cable_model_id
+            constraintName: fk_cable_model
+            referencedTableName: component_models_catalog
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        - addForeignKeyConstraint:
+            baseTableName: components
+            baseColumnNames: start_location_id
+            constraintName: fk_cable_start_location
+            referencedTableName: locations
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        - addForeignKeyConstraint:
+            baseTableName: components
+            baseColumnNames: end_location_id
+            constraintName: fk_cable_end_location
+            referencedTableName: locations
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        # ============================================================
+        # Indexes
+        # ============================================================
+        - createIndex:
+            tableName: components
+            indexName: idx_component_cable_model
+            columns:
+              - column:
+                  name: cable_model_id
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_cable_type
+            columns:
+              - column:
+                  name: cable_type
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_cable_tested
+            columns:
+              - column:
+                  name: tested
+              - column:
+                  name: test_result
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_cable_circuit
+            columns:
+              - column:
+                  name: circuit_id
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_cable_start_loc
+            columns:
+              - column:
+                  name: start_location_id
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_cable_end_loc
+            columns:
+              - column:
+                  name: end_location_id
+
+  # ============================================================
+  # Cable Run Locations ManyToMany ordered table
+  # ============================================================
+  - changeSet:
+      id: create-cable-run-locations-table
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: cable_run_locations
+            columns:
+              - column:
+                  name: cable_run_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: location_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: location_order
+                  type: INTEGER
+                  remarks: "Order of location in cable path"
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: cable_run_locations
+            columnNames: cable_run_id, location_order
+            constraintName: pk_cable_run_locations
+
+        - addForeignKeyConstraint:
+            baseTableName: cable_run_locations
+            baseColumnNames: cable_run_id
+            constraintName: fk_cable_run_locations_cable
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: cable_run_locations
+            baseColumnNames: location_id
+            constraintName: fk_cable_run_locations_loc
+            referencedTableName: locations
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: cable_run_locations
+            indexName: idx_cable_run_locations_cable
+            columns:
+              - column:
+                  name: cable_run_id
+
+        - createIndex:
+            tableName: cable_run_locations
+            indexName: idx_cable_run_locations_loc
+            columns:
+              - column:
+                  name: location_id
+

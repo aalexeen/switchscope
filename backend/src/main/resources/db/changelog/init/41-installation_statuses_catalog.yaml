@@ -1,0 +1,232 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-installation-statuses-catalog
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: installation_statuses_catalog
+            columns:
+              # ============================================================
+              # BaseEntity fields
+              # ============================================================
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+
+              # ============================================================
+              # NamedEntity fields
+              # ============================================================
+              - column:
+                  name: name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+
+              # ============================================================
+              # BaseCodedEntity fields
+              # ============================================================
+              - column:
+                  name: code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: display_name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: INTEGER
+                  defaultValueNumeric: 0
+
+              # ============================================================
+              # InstallationStatusEntity specific fields
+              # ============================================================
+
+              # Status characteristics
+              - column:
+                  name: is_physically_present
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_operational
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: requires_attention
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_final_status
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_error_status
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+              # UI representation
+              - column:
+                  name: color_category
+                  type: VARCHAR(16)
+                  defaultValue: "secondary"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: icon_class
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: true
+
+              # Status workflow
+              - column:
+                  name: status_order
+                  type: INTEGER
+                  defaultValueNumeric: 50
+                  constraints:
+                    nullable: true
+              - column:
+                  name: auto_transition_minutes
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+              # Business rules
+              - column:
+                  name: allows_equipment_operation
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: allows_maintenance
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: requires_documentation
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: notifies_stakeholders
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        # Unique constraint for code
+        - addUniqueConstraint:
+            tableName: installation_statuses_catalog
+            columnNames: code
+            constraintName: uk_installation_status_code
+
+        # Indexes
+        - createIndex:
+            tableName: installation_statuses_catalog
+            indexName: idx_installation_status_active_sort
+            columns:
+              - column:
+                  name: is_active
+              - column:
+                  name: sort_order
+                  descending: false
+
+        - createIndex:
+            tableName: installation_statuses_catalog
+            indexName: idx_installation_status_order
+            columns:
+              - column:
+                  name: status_order
+
+  # ManyToMany relationship table for status transitions
+  - changeSet:
+      id: create-installation-status-transitions
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: installation_status_transitions
+            columns:
+              - column:
+                  name: from_status_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: to_status_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: installation_status_transitions
+            baseColumnNames: from_status_id
+            constraintName: fk_status_transition_from
+            referencedTableName: installation_statuses_catalog
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: installation_status_transitions
+            baseColumnNames: to_status_id
+            constraintName: fk_status_transition_to
+            referencedTableName: installation_statuses_catalog
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - addUniqueConstraint:
+            tableName: installation_status_transitions
+            columnNames: from_status_id, to_status_id
+            constraintName: uk_status_transition_pair
+
+        - createIndex:
+            tableName: installation_status_transitions
+            indexName: idx_status_transition_from
+            columns:
+              - column:
+                  name: from_status_id
+
+        - createIndex:
+            tableName: installation_status_transitions
+            indexName: idx_status_transition_to
+            columns:
+              - column:
+                  name: to_status_id
+

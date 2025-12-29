@@ -1,0 +1,254 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-network-switch-columns
+      author: AALEXEEN
+      comment: "Add NetworkSwitch specific columns to components table (inherits from HasPortsImpl -> Device -> Component)"
+      changes:
+        # ============================================================
+        # NetworkSwitch specific fields
+        # Discriminator value: "NETWORK_SWITCH"
+        # Inheritance chain: NetworkSwitch -> HasPortsImpl -> Device -> Component -> NamedEntity -> BaseEntity
+        # ============================================================
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: switch_model_id
+                  type: UUID
+                  remarks: "FK to component_models_catalog (SwitchModel)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: max_ports
+                  type: INTEGER
+                  remarks: "Maximum number of ports"
+                  constraints:
+                    nullable: true
+
+        # PoE capabilities
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_poe
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Supports Power over Ethernet"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: poe_budget_watts
+                  type: INTEGER
+                  remarks: "Total PoE power budget in watts"
+                  constraints:
+                    nullable: true
+
+        # Stacking capabilities
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: supports_stacking
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: stack_id
+                  type: INTEGER
+                  remarks: "Stack identifier"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: stack_priority
+                  type: INTEGER
+                  remarks: "Priority in stack (1 = master)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: max_stack_members
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+        # Performance characteristics
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: switching_capacity_gbps
+                  type: DOUBLE
+                  remarks: "Switching capacity in Gbps"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: forwarding_rate_mpps
+                  type: DOUBLE
+                  remarks: "Forwarding rate in Mpps"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: mac_address_table_size
+                  type: INTEGER
+                  remarks: "MAC address table size"
+                  constraints:
+                    nullable: true
+
+        # VLAN and Layer 2 features
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: vlan_support
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: max_vlans
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: spanning_tree_support
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: qos_support
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "Quality of Service support"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: port_mirroring
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: link_aggregation
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: "LACP/LAG support"
+                  constraints:
+                    nullable: false
+
+        # VLAN configuration
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: switch_native_vlan
+                  type: INTEGER
+                  defaultValueNumeric: 1
+                  remarks: "Native VLAN ID (1-4094)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: voice_vlan
+                  type: INTEGER
+                  remarks: "Voice VLAN ID (1-4094)"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
+                  name: packet_buffer_size_mb
+                  type: DOUBLE
+                  remarks: "Packet buffer size in MB"
+                  constraints:
+                    nullable: true
+
+        # ============================================================
+        # Foreign Keys
+        # ============================================================
+        - addForeignKeyConstraint:
+            baseTableName: components
+            baseColumnNames: switch_model_id
+            constraintName: fk_switch_model
+            referencedTableName: component_models_catalog
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        # ============================================================
+        # Indexes
+        # ============================================================
+        - createIndex:
+            tableName: components
+            indexName: idx_component_switch_model
+            columns:
+              - column:
+                  name: switch_model_id
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_switch_stack
+            columns:
+              - column:
+                  name: stack_id
+
+        - createIndex:
+            tableName: components
+            indexName: idx_component_switch_poe
+            columns:
+              - column:
+                  name: supports_poe
+
