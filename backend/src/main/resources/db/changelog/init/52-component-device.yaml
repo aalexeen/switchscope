@@ -90,6 +90,16 @@ databaseChangeLog:
             tableName: components
             columns:
               - column:
+                  name: admin_password
+                  type: VARCHAR(512)
+                  remarks: "Encrypted admin password for device access"
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: components
+            columns:
+              - column:
                   name: snmp_community_read
                   type: VARCHAR(128)
                   constraints:
