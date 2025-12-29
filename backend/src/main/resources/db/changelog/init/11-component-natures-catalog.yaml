@@ -95,10 +95,10 @@ databaseChangeLog:
         - addUniqueConstraint:
             tableName: component_natures_catalog
             columnNames: code
-            constraintName: UK_CODE
+            constraintName: UK_COMPONENT_NATURES_CODE
         - createIndex:
             tableName: component_natures_catalog
-            indexName: idx_base_active_sort
+            indexName: idx_component_natures_active_sort
             columns:
               - column:
                   name: is_active

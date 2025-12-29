@@ -11,7 +11,6 @@ databaseChangeLog:
             tableName: component_statuses_catalog
             file: ../csv/12-component-statuses-catalog.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile: true
             columns:
               - column:
@@ -102,7 +101,6 @@ databaseChangeLog:
             tableName: component_status_transitions
             file: ../csv/12-component-status-transitions.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile: true
             columns:
               - column:

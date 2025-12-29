@@ -11,7 +11,6 @@ databaseChangeLog:
             tableName: device_model_specifications
             file: ../csv/32-device-model-specifications.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile: true
             columns:
               - column: { header: device_model_id, name: device_model_id, type: UUID }

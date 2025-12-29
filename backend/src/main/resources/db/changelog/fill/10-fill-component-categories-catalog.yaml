@@ -11,7 +11,6 @@ databaseChangeLog:
             tableName: component_categories_catalog
             file: ../csv/10-component-categories-catalog.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile: true
             columns:
               - column:

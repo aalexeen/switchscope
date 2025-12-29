@@ -11,7 +11,6 @@ databaseChangeLog:
             tableName: cable_run_locations
             file: ../csv/58-cable-run-locations.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile: true
             columns:
               - column: { header: cable_run_id, name: cable_run_id, type: UUID }

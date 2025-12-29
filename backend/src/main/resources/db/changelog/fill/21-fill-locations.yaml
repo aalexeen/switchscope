@@ -11,7 +11,6 @@ databaseChangeLog:
             tableName: locations
             file: ../csv/21-locations.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile: true
             columns:
               - column:

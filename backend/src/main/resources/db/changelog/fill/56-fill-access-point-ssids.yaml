@@ -11,7 +11,6 @@ databaseChangeLog:
             tableName: access_point_ssids
             file: ../csv/56-access-point-ssids.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile: true
             columns:
               - column: { header: access_point_id, name: access_point_id, type: UUID }

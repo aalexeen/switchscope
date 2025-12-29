@@ -74,10 +74,10 @@ databaseChangeLog:
         - addUniqueConstraint:
             tableName: component_categories_catalog
             columnNames: code
-            constraintName: UK_CODE
+            constraintName: UK_COMPONENT_CATEGORIES_CODE
         - createIndex:
             tableName: component_categories_catalog
-            indexName: idx_base_active_sort
+            indexName: idx_component_categories_active_sort
             columns:
               - column:
                   name: is_active

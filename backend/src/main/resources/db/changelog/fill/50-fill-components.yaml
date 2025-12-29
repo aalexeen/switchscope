@@ -11,7 +11,6 @@ databaseChangeLog:
             tableName: components
             file: ../csv/50-components.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile: true
             columns:
               # Base entity fields

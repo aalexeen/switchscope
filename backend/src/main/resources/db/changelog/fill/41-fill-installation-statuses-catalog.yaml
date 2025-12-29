@@ -11,7 +11,6 @@ databaseChangeLog:
             tableName: installation_statuses_catalog
             file: ../csv/41-installation-statuses-catalog.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile: true
             columns:
               # Base entity fields
@@ -52,7 +51,6 @@ databaseChangeLog:
             tableName: installation_status_transitions
             file: ../csv/41-installation-status-transitions.csv
             commentLineStartsWith: //
-            schemaName: public
             relativeToChangelogFile: true
             columns:
               - column: { header: from_status_id, name: from_status_id, type: UUID }

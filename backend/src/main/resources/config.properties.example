@@ -1,0 +1,4 @@
+app.version=1.0.0
+database.url=jdbc:postgresql://localhost:5432/switchscope
+database.username=your_username
+database.password=your_password

@@ -153,7 +153,7 @@ databaseChangeLog:
             constraintName: uk_code_category
         - createIndex:
             tableName: component_types_catalog
-            indexName: idx_base_active_sort
+            indexName: idx_component_types_active_sort
             columns:
               - column:
                   name: is_active
