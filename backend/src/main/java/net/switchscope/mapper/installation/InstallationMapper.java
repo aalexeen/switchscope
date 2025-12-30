@@ -22,8 +22,8 @@ public interface InstallationMapper extends BaseMapper<Installation, Installatio
     @Mapping(target = "locationId", source = "location.id")
     @Mapping(target = "locationName", source = "location.name")
     @Mapping(target = "locationFullPath", expression = "java(entity.getLocation().getFullPath())")
-    @Mapping(target = "componentId", source = "сomponent.id")
-    @Mapping(target = "componentName", source = "сomponent.name")
+    @Mapping(target = "componentId", source = "component.id")
+    @Mapping(target = "componentName", source = "component.name")
     @Mapping(target = "installedItemTypeId", source = "installedItemType.id")
     @Mapping(target = "installedItemTypeCode", source = "installedItemType.code")
     @Mapping(target = "installedItemTypeDisplayName", source = "installedItemType.displayName")
@@ -55,7 +55,7 @@ public interface InstallationMapper extends BaseMapper<Installation, Installatio
 
     // TO -> Entity (create)
     @Mapping(target = "location", ignore = true) // Set via service
-    @Mapping(target = "сomponent", ignore = true) // Set via service
+    @Mapping(target = "component", ignore = true) // Set via service
     @Mapping(target = "installedItemType", ignore = true) // Set via service
     @Mapping(target = "status", ignore = true) // Set via service
     @Mapping(target = "lastStatusChange", ignore = true)
@@ -68,7 +68,7 @@ public interface InstallationMapper extends BaseMapper<Installation, Installatio
     // TO -> Entity (update)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "location", ignore = true)
-    @Mapping(target = "сomponent", ignore = true)
+    @Mapping(target = "component", ignore = true)
     @Mapping(target = "installedItemType", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "lastStatusChange", ignore = true)

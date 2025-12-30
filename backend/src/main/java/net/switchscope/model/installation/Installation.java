@@ -32,7 +32,7 @@ public class Installation extends BaseEntity {
     // Housing component (component that contains/houses the installed item)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "housing_component_id", nullable = true)
-    private Component сomponent;
+    private Component component;
 
     // What type of item is being installed
     @ManyToOne(fetch = FetchType.LAZY)
@@ -114,7 +114,7 @@ public class Installation extends BaseEntity {
     public Installation(Location location, Component housingComponent,
             InstallableTypeEntity installedItemType, Integer installedItemId) {
         this.location = location;
-        this.сomponent = housingComponent;
+        this.component = housingComponent;
         this.installedItemType = installedItemType;
         this.installedItemId = installedItemId;
     }
@@ -128,18 +128,18 @@ public class Installation extends BaseEntity {
 
     // Location-related methods
     public boolean isDirectLocationInstallation() {
-        return сomponent == null;
+        return component == null;
     }
 
     public boolean isComponentHousedInstallation() {
-        return сomponent != null;
+        return component != null;
     }
 
     public String getInstallationLocationPath() {
         StringBuilder path = new StringBuilder(location.getFullPath());
 
-        if (сomponent != null) {
-            path.append("/").append(сomponent.getName());
+        if (component != null) {
+            path.append("/").append(component.getName());
         }
 
         if (rackPosition != null) {
@@ -162,7 +162,7 @@ public class Installation extends BaseEntity {
         }
 
         // Check housing component compatibility
-        if (сomponent != null && !сomponent.canContainComponent(null)) { // TODO: resolve actual component
+        if (component != null && !component.canContainComponent(null)) { // TODO: resolve actual component
             return false;
         }
 
@@ -348,8 +348,8 @@ public class Installation extends BaseEntity {
 
         desc.append("Location: ").append(location.getFullPath());
 
-        if (сomponent != null) {
-            desc.append(", Housing: ").append(сomponent.getName());
+        if (component != null) {
+            desc.append(", Housing: ").append(component.getName());
         }
 
         if (isRackMounted()) {
@@ -381,7 +381,7 @@ public class Installation extends BaseEntity {
                 (installedItemType != null ? installedItemType.getCode() : "null") +
                 ":" + installedItemId +
                 " at " + (location != null ? location.getName() : "null") +
-                (сomponent != null ? " in " + сomponent.getName() : "") +
+                (component != null ? " in " + component.getName() : "") +
                 ", status=" + (status != null ? status.getCode() : "null") + "]";
     }
 }
