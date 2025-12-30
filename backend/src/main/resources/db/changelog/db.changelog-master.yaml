@@ -143,11 +143,30 @@ databaseChangeLog:
   - include:
       file: fill/41-fill-installation-statuses-catalog.yaml
       relativeToChangelogFile: true
+  # Components split by type for maintainability
+  - include:
+      file: fill/50-fill-racks.yaml
+      relativeToChangelogFile: true
   - include:
       file: fill/42-fill-installations.yaml
       relativeToChangelogFile: true
   - include:
-      file: fill/50-fill-components.yaml
+      file: fill/51-fill-network-switches.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: fill/52-fill-routers.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: fill/53-fill-access-points.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: fill/54-fill-patch-panels.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: fill/54a-fill-cable-runs.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: fill/54b-fill-connectors.yaml
       relativeToChangelogFile: true
   - include:
       file: fill/55-fill-router-wan-interfaces.yaml
@@ -161,6 +180,7 @@ databaseChangeLog:
   - include:
       file: fill/58-fill-cable-run-locations.yaml
       relativeToChangelogFile: true
-  - include:
-      file: fill/80-fill-ports.yaml
-      relativeToChangelogFile: true
+# TODO: Fix 80-ports.csv type handling issues
+#  - include:
+#      file: fill/80-fill-ports.yaml
+#      relativeToChangelogFile: true

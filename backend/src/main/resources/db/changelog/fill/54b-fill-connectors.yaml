@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-connectors
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: false
+            tableName: components
+            file: ../csv/54b-connectors.csv
+            commentLineStartsWith: //
+            relativeToChangelogFile: true
+            columns:
+              - column: { header: id, name: id, type: UUID }
+              - column: { header: name, name: name, type: VARCHAR }
+              - column: { header: description, name: description, type: TEXT }
+              - column: { header: component_class, name: component_class, type: VARCHAR }
+              - column: { header: manufacturer, name: manufacturer, type: VARCHAR }
+              - column: { header: model, name: model, type: VARCHAR }
+              - column: { header: serial_number, name: serial_number, type: VARCHAR }
+              - column: { header: part_number, name: part_number, type: VARCHAR }
+              - column: { header: component_status_id, name: component_status_id, type: UUID }
+              - column: { header: component_type_id, name: component_type_id, type: UUID }
+              - column: { header: component_nature_id, name: component_nature_id, type: UUID }
+              - column: { header: installation_id, name: installation_id, type: UUID }
+              - column: { header: parent_component_id, name: parent_component_id, type: UUID }
+              - column: { header: last_maintenance_date, name: last_maintenance_date, type: DATE }
+              - column: { header: next_maintenance_date, name: next_maintenance_date, type: DATE }
+              - column: { header: connector_model_id, name: connector_model_id, type: UUID }
+              - column: { header: conn_connector_type, name: conn_connector_type, type: VARCHAR }
+              - column: { header: connector_position, name: connector_position, type: VARCHAR }
+              - column: { header: gender, name: gender, type: VARCHAR }
+              - column: { header: connector_label, name: connector_label, type: VARCHAR }
+              - column: { header: color_code, name: color_code, type: VARCHAR }
+              - column: { header: termination_quality, name: termination_quality, type: VARCHAR }
+              - column: { header: connector_installation_notes, name: connector_installation_notes, type: VARCHAR }
+              - column: { header: cable_run_id, name: cable_run_id, type: UUID }
+      rollback:
+        - delete:
+            tableName: components
+            where: component_class = 'CONNECTOR'
+

@@ -7,7 +7,7 @@ databaseChangeLog:
             encoding: UTF-8
             separator: ;
             quotchar: ''''
-            usePreparedStatements: true
+            usePreparedStatements: false
             tableName: router_wan_interfaces
             file: ../csv/55-router-wan-interfaces.csv
             commentLineStartsWith: //
