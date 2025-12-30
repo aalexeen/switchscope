@@ -102,7 +102,7 @@ public class CableRun extends Component {
         joinColumns = @JoinColumn(name = "cable_run_id"),
         inverseJoinColumns = @JoinColumn(name = "location_id")
     )
-    @OrderColumn(name = "location_order") // Важно для сохранения порядка
+    @OrderColumn(name = "location_order") // Important for preserving order
     private List<Location> locations = new ArrayList<>();
 
     // Start and end locations (most common case)
@@ -186,7 +186,7 @@ public class CableRun extends Component {
     }
 
     public List<Location> getLocationPath() {
-        return new ArrayList<>(locations); // Возвращаем копию для безопасности
+        return new ArrayList<>(locations); // Return a copy for safety
     }
 
     public String getOrderedLocationPath() {
@@ -213,10 +213,10 @@ public class CableRun extends Component {
 
     public boolean isValidCablePath() {
         if (locations.size() < 2) {
-            return false; // Кабель должен соединять минимум 2 локации
+            return false; // Cable must connect at least 2 locations
         }
 
-        // Проверка на дубликаты локаций в пути
+        // Check for duplicate locations in path
         Set<Location> uniqueLocations = new HashSet<>(locations);
         return uniqueLocations.size() == locations.size();
     }

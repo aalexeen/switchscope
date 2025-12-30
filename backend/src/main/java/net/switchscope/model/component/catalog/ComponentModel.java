@@ -336,7 +336,7 @@ public abstract class ComponentModel extends NamedEntity {
 
     // Enhanced validation
     public boolean isValidConfiguration() {
-        return isValidModel(); // Убрать дублирование логики
+        return isValidModel(); // TODO: Remove logic duplication
     }
 
 
