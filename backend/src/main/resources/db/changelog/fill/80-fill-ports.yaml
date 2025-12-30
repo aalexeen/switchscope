@@ -22,60 +22,153 @@ databaseChangeLog:
               - column: { header: equipment_id, name: equipment_id, type: UUID }
               - column: { header: connector_id, name: connector_id, type: UUID }
               # Basic port characteristics
-              - column: { header: port_number, name: port_number, type: NUMERIC }
+              - column:
+                  { header: port_number, name: port_number, type: NUMERIC }
               - column: { header: port_label, name: port_label, type: VARCHAR }
               # Status and state
               - column: { header: status, name: status, type: VARCHAR }
-              - column: { header: admin_status, name: admin_status, type: VARCHAR }
-              - column: { header: operational_status, name: operational_status, type: VARCHAR }
+              - column:
+                  { header: admin_status, name: admin_status, type: VARCHAR }
+              - column:
+                  {
+                    header: operational_status,
+                    name: operational_status,
+                    type: VARCHAR,
+                  }
               # Speed and duplex
               - column: { header: speed_mbps, name: speed_mbps, type: NUMERIC }
-              - column: { header: max_speed_mbps, name: max_speed_mbps, type: NUMERIC }
-              - column: { header: duplex_mode, name: duplex_mode, type: VARCHAR }
-              - column: { header: auto_negotiation, name: auto_negotiation, type: BOOLEAN }
+              - column:
+                  {
+                    header: max_speed_mbps,
+                    name: max_speed_mbps,
+                    type: NUMERIC,
+                  }
+              - column:
+                  { header: duplex_mode, name: duplex_mode, type: VARCHAR }
+              - column:
+                  {
+                    header: auto_negotiation,
+                    name: auto_negotiation,
+                    type: BOOLEAN,
+                  }
               # Physical characteristics
-              - column: { header: connector_type, name: connector_type, type: VARCHAR }
-              - column: { header: medium_type, name: medium_type, type: VARCHAR }
+              - column:
+                  {
+                    header: connector_type,
+                    name: connector_type,
+                    type: VARCHAR,
+                  }
+              - column:
+                  { header: medium_type, name: medium_type, type: VARCHAR }
               # VLAN and network configuration
-              - column: { header: access_vlan, name: access_vlan, type: NUMERIC }
-              - column: { header: native_vlan, name: native_vlan, type: NUMERIC }
+              - column:
+                  { header: access_vlan, name: access_vlan, type: NUMERIC }
+              - column:
+                  { header: native_vlan, name: native_vlan, type: NUMERIC }
               - column: { header: port_mode, name: port_mode, type: VARCHAR }
               # Power over Ethernet
-              - column: { header: poe_enabled, name: poe_enabled, type: BOOLEAN }
+              - column:
+                  { header: poe_enabled, name: poe_enabled, type: BOOLEAN }
               - column: { header: poe_class, name: poe_class, type: NUMERIC }
-              - column: { header: poe_power_watts, name: poe_power_watts, type: DOUBLE }
-              - column: { header: poe_max_power_watts, name: poe_max_power_watts, type: DOUBLE }
+              - column:
+                  {
+                    header: poe_power_watts,
+                    name: poe_power_watts,
+                    type: DOUBLE,
+                  }
+              - column:
+                  {
+                    header: poe_max_power_watts,
+                    name: poe_max_power_watts,
+                    type: DOUBLE,
+                  }
               # Traffic statistics
               - column: { header: bytes_in, name: bytes_in, type: NUMERIC }
               - column: { header: bytes_out, name: bytes_out, type: NUMERIC }
               - column: { header: packets_in, name: packets_in, type: NUMERIC }
-              - column: { header: packets_out, name: packets_out, type: NUMERIC }
+              - column:
+                  { header: packets_out, name: packets_out, type: NUMERIC }
               - column: { header: errors_in, name: errors_in, type: NUMERIC }
               - column: { header: errors_out, name: errors_out, type: NUMERIC }
-              - column: { header: discards_in, name: discards_in, type: NUMERIC }
-              - column: { header: discards_out, name: discards_out, type: NUMERIC }
+              - column:
+                  { header: discards_in, name: discards_in, type: NUMERIC }
+              - column:
+                  { header: discards_out, name: discards_out, type: NUMERIC }
               # Timestamps
-              - column: { header: last_change, name: last_change, type: TIMESTAMP }
-              - column: { header: last_activity, name: last_activity, type: TIMESTAMP }
-              - column: { header: stats_last_reset, name: stats_last_reset, type: TIMESTAMP }
+              - column:
+                  { header: last_change, name: last_change, type: TIMESTAMP }
+              - column:
+                  {
+                    header: last_activity,
+                    name: last_activity,
+                    type: TIMESTAMP,
+                  }
+              - column:
+                  {
+                    header: stats_last_reset,
+                    name: stats_last_reset,
+                    type: TIMESTAMP,
+                  }
               # Configuration and notes
-              - column: { header: configuration_notes, name: configuration_notes, type: VARCHAR }
-              - column: { header: monitoring_enabled, name: monitoring_enabled, type: BOOLEAN }
+              - column:
+                  {
+                    header: configuration_notes,
+                    name: configuration_notes,
+                    type: VARCHAR,
+                  }
+              - column:
+                  {
+                    header: monitoring_enabled,
+                    name: monitoring_enabled,
+                    type: BOOLEAN,
+                  }
               # EthernetPort specific fields
-              - column: { header: ethernet_standard, name: ethernet_standard, type: VARCHAR }
-              - column: { header: mdi_mdix_mode, name: mdi_mdix_mode, type: VARCHAR }
-              - column: { header: cable_length_meters, name: cable_length_meters, type: NUMERIC }
-              - column: { header: link_partner_info, name: link_partner_info, type: VARCHAR }
+              - column:
+                  {
+                    header: ethernet_standard,
+                    name: ethernet_standard,
+                    type: VARCHAR,
+                  }
+              - column:
+                  { header: mdi_mdix_mode, name: mdi_mdix_mode, type: VARCHAR }
+              - column:
+                  {
+                    header: cable_length_meters,
+                    name: cable_length_meters,
+                    type: NUMERIC,
+                  }
+              - column:
+                  {
+                    header: link_partner_info,
+                    name: link_partner_info,
+                    type: VARCHAR,
+                  }
               # FiberPort specific fields
               - column: { header: fiber_type, name: fiber_type, type: VARCHAR }
-              - column: { header: wavelength_nm, name: wavelength_nm, type: NUMERIC }
-              - column: { header: fiber_standard, name: fiber_standard, type: VARCHAR }
-              - column: { header: transmission_distance_km, name: transmission_distance_km, type: DOUBLE }
-              - column: { header: tx_power_dbm, name: tx_power_dbm, type: DOUBLE }
-              - column: { header: rx_power_dbm, name: rx_power_dbm, type: DOUBLE }
-              - column: { header: optical_loss_db, name: optical_loss_db, type: DOUBLE }
+              - column:
+                  { header: wavelength_nm, name: wavelength_nm, type: NUMERIC }
+              - column:
+                  {
+                    header: fiber_standard,
+                    name: fiber_standard,
+                    type: VARCHAR,
+                  }
+              - column:
+                  {
+                    header: transmission_distance_km,
+                    name: transmission_distance_km,
+                    type: DOUBLE,
+                  }
+              - column:
+                  { header: tx_power_dbm, name: tx_power_dbm, type: DOUBLE }
+              - column:
+                  { header: rx_power_dbm, name: rx_power_dbm, type: DOUBLE }
+              - column:
+                  {
+                    header: optical_loss_db,
+                    name: optical_loss_db,
+                    type: DOUBLE,
+                  }
       rollback:
         - delete:
             tableName: ports
-
-
