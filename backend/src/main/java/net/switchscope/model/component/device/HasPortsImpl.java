@@ -96,7 +96,7 @@ public abstract class HasPortsImpl extends Device implements HasPorts {
     // Device abstract method implementation
     @Override
     public boolean hasPorts() {
-        return getPortCount() > 0; // Динамическая проверка вместо статического true
+        return getPortCount() > 0; // Dynamic check instead of static true
     }
 
     protected void setPorts(List<Port> ports) {
