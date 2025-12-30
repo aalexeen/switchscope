@@ -180,7 +180,7 @@ databaseChangeLog:
   - include:
       file: fill/58-fill-cable-run-locations.yaml
       relativeToChangelogFile: true
-# TODO: Fix 80-ports.csv type handling issues
-#  - include:
-#      file: fill/80-fill-ports.yaml
-#      relativeToChangelogFile: true
+  # TODO: Fix 80-ports.csv type handling issues
+  - include:
+      file: fill/80-fill-ports.yaml
+      relativeToChangelogFile: true
