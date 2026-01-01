@@ -1,10 +1,12 @@
 package net.switchscope.service.component.device;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import net.switchscope.model.component.device.NetworkSwitch;
 import net.switchscope.repository.component.device.DeviceRepository;
+import net.switchscope.service.CrudService;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,36 +14,42 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class NetworkSwitchService {
+public class NetworkSwitchService implements CrudService<NetworkSwitch> {
 
     private final DeviceRepository repository;
 
+    @Override
     public List<NetworkSwitch> getAll() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // TODO: filter by type
+        return repository.findAll().stream()
+                .filter(d -> d instanceof NetworkSwitch)
+                .map(d -> (NetworkSwitch) d)
+                .toList();
     }
 
+    @Override
     public NetworkSwitch getById(UUID id) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return (NetworkSwitch) repository.getExisted(id);
     }
 
+    @Override
     @Transactional
     public NetworkSwitch create(NetworkSwitch entity) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // TODO: implement validation
+        return repository.save(entity);
     }
 
+    @Override
     @Transactional
     public NetworkSwitch update(UUID id, NetworkSwitch entity) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        repository.getExisted(id);
+        entity.setId(id);
+        return repository.save(entity);
     }
 
+    @Override
     @Transactional
     public void delete(UUID id) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        repository.deleteExisted(id);
     }
 }
-

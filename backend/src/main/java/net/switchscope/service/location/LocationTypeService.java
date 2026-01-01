@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import net.switchscope.model.location.catalog.LocationTypeEntity;
 import net.switchscope.repository.location.LocationTypeRepository;
+import net.switchscope.service.CrudService;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,36 +13,38 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class LocationTypeService {
+public class LocationTypeService implements CrudService<LocationTypeEntity> {
 
     private final LocationTypeRepository repository;
 
+    @Override
     public List<LocationTypeEntity> getAll() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return repository.findAll();
     }
 
+    @Override
     public LocationTypeEntity getById(UUID id) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return repository.getExisted(id);
     }
 
+    @Override
     @Transactional
     public LocationTypeEntity create(LocationTypeEntity entity) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // TODO: implement validation
+        return repository.save(entity);
     }
 
+    @Override
     @Transactional
     public LocationTypeEntity update(UUID id, LocationTypeEntity entity) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        repository.getExisted(id);
+        entity.setId(id);
+        return repository.save(entity);
     }
 
+    @Override
     @Transactional
     public void delete(UUID id) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        repository.deleteExisted(id);
     }
 }
-
