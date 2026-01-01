@@ -1,10 +1,12 @@
 package net.switchscope.service.component.connectivity;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import net.switchscope.model.component.connectivity.Connector;
 import net.switchscope.repository.component.connectivity.ConnectivityRepository;
+import net.switchscope.service.CrudService;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,36 +14,42 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ConnectorService {
+public class ConnectorService implements CrudService<Connector> {
 
     private final ConnectivityRepository repository;
 
+    @Override
     public List<Connector> getAll() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // TODO: filter by type
+        return repository.findAll().stream()
+                .filter(c -> c instanceof Connector)
+                .map(c -> (Connector) c)
+                .toList();
     }
 
+    @Override
     public Connector getById(UUID id) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return (Connector) repository.getExisted(id);
     }
 
+    @Override
     @Transactional
     public Connector create(Connector entity) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // TODO: implement validation
+        return repository.save(entity);
     }
 
+    @Override
     @Transactional
     public Connector update(UUID id, Connector entity) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        repository.getExisted(id);
+        entity.setId(id);
+        return repository.save(entity);
     }
 
+    @Override
     @Transactional
     public void delete(UUID id) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        repository.deleteExisted(id);
     }
 }
-

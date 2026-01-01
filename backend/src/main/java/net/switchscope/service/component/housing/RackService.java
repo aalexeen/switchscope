@@ -1,10 +1,12 @@
 package net.switchscope.service.component.housing;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import net.switchscope.model.component.housing.Rack;
 import net.switchscope.repository.component.housing.HousingRepository;
+import net.switchscope.service.CrudService;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,36 +14,42 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RackService {
+public class RackService implements CrudService<Rack> {
 
     private final HousingRepository repository;
 
+    @Override
     public List<Rack> getAll() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // TODO: filter by type
+        return repository.findAll().stream()
+                .filter(h -> h instanceof Rack)
+                .map(h -> (Rack) h)
+                .toList();
     }
 
+    @Override
     public Rack getById(UUID id) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return (Rack) repository.getExisted(id);
     }
 
+    @Override
     @Transactional
     public Rack create(Rack entity) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // TODO: implement validation
+        return repository.save(entity);
     }
 
+    @Override
     @Transactional
     public Rack update(UUID id, Rack entity) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        repository.getExisted(id);
+        entity.setId(id);
+        return repository.save(entity);
     }
 
+    @Override
     @Transactional
     public void delete(UUID id) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        repository.deleteExisted(id);
     }
 }
-

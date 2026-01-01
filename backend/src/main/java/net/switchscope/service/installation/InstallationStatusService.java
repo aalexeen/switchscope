@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import net.switchscope.model.installation.catalog.InstallationStatusEntity;
 import net.switchscope.repository.installation.InstallationStatusRepository;
+import net.switchscope.service.CrudService;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,36 +13,38 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class InstallationStatusService {
+public class InstallationStatusService implements CrudService<InstallationStatusEntity> {
 
     private final InstallationStatusRepository repository;
 
+    @Override
     public List<InstallationStatusEntity> getAll() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return repository.findAll();
     }
 
+    @Override
     public InstallationStatusEntity getById(UUID id) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return repository.getExisted(id);
     }
 
+    @Override
     @Transactional
     public InstallationStatusEntity create(InstallationStatusEntity entity) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        // TODO: implement validation
+        return repository.save(entity);
     }
 
+    @Override
     @Transactional
     public InstallationStatusEntity update(UUID id, InstallationStatusEntity entity) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        repository.getExisted(id);
+        entity.setId(id);
+        return repository.save(entity);
     }
 
+    @Override
     @Transactional
     public void delete(UUID id) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        repository.deleteExisted(id);
     }
 }
-
