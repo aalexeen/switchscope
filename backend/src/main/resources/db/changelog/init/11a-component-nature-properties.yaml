@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-component-nature-properties
+      author: AALEXEEN
+      changes:
+        - createTable:
+            tableName: component_nature_properties
+            columns:
+              - column:
+                  name: component_nature_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: property_key
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: property_value
+                  type: VARCHAR(255)
+        - addPrimaryKey:
+            tableName: component_nature_properties
+            columnNames: component_nature_id, property_key
+            constraintName: pk_component_nature_properties
+        - addForeignKeyConstraint:
+            baseTableName: component_nature_properties
+            baseColumnNames: component_nature_id
+            constraintName: fk_component_nature_properties_nature
+            referencedTableName: component_natures_catalog
+            referencedColumnNames: id
+            onDelete: CASCADE
+
