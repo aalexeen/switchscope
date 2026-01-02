@@ -17,8 +17,8 @@ import java.util.UUID;
 @Access(AccessType.FIELD)
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class BaseEntity implements HasId {
 
     @Id
@@ -37,7 +37,7 @@ public abstract class BaseEntity implements HasId {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     protected OffsetDateTime updatedAt;
 
-    protected BaseEntity(UUID id) {
+    public BaseEntity(UUID id) {
         this.id = id;
     }
 

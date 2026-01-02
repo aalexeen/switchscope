@@ -25,7 +25,7 @@ import java.util.UUID;
 @DiscriminatorColumn(name = "model_class", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public abstract class ComponentModel extends NamedEntity {
 
     // Basic model identification (name and description inherited from NamedEntity)

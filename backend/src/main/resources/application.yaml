@@ -20,7 +20,7 @@ spring:
         default_batch_fetch_size: 20
         # https://stackoverflow.com/questions/21257819/what-is-the-difference-between-hibernate-jdbc-fetch-size-and-hibernate-jdbc-batc
         jdbc.batch_size: 20
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # database-platform not needed - Hibernate 7 auto-detects dialect
   datasource:
       url: ${DB_URL:jdbc:postgresql://localhost:5432/switchscope}
       username: ${DB_USERNAME}

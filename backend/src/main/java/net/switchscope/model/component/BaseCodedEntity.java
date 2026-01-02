@@ -13,14 +13,14 @@ import net.switchscope.validation.NoHtml;
 import java.util.UUID;
 
 /**
- * Base class for coded entities with common attributes
+ * Base class for coded entities with common attributes.
+ * Note: @Table annotations with indexes/constraints should be defined
+ * in concrete entity classes that extend this superclass.
  */
 @MappedSuperclass
-@Table(indexes = @Index(name = "idx_base_active_sort", columnList = "is_active,sort_order"),
-uniqueConstraints = {@UniqueConstraint(columnNames = {"code"}, name = "uk_code")})
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public abstract class BaseCodedEntity extends NamedEntity {
 
     @Column(name = "code", nullable = false)

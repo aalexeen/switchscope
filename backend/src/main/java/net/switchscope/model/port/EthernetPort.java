@@ -18,7 +18,7 @@ import java.util.UUID;
 @DiscriminatorValue("ETHERNET")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class EthernetPort extends Port {
 
     @Column(name = "ethernet_standard")

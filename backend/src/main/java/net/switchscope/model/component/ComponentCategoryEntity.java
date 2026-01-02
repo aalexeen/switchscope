@@ -16,7 +16,7 @@ import java.util.*;
 @Table(name = "component_categories_catalog")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ComponentCategoryEntity extends UIStyledEntity {
 
     @Column(name = "is_system_category", nullable = false)

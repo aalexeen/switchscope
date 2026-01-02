@@ -18,7 +18,7 @@ import net.switchscope.validation.NoHtml;
        uniqueConstraints = @UniqueConstraint(columnNames = {"code"}))
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class InstallableTypeEntity extends BaseCodedEntity {
 
     // Configuration flags

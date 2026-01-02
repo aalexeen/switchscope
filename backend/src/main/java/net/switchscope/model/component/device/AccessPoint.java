@@ -18,7 +18,7 @@ import java.util.*;
 @DiscriminatorValue("ACCESS_POINT")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class AccessPoint extends HasPortsImpl {
 
     // WiFi capabilities

@@ -17,7 +17,7 @@ import java.util.*;
 @Table(name = "component_statuses_catalog")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ComponentStatusEntity extends UIStyledEntity {
 
     @Column(name = "lifecycle_phase")

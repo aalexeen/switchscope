@@ -19,7 +19,7 @@ import java.util.*;
 @DiscriminatorValue("SWITCH_MODEL")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class SwitchModel extends DeviceModel {
 
     // Switch-specific fields only (common fields moved to DeviceModel)

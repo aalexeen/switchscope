@@ -26,7 +26,7 @@ import java.util.UUID;
 @DiscriminatorColumn(name = "port_type", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public abstract class Port extends NamedEntity {
 
     // Device relationship

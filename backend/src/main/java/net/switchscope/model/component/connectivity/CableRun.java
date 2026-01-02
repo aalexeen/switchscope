@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @DiscriminatorValue("CABLE_RUN")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class CableRun extends Component {
 
     // Link to cable model catalog

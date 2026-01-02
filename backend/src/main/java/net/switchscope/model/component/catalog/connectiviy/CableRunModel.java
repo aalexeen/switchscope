@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 @DiscriminatorValue("CABLE_RUN")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class CableRunModel extends ComponentModel {
 
     // Cable type and category

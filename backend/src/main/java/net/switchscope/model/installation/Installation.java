@@ -21,7 +21,7 @@ import java.util.UUID;
 @Table(name = "installations")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Installation extends BaseEntity {
 
     // Location where the component is installed
