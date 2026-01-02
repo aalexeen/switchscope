@@ -19,7 +19,7 @@ import java.util.*;
 @DiscriminatorValue("ACCESS_POINT_MODEL")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class AccessPointModel extends DeviceModel {
 
     // Access Point-specific fields only (common fields moved to DeviceModel)

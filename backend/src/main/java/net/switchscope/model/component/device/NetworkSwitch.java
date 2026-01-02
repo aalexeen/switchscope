@@ -25,7 +25,7 @@ import java.util.UUID;
 @DiscriminatorValue("NETWORK_SWITCH")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class NetworkSwitch extends HasPortsImpl {
 
     // Link to switch model catalog

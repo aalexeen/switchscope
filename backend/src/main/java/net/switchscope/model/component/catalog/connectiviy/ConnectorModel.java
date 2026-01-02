@@ -17,7 +17,7 @@ import net.switchscope.validation.NoHtml;
 @DiscriminatorValue("CONNECTOR_MODEL")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ConnectorModel extends ComponentModel {
 
     // Connector type and specifications

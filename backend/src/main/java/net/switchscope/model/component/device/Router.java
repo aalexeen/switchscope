@@ -17,7 +17,7 @@ import java.util.*;
 @DiscriminatorValue("ROUTER")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Router extends HasPortsImpl {
 
     // Router-specific capabilities

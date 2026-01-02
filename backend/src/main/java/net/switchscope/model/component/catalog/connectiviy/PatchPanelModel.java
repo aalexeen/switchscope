@@ -18,7 +18,7 @@ import net.switchscope.validation.NoHtml;
 @DiscriminatorValue("PATCH_PANEL_MODEL")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class PatchPanelModel extends ComponentModel {
 
     // Panel specifications

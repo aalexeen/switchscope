@@ -1,8 +1,17 @@
 package net.switchscope.model.component.connectivity;
 
-import jakarta.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,10 +21,6 @@ import net.switchscope.model.component.catalog.connectiviy.ConnectorModel;
 import net.switchscope.model.port.Port;
 import net.switchscope.validation.NoHtml;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 /**
  * Connector entity - represents a physical connector attached to a cable run
  */
@@ -23,7 +28,7 @@ import java.util.UUID;
 @DiscriminatorValue("CONNECTOR")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Connector extends Component {
 
     // Link to connector model catalog
@@ -74,20 +79,21 @@ public class Connector extends Component {
     @JoinColumn(name = "cable_run_id", nullable = false)
     private CableRun cableRun;
 
-    // OneToOne relationship with Port (nullable, mappedBy indicates the owning side is Port)
+    // OneToOne relationship with Port (nullable, mappedBy indicates the owning side
+    // is Port)
     @OneToOne(mappedBy = "connector", fetch = FetchType.LAZY)
     private Port port;
 
     // Constructors
     public Connector(UUID id, String name, ComponentTypeEntity componentType,
-                    CableRun cableRun) {
+            CableRun cableRun) {
         super(id, name, componentType);
         this.cableRun = cableRun;
     }
 
     public Connector(UUID id, String name, String manufacturer, String model,
-                    String serialNumber, ComponentTypeEntity componentType,
-                    CableRun cableRun) {
+            String serialNumber, ComponentTypeEntity componentType,
+            CableRun cableRun) {
         super(id, name, manufacturer, model, serialNumber, componentType);
         this.cableRun = cableRun;
     }
@@ -102,11 +108,16 @@ public class Connector extends Component {
     public Map<String, String> getSpecifications() {
         Map<String, String> specs = new HashMap<>();
 
-        if (connectorType != null) specs.put("Connector Type", connectorType);
-        if (gender != null) specs.put("Gender", gender);
-        if (connectorPosition != null) specs.put("Position", connectorPosition);
-        if (colorCode != null) specs.put("Color", colorCode);
-        if (terminationQuality != null) specs.put("Quality", terminationQuality);
+        if (connectorType != null)
+            specs.put("Connector Type", connectorType);
+        if (gender != null)
+            specs.put("Gender", gender);
+        if (connectorPosition != null)
+            specs.put("Position", connectorPosition);
+        if (colorCode != null)
+            specs.put("Color", colorCode);
+        if (terminationQuality != null)
+            specs.put("Quality", terminationQuality);
 
         return specs;
     }
@@ -160,8 +171,8 @@ public class Connector extends Component {
     @Override
     public String toString() {
         return "Connector:" + getId() + "[" + getName() +
-               (getEffectiveConnectorType() != null ? ", " + getEffectiveConnectorType() : "") +
-               (connectorPosition != null ? ", " + connectorPosition : "") +
-               ", Cable: " + (cableRun != null ? cableRun.getName() : "None") + "]";
+                (getEffectiveConnectorType() != null ? ", " + getEffectiveConnectorType() : "") +
+                (connectorPosition != null ? ", " + connectorPosition : "") +
+                ", Cable: " + (cableRun != null ? cableRun.getName() : "None") + "]";
     }
 }

@@ -29,7 +29,7 @@ import java.util.UUID;
 @DiscriminatorColumn(name = "component_class", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public abstract class Component extends NamedEntity {
 
     @Column(name = "manufacturer", nullable = false)
@@ -87,12 +87,12 @@ public abstract class Component extends NamedEntity {
     private List<Component> childComponents = new ArrayList<>();
 
     // Constructors
-    protected Component(UUID id, String name, ComponentTypeEntity componentType) {
+    public Component(UUID id, String name, ComponentTypeEntity componentType) {
         super(id, name, null);
         this.componentType = componentType;
     }
 
-    protected Component(UUID id, String name, String manufacturer, String model,
+    public Component(UUID id, String name, String manufacturer, String model,
             String serialNumber, ComponentTypeEntity componentType) {
         super(id, name, null);
         this.manufacturer = manufacturer;
@@ -101,7 +101,7 @@ public abstract class Component extends NamedEntity {
         this.componentType = componentType;
     }
 
-    protected Component(UUID id, String name, String manufacturer, String model,
+    public Component(UUID id, String name, String manufacturer, String model,
             String serialNumber, ComponentStatusEntity status,
             ComponentTypeEntity componentType) {
         super(id, name, null);

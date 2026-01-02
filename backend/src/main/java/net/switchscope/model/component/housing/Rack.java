@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @DiscriminatorValue("RACK")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Rack extends Component {
 
     @Column(name = "rack_units_total")

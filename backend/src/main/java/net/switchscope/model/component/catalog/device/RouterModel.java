@@ -19,7 +19,7 @@ import java.util.*;
 @DiscriminatorValue("ROUTER_MODEL")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class RouterModel extends DeviceModel {
 
     // Router-specific fields only (common fields moved to DeviceModel)

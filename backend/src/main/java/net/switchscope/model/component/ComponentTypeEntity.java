@@ -18,7 +18,7 @@ import java.util.*;
        uniqueConstraints = {@UniqueConstraint(columnNames = {"code", "category_id"}, name = "uk_code_category")})
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ComponentTypeEntity extends UIStyledEntity {
 
     // FK to ComponentCategoryEntity

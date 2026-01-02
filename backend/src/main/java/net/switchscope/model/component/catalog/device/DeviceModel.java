@@ -21,7 +21,7 @@ import java.util.*;
 @MappedSuperclass
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public abstract class DeviceModel extends ComponentModel {
 
     // Device-specific identification

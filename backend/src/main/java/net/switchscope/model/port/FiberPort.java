@@ -18,7 +18,7 @@ import java.util.UUID;
 @DiscriminatorValue("FIBER")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class FiberPort extends Port {
 
     @Column(name = "fiber_type")

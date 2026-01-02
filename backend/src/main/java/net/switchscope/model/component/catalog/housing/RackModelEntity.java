@@ -20,7 +20,7 @@ import java.util.List;
 @DiscriminatorValue("RACK_MODEL")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class RackModelEntity extends ComponentModel {
 
     // Physical characteristics

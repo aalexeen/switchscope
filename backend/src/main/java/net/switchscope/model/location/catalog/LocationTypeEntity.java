@@ -21,7 +21,7 @@ import java.util.Set;
        uniqueConstraints = @UniqueConstraint(columnNames = {"code"}))
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class LocationTypeEntity extends BaseCodedEntity {
 
     // Hierarchy characteristics

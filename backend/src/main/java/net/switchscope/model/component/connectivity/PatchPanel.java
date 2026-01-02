@@ -22,7 +22,7 @@ import java.util.*;
 @DiscriminatorValue("PATCH_PANEL")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class PatchPanel extends HasPortsImpl {
 
     // Link to patch panel model catalog

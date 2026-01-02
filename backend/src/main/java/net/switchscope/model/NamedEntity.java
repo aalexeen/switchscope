@@ -16,7 +16,7 @@ import java.util.UUID;
 @MappedSuperclass
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public abstract class NamedEntity extends BaseEntity {
 
     @NotBlank
@@ -30,7 +30,7 @@ public abstract class NamedEntity extends BaseEntity {
     @NoHtml
     private String description;
 
-    protected NamedEntity(UUID id, String name, String description) {
+    public NamedEntity(UUID id, String name, String description) {
         super(id);
         this.name = name;
         this.description = description;

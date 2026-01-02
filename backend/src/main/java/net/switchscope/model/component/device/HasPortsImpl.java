@@ -27,20 +27,20 @@ public abstract class HasPortsImpl extends Device implements HasPorts {
     protected List<Port> ports = new ArrayList<>();
 
     // Constructors
-    protected HasPortsImpl() {
+    public HasPortsImpl() {
         super();
     }
 
-    protected HasPortsImpl(UUID id, String name, ComponentTypeEntity componentType) {
+    public HasPortsImpl(UUID id, String name, ComponentTypeEntity componentType) {
         super(id, name, componentType);
     }
 
-    protected HasPortsImpl(UUID id, String name, String manufacturer, String model,
+    public HasPortsImpl(UUID id, String name, String manufacturer, String model,
             String serialNumber, ComponentTypeEntity componentType) {
         super(id, name, manufacturer, model, serialNumber, componentType);
     }
 
-    protected HasPortsImpl(UUID id, String name, String manufacturer, String model,
+    public HasPortsImpl(UUID id, String name, String manufacturer, String model,
             String serialNumber, ComponentStatusEntity status,
             ComponentTypeEntity componentType) {
         super(id, name, manufacturer, model, serialNumber, status, componentType);

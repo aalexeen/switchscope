@@ -16,7 +16,7 @@ import java.util.UUID;
 @MappedSuperclass
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public abstract class UIStyledEntity extends BaseCodedEntity {
 
     @Column(name = "color_class")

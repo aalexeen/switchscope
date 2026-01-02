@@ -127,20 +127,20 @@ public abstract class Device extends Component {
     private Integer temperatureCelsius;
 
     // Constructors
-    protected Device() {
+    public Device() {
         super();
     }
 
-    protected Device(UUID id, String name, ComponentTypeEntity componentType) {
+    public Device(UUID id, String name, ComponentTypeEntity componentType) {
         super(id, name, componentType);
     }
 
-    protected Device(UUID id, String name, String manufacturer, String model,
+    public Device(UUID id, String name, String manufacturer, String model,
             String serialNumber, ComponentTypeEntity componentType) {
         super(id, name, manufacturer, model, serialNumber, componentType);
     }
 
-    protected Device(UUID id, String name, String manufacturer, String model,
+    public Device(UUID id, String name, String manufacturer, String model,
             String serialNumber, ComponentStatusEntity status,
             ComponentTypeEntity componentType) {
         super(id, name, manufacturer, model, serialNumber, status, componentType);

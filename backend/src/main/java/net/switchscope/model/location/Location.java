@@ -21,7 +21,7 @@ import java.util.UUID;
 @Table(name = "locations")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Location extends NamedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

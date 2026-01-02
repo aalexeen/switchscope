@@ -19,7 +19,7 @@ import java.util.UUID;
 @Table(name = "component_natures_catalog")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ComponentNatureEntity extends UIStyledEntity {
 
     // Business logic flags

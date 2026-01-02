@@ -19,7 +19,7 @@ import java.util.*;
        uniqueConstraints = @UniqueConstraint(columnNames = {"code"}))
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class InstallationStatusEntity extends BaseCodedEntity {
 
     // Status characteristics
