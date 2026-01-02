@@ -1,19 +1,29 @@
 package net.switchscope.model.component.connectivity;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.AccessLevel;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.model.component.catalog.connectiviy.PatchPanelModel;
 import net.switchscope.model.component.device.HasPortsImpl;
-import net.switchscope.model.location.Location;
 import net.switchscope.validation.NoHtml;
-
-import java.util.*;
 
 /**
  * Patch Panel entity - represents a passive connectivity panel with ports
@@ -31,9 +41,12 @@ public class PatchPanel extends HasPortsImpl {
     private PatchPanelModel patchPanelModel;
 
     // Panel specifications
-    /*@Column(name = "port_count")
-    @Min(1) @Max(144)
-    private Integer portCount;*/
+    /*
+     * @Column(name = "port_count")
+     * 
+     * @Min(1) @Max(144)
+     * private Integer portCount;
+     */
 
     @Column(name = "panel_type")
     @Size(max = 64)
@@ -47,7 +60,8 @@ public class PatchPanel extends HasPortsImpl {
 
     // Rack positioning (patch panels require rack space)
     @Column(name = "rack_units")
-    @Min(1) @Max(10)
+    @Min(1)
+    @Max(10)
     private Integer rackUnits;
 
     @Column(name = "rack_position")
@@ -101,11 +115,7 @@ public class PatchPanel extends HasPortsImpl {
 
     // Related cable runs (patch panels terminate cable runs)
     @ManyToMany
-    @JoinTable(
-        name = "patch_panel_cable_runs",
-        joinColumns = @JoinColumn(name = "patch_panel_id"),
-        inverseJoinColumns = @JoinColumn(name = "cable_run_id")
-    )
+    @JoinTable(name = "patch_panel_cable_runs", joinColumns = @JoinColumn(name = "patch_panel_id"), inverseJoinColumns = @JoinColumn(name = "cable_run_id"))
     private Set<CableRun> cableRuns = new HashSet<>();
 
     // Constructors
@@ -114,7 +124,7 @@ public class PatchPanel extends HasPortsImpl {
     }
 
     public PatchPanel(UUID id, String name, String manufacturer, String model,
-                     String serialNumber, ComponentTypeEntity componentType) {
+            String serialNumber, ComponentTypeEntity componentType) {
         super(id, name, manufacturer, model, serialNumber, componentType);
     }
 
@@ -138,13 +148,20 @@ public class PatchPanel extends HasPortsImpl {
     public Map<String, String> getSpecifications() {
         Map<String, String> specs = new HashMap<>();
 
-        if (getPortCount() != null) specs.put("Port Count", Integer.toString(getPortCount()));
-        if (panelType != null) specs.put("Panel Type", panelType);
-        if (connectorType != null) specs.put("Connector Type", connectorType);
-        if (categoryRating != null) specs.put("Category", categoryRating);
-        if (rackUnits != null) specs.put("Rack Units", rackUnits + "U");
-        if (shielded) specs.put("Shielding", "Yes");
-        if (cableManagement) specs.put("Cable Management", "Yes");
+        if (getPortCount() != null)
+            specs.put("Port Count", Integer.toString(getPortCount()));
+        if (panelType != null)
+            specs.put("Panel Type", panelType);
+        if (connectorType != null)
+            specs.put("Connector Type", connectorType);
+        if (categoryRating != null)
+            specs.put("Category", categoryRating);
+        if (rackUnits != null)
+            specs.put("Rack Units", rackUnits + "U");
+        if (shielded)
+            specs.put("Shielding", "Yes");
+        if (cableManagement)
+            specs.put("Cable Management", "Yes");
 
         return specs;
     }
@@ -172,7 +189,7 @@ public class PatchPanel extends HasPortsImpl {
 
     public boolean isHighDensity() {
         return getPortCount() != null && rackUnits != null &&
-               (getPortCount() / (double) rackUnits) >= 24.0;
+                (getPortCount() / (double) rackUnits) >= 24.0;
     }
 
     public boolean requiresRackSpace() {
@@ -230,9 +247,9 @@ public class PatchPanel extends HasPortsImpl {
     @Override
     public String toString() {
         return "PatchPanel:" + getId() + "[" + getName() +
-               (getModel() != null ? ", " + getModel() : "") +
-               (getPortCount() != null ? ", " + getPortCount() + " ports" : "") +
-               (rackUnits != null ? ", " + rackUnits + "U" : "") +
-               (panelType != null ? ", " + panelType : "") + "]";
+                (getModel() != null ? ", " + getModel() : "") +
+                (getPortCount() != null ? ", " + getPortCount() + " ports" : "") +
+                (rackUnits != null ? ", " + rackUnits + "U" : "") +
+                (panelType != null ? ", " + panelType : "") + "]";
     }
 }

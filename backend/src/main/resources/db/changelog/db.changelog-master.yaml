@@ -13,6 +13,9 @@ databaseChangeLog:
       file: init/11-component-natures-catalog.yaml
       relativeToChangelogFile: true
   - include:
+      file: init/11a-component-nature-properties.yaml
+      relativeToChangelogFile: true
+  - include:
       file: init/12-component-statuses-catalog.yaml
       relativeToChangelogFile: true
   - include:
