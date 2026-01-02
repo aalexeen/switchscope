@@ -49,8 +49,8 @@ public class AccessPoint extends HasPortsImpl {
     @Column(name = "coverage_radius_meters")
     private Integer coverageRadiusMeters;
 
-    @Column(name = "max_throughput_mbps")
-    private Integer maxThroughputMbps;
+    /*@Column(name = "max_throughput_mbps")
+    private Integer maxThroughputMbps;*/
 
     // Security features
     @Column(name = "supports_wpa3", nullable = false)
@@ -113,7 +113,7 @@ public class AccessPoint extends HasPortsImpl {
             if (poeConsumptionWatts != null) specs.put("PoE Consumption", poeConsumptionWatts + "W");
         }
         if (coverageRadiusMeters != null) specs.put("Coverage Radius", coverageRadiusMeters + "m");
-        if (maxThroughputMbps != null) specs.put("Max Throughput", maxThroughputMbps + " Mbps");
+        //if (maxThroughputMbps != null) specs.put("Max Throughput", maxThroughputMbps + " Mbps");
 
         return specs;
     }

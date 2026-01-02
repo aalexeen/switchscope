@@ -15,6 +15,7 @@ import net.switchscope.model.location.Location;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "installations")
@@ -43,7 +44,7 @@ public class Installation extends BaseEntity {
     // ID of the actual installed item (Component.id, Device.id, etc.)
     @Column(name = "installed_item_id", nullable = false)
     @NotNull
-    private Integer installedItemId;
+    private UUID installedItemId;
 
     // Current status of the installation
     @ManyToOne(fetch = FetchType.LAZY)
@@ -92,27 +93,27 @@ public class Installation extends BaseEntity {
 
     // Constructors for direct location installation (e.g., standalone equipment)
     public Installation(Location location, InstallableTypeEntity installedItemType,
-            Integer installedItemId) {
+            UUID installedItemId) {
         this.location = location;
         this.installedItemType = installedItemType;
         this.installedItemId = installedItemId;
     }
 
     public Installation(Location location, InstallableTypeEntity installedItemType,
-            Integer installedItemId, Integer rackPosition) {
+            UUID installedItemId, Integer rackPosition) {
         this(location, installedItemType, installedItemId);
         this.rackPosition = rackPosition;
     }
 
     public Installation(Location location, InstallableTypeEntity installedItemType,
-            Integer installedItemId, InstallationStatusEntity status) {
+            UUID installedItemId, InstallationStatusEntity status) {
         this(location, installedItemType, installedItemId);
         this.status = status;
     }
 
     // Constructors for component-housed installation (e.g., modules in chassis)
     public Installation(Location location, Component housingComponent,
-            InstallableTypeEntity installedItemType, Integer installedItemId) {
+            InstallableTypeEntity installedItemType, UUID installedItemId) {
         this.location = location;
         this.component = housingComponent;
         this.installedItemType = installedItemType;
@@ -120,7 +121,7 @@ public class Installation extends BaseEntity {
     }
 
     public Installation(Location location, Component housingComponent,
-            InstallableTypeEntity installedItemType, Integer installedItemId,
+            InstallableTypeEntity installedItemType, UUID installedItemId,
             InstallationStatusEntity status) {
         this(location, housingComponent, installedItemType, installedItemId);
         this.status = status;

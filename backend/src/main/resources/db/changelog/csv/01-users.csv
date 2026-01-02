@@ -1,4 +1,4 @@
-Name;Email;Password
-'User';'user@gmail.com';'{noop}password'
-'Admin';'admin@gmail.com';'{noop}admin'
-'Guest';'guest@gmai.com';'{noop}guest'
+id;name;email;password;enabled;registered;created_at;updated_at
+'01937b3a-1111-7000-8000-000000000001';'User';'user@gmail.com';'{noop}password';true;'2025-01-01 00:00:00';'2025-01-01 00:00:00';'2025-01-01 00:00:00'
+'01937b3a-2222-7000-8000-000000000002';'Admin';'admin@gmail.com';'{noop}admin';true;'2025-01-01 00:00:00';'2025-01-01 00:00:00';'2025-01-01 00:00:00'
+'01937b3a-3333-7000-8000-000000000003';'Guest';'guest@gmail.com';'{noop}guest';true;'2025-01-01 00:00:00';'2025-01-01 00:00:00';'2025-01-01 00:00:00'

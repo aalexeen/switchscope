@@ -8,22 +8,28 @@ databaseChangeLog:
             columns:
               - column:
                   name: user_id
-                  type: integer
+                  type: UUID
                   constraints:
                     nullable: false
               - column:
                   name: role
-                  type: varchar(100)
+                  type: VARCHAR(32)
                   constraints:
                     nullable: false
         - addUniqueConstraint:
             tableName: user_role
             columnNames: user_id, role
-            constraintName: UK_USER_ROLES
+            constraintName: uk_user_role
         - addForeignKeyConstraint:
             baseTableName: user_role
             baseColumnNames: user_id
             referencedTableName: users
             referencedColumnNames: id
-            constraintName: FK_USER_ROLES
-            onDelete: cascade
+            constraintName: fk_user_role_user
+            onDelete: CASCADE
+        - createIndex:
+            tableName: user_role
+            indexName: idx_user_role_user_id
+            columns:
+              - column:
+                  name: user_id

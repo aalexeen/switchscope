@@ -16,12 +16,12 @@ import java.util.UUID;
 public interface InstallationRepository extends net.switchscope.repository.BaseRepository<Installation> {
 
     /**
-     * Find installation by installed item ID and type
+     * Find installation by installed item ID
      *
-     * @param installedItemId installed item ID
+     * @param installedItemId installed item ID (UUID)
      * @return optional installation
      */
-    Optional<Installation> findByInstalledItemId(Integer installedItemId);
+    Optional<Installation> findByInstalledItemId(UUID installedItemId);
 
     /**
      * Find all installations for a location

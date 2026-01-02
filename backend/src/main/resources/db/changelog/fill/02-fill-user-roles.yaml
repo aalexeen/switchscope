@@ -11,16 +11,16 @@ databaseChangeLog:
             tableName: user_role
             file: ../csv/02-user-roles.csv
             commentLineStartsWith: //
-            relativeToChangelogFile:  true
+            relativeToChangelogFile: true
             columns:
-              - column:
-                  header: role
-                  name: role
-                  type: varchar
               - column:
                   header: user_id
                   name: user_id
-                  type: numeric
+                  type: UUID
+              - column:
+                  header: role
+                  name: role
+                  type: STRING
       rollback:
         - sql:
             sql: DELETE FROM user_role;
