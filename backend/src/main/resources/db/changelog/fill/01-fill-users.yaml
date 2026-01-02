@@ -11,20 +11,40 @@ databaseChangeLog:
             tableName: users
             file: ../csv/01-users.csv
             commentLineStartsWith: //
-            relativeToChangelogFile:  true
+            relativeToChangelogFile: true
             columns:
+              - column:
+                  header: id
+                  name: id
+                  type: UUID
               - column:
                   header: name
                   name: name
-                  type: varchar
+                  type: STRING
               - column:
                   header: email
                   name: email
-                  type: varchar
+                  type: STRING
               - column:
                   header: password
                   name: password
-                  type: varchar
+                  type: STRING
+              - column:
+                  header: enabled
+                  name: enabled
+                  type: BOOLEAN
+              - column:
+                  header: registered
+                  name: registered
+                  type: DATETIME
+              - column:
+                  header: created_at
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  header: updated_at
+                  name: updated_at
+                  type: DATETIME
       rollback:
         - sql:
             sql: DELETE FROM users;

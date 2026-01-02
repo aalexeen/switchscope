@@ -53,7 +53,8 @@ public class InstallationTo extends BaseTo {
 
     // Installed item reference
     @NotNull
-    private Integer installedItemId;
+    @Schema(description = "ID of the installed item (Component UUID)")
+    private UUID installedItemId;
 
     // Installation status
     @NotNull

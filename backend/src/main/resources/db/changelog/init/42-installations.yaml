@@ -57,7 +57,7 @@ databaseChangeLog:
               # ID of the actual installed item (Component.id, Device.id, etc.)
               - column:
                   name: installed_item_id
-                  type: INTEGER
+                  type: UUID
                   constraints:
                     nullable: false
 

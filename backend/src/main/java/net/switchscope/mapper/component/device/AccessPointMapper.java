@@ -51,7 +51,7 @@ public interface AccessPointMapper extends DeviceMapper<AccessPoint, AccessPoint
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "ports", ignore = true)
-    @Mapping(target = "maxThroughputGbps", ignore = true)
+    //@Mapping(target = "maxThroughputMbps", ignore = true)
     @Override
     AccessPoint toEntity(AccessPointTo to);
 
@@ -66,7 +66,7 @@ public interface AccessPointMapper extends DeviceMapper<AccessPoint, AccessPoint
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "ports", ignore = true)
-    @Mapping(target = "maxThroughputGbps", ignore = true)
+    //@Mapping(target = "maxThroughputMbps", ignore = true)
     @Override
     AccessPoint updateFromTo(@MappingTarget AccessPoint entity, AccessPointTo to);
 }
