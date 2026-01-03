@@ -83,17 +83,7 @@ databaseChangeLog:
                   remarks: "Termination quality: GOOD, ACCEPTABLE, POOR, REWORK_NEEDED"
                   constraints:
                     nullable: true
-
-        - addColumn:
-            tableName: components
-            columns:
-              - column:
-                  name: connector_installation_notes
-                  type: VARCHAR(512)
-                  remarks: "Installation notes"
-                  constraints:
-                    nullable: true
-
+                    
         # Relationship to cable run
         - addColumn:
             tableName: components

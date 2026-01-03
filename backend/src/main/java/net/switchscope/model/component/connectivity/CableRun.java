@@ -1,8 +1,30 @@
 package net.switchscope.model.component.connectivity;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.AccessLevel;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,10 +33,6 @@ import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.model.component.catalog.connectiviy.CableRunModel;
 import net.switchscope.model.location.Location;
 import net.switchscope.validation.NoHtml;
-
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Cable Run entity - represents a specific cable installation between locations
@@ -49,8 +67,10 @@ public class CableRun extends Component {
     private String cableCategory;
 
     // Installation details
-    /*@Column(name = "installation_date")
-    private LocalDate installationDate;*/
+    /*
+     * @Column(name = "installation_date")
+     * private LocalDate installationDate;
+     */
 
     @Column(name = "installation_method")
     @Size(max = 64)
@@ -90,18 +110,9 @@ public class CableRun extends Component {
     @NoHtml
     private String circuitId; // Logical circuit identifier
 
-    @Column(name = "installation_notes")
-    @Size(max = 1024)
-    @NoHtml
-    private String installationNotes;
-
     // Relationships - CableRun can span multiple locations
     @ManyToMany
-    @JoinTable(
-        name = "cable_run_locations",
-        joinColumns = @JoinColumn(name = "cable_run_id"),
-        inverseJoinColumns = @JoinColumn(name = "location_id")
-    )
+    @JoinTable(name = "cable_run_locations", joinColumns = @JoinColumn(name = "cable_run_id"), inverseJoinColumns = @JoinColumn(name = "location_id"))
     @OrderColumn(name = "location_order") // Important for preserving order
     private List<Location> locations = new ArrayList<>();
 
@@ -120,14 +131,14 @@ public class CableRun extends Component {
 
     // Constructors
     public CableRun(UUID id, String name, ComponentTypeEntity componentType,
-                   Double cableLengthMeters) {
+            Double cableLengthMeters) {
         super(id, name, componentType);
         this.cableLengthMeters = cableLengthMeters;
     }
 
     public CableRun(UUID id, String name, String manufacturer, String model,
-                   String serialNumber, ComponentTypeEntity componentType,
-                   Double cableLengthMeters) {
+            String serialNumber, ComponentTypeEntity componentType,
+            Double cableLengthMeters) {
         super(id, name, manufacturer, model, serialNumber, componentType);
         this.cableLengthMeters = cableLengthMeters;
     }
@@ -143,12 +154,16 @@ public class CableRun extends Component {
         Map<String, String> specs = new HashMap<>();
 
         specs.put("Length", cableLengthMeters + "m");
-        if (cableType != null) specs.put("Cable Type", cableType);
-        if (cableCategory != null) specs.put("Category", cableCategory);
-        if (installationMethod != null) specs.put("Installation Method", installationMethod);
+        if (cableType != null)
+            specs.put("Cable Type", cableType);
+        if (cableCategory != null)
+            specs.put("Category", cableCategory);
+        if (installationMethod != null)
+            specs.put("Installation Method", installationMethod);
         if (tested) {
             specs.put("Tested", testResult != null ? testResult : "Yes");
-            if (testDate != null) specs.put("Test Date", testDate.toString());
+            if (testDate != null)
+                specs.put("Test Date", testDate.toString());
         }
 
         return specs;
@@ -241,7 +256,7 @@ public class CableRun extends Component {
 
     public boolean requiresTesting() {
         return !tested || testDate == null ||
-               (testDate.isBefore(LocalDate.now().minusYears(1)));
+                (testDate.isBefore(LocalDate.now().minusYears(1)));
     }
 
     public String getEffectiveManufacturer() {
@@ -277,8 +292,8 @@ public class CableRun extends Component {
     @Override
     public String toString() {
         return "CableRun:" + getId() + "[" + getName() +
-               ", " + cableLengthMeters + "m" +
-               (getEffectiveCableType() != null ? ", " + getEffectiveCableType() : "") +
-               ", " + getLocationPath() + "]";
+                ", " + cableLengthMeters + "m" +
+                (getEffectiveCableType() != null ? ", " + getEffectiveCableType() : "") +
+                ", " + getLocationPath() + "]";
     }
 }

@@ -40,7 +40,6 @@ databaseChangeLog:
               - column: { header: test_notes, name: test_notes, type: VARCHAR }
               - column: { header: cable_id, name: cable_id, type: VARCHAR }
               - column: { header: circuit_id, name: circuit_id, type: VARCHAR }
-              - column: { header: cable_installation_notes, name: cable_installation_notes, type: VARCHAR }
               - column: { header: start_location_id, name: start_location_id, type: UUID }
               - column: { header: end_location_id, name: end_location_id, type: UUID }
       rollback:

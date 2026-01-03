@@ -69,11 +69,6 @@ public class Connector extends Component {
     @NoHtml
     private String terminationQuality; // GOOD, ACCEPTABLE, POOR, REWORK_NEEDED
 
-    @Column(name = "installation_notes")
-    @Size(max = 512)
-    @NoHtml
-    private String installationNotes;
-
     // Relationship to cable run
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cable_run_id", nullable = false)

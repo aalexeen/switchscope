@@ -41,7 +41,6 @@ databaseChangeLog:
               - column: { header: shielded, name: shielded, type: BOOLEAN }
               - column: { header: panel_cable_management, name: panel_cable_management, type: BOOLEAN }
               - column: { header: panel_cable_mgmt_type, name: panel_cable_mgmt_type, type: VARCHAR }
-              - column: { header: panel_installation_notes, name: panel_installation_notes, type: VARCHAR }
       rollback:
         - delete:
             tableName: components

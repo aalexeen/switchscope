@@ -35,7 +35,6 @@ databaseChangeLog:
               - column: { header: connector_label, name: connector_label, type: VARCHAR }
               - column: { header: color_code, name: color_code, type: VARCHAR }
               - column: { header: termination_quality, name: termination_quality, type: VARCHAR }
-              - column: { header: connector_installation_notes, name: connector_installation_notes, type: VARCHAR }
               - column: { header: cable_run_id, name: cable_run_id, type: UUID }
       rollback:
         - delete:

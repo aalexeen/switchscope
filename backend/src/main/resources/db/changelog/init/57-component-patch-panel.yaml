@@ -149,17 +149,6 @@ databaseChangeLog:
                   constraints:
                     nullable: true
 
-        # Documentation
-        - addColumn:
-            tableName: components
-            columns:
-              - column:
-                  name: panel_installation_notes
-                  type: VARCHAR(1024)
-                  remarks: "Installation notes"
-                  constraints:
-                    nullable: true
-
         # ============================================================
         # Foreign Keys
         # ============================================================
