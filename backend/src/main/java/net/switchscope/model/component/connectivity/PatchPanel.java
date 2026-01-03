@@ -107,12 +107,6 @@ public class PatchPanel extends HasPortsImpl {
     @NoHtml
     private String cableManagementType;
 
-    // Documentation
-    @Column(name = "installation_notes")
-    @Size(max = 1024)
-    @NoHtml
-    private String installationNotes;
-
     // Related cable runs (patch panels terminate cable runs)
     @ManyToMany
     @JoinTable(name = "patch_panel_cable_runs", joinColumns = @JoinColumn(name = "patch_panel_id"), inverseJoinColumns = @JoinColumn(name = "cable_run_id"))
