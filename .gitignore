@@ -84,3 +84,12 @@ Thumbs.db
 /backend/mvnw
 /backend/mvnw.cmd
 /.vscode/settings.json
+
+venv/
+
+
+
+
+.local.props
+
+
