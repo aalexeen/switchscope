@@ -32,6 +32,7 @@ cd backend
 ./mvnw liquibase:update        # Apply migrations
 ./mvnw liquibase:status        # Check migration status
 ./mvnw liquibase:rollback      # Rollback last change
+./mvnw liquibase:dropAll      # Drop all tables
 
 # Code quality
 ./mvnw checkstyle:check        # Check code style

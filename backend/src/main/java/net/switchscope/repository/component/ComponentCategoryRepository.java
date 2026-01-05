@@ -14,14 +14,6 @@ import java.util.List;
 public interface ComponentCategoryRepository extends ComponentCatalogRepository<ComponentCategoryEntity> {
 
     /**
-     * Find container categories (can contain other components)
-     *
-     * @return list of container categories
-     */
-    @Query("SELECT cc FROM ComponentCategoryEntity cc WHERE cc.canContainComponents = true AND cc.active = true ORDER BY cc.sortOrder")
-    List<ComponentCategoryEntity> findContainerCategories();
-
-    /**
      * Find infrastructure categories
      *
      * @return list of infrastructure categories
@@ -30,36 +22,12 @@ public interface ComponentCategoryRepository extends ComponentCatalogRepository<
     List<ComponentCategoryEntity> findInfrastructureCategories();
 
     /**
-     * Find power consuming categories
+     * Find system categories
      *
-     * @return list of categories that require power
+     * @return list of system categories
      */
-    @Query("SELECT cc FROM ComponentCategoryEntity cc WHERE cc.requiresPower = true AND cc.active = true ORDER BY cc.sortOrder")
-    List<ComponentCategoryEntity> findPowerConsumingCategories();
-
-    /**
-     * Find categories that need cooling
-     *
-     * @return list of categories that need cooling
-     */
-    @Query("SELECT cc FROM ComponentCategoryEntity cc WHERE cc.needsCooling = true AND cc.active = true ORDER BY cc.sortOrder")
-    List<ComponentCategoryEntity> findCoolingRequiredCategories();
-
-    /**
-     * Find categories that generate heat
-     *
-     * @return list of categories that generate heat
-     */
-    @Query("SELECT cc FROM ComponentCategoryEntity cc WHERE cc.generatesHeat = true AND cc.active = true ORDER BY cc.sortOrder")
-    List<ComponentCategoryEntity> findHeatGeneratingCategories();
-
-    /**
-     * Find categories that require physical space
-     *
-     * @return list of categories requiring physical space
-     */
-    @Query("SELECT cc FROM ComponentCategoryEntity cc WHERE cc.requiresPhysicalSpace = true AND cc.active = true ORDER BY cc.sortOrder")
-    List<ComponentCategoryEntity> findPhysicalSpaceRequiredCategories();
+    @Query("SELECT cc FROM ComponentCategoryEntity cc WHERE cc.systemCategory = true AND cc.active = true ORDER BY cc.sortOrder")
+    List<ComponentCategoryEntity> findSystemCategories();
 
     /**
      * Find categories by property

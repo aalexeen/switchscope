@@ -1,3 +1,6 @@
+server:
+  port: 8090
+
 #  hswitchscope.iottps://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 spring:
   application:
@@ -59,6 +62,12 @@ server.servlet:
     force: true
 
 springdoc.swagger-ui.path: /
+
+# Management and monitoring
+management:
+  health:
+    redis:
+      enabled: false
 
 # Application-specific settings
 app:

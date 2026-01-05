@@ -85,7 +85,7 @@ public class NetworkSwitch extends HasPortsImpl {
     private boolean linkAggregation = false;
 
     // VLAN configuration
-    @Column(name = "native_vlan")
+    @Column(name = "switch_native_vlan")
     @Min(1)
     @Max(4094)
     private Integer nativeVlan = 1;

@@ -8,6 +8,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **License**: Business Source License 1.1 (free for healthcare, education, government; becomes Apache 2.0 on Jan 1, 2029)
 
+## Repository Structure
+
+```
+switchscope/
+├── backend/                           # Java Spring Boot backend
+│   ├── src/main/java/net/switchscope/
+│   │   ├── model/                     # JPA entities
+│   │   ├── repository/                # Data access layer
+│   │   ├── service/                   # Business logic
+│   │   ├── web/                       # REST controllers
+│   │   ├── mapper/                    # MapStruct DTO mappers
+│   │   ├── to/                        # Transfer Objects (DTOs)
+│   │   ├── config/                    # Spring configuration
+│   │   ├── error/                     # Exception handling
+│   │   └── validation/                # Custom validators
+│   ├── src/main/resources/
+│   │   ├── db/changelog/              # Liquibase migrations
+│   │   │   ├── init/                  # DDL changesets
+│   │   │   ├── fill/                  # DML changesets
+│   │   │   └── csv/                   # Seed data
+│   │   └── config.properties          # App configuration (gitignored)
+│   ├── src/test/                      # Tests with Testcontainers
+│   ├── pom.xml                        # Maven configuration
+│   └── mvnw, mvnw.cmd                 # Maven wrapper
+├── validate_schema.py                 # Database schema validator
+├── .local.props                       # Local DB config (gitignored)
+├── .mcp.json                          # MCP server configuration
+├── CLAUDE.md                          # This file
+└── README.md                          # Project documentation
+```
+
+**Note**: The repository is backend-only currently. Frontend (Vue 3 + Quasar) mentioned in README is planned for future development.
+
 ## Common Development Commands
 
 ### Backend (Maven)
@@ -32,6 +65,7 @@ cd backend
 ./mvnw liquibase:update        # Apply migrations
 ./mvnw liquibase:status        # Check migration status
 ./mvnw liquibase:rollback      # Rollback last change
+./mvnw liquibase:dropAll      # Drop All tables
 
 # Code quality
 ./mvnw checkstyle:check        # Check code style
@@ -55,8 +89,10 @@ This script:
 ### Configuration Files
 
 - **Backend config**: `backend/src/main/resources/config.properties` (from `config.properties.example`)
-- **Database credentials**: `.local.props` (for validation script and MCP server)
+- **Database credentials**: `.local.props` (for validation script and MCP server, gitignored)
 - **MCP server config**: `.mcp.json` (PostgreSQL connection for Claude Code)
+
+**Note**: Configuration files with credentials are gitignored. Copy `.example` files and configure locally.
 
 ## High-Level Architecture
 
@@ -156,7 +192,7 @@ net.switchscope/
 #### Liquibase Structure
 
 ```
-db/changelog/
+backend/src/main/resources/db/changelog/
 ├── db.changelog-master.yaml       # Master changelog (includes all others)
 ├── init/                          # DDL: table creation (01-users to 90-fk)
 ├── fill/                          # DML: data population
@@ -164,6 +200,8 @@ db/changelog/
 ```
 
 **Execution Order**: Master file includes init files first (DDL), then fill files (DML)
+
+**File Naming Convention**: Sequential numbering determines execution order (e.g., `01-users.yaml`, `10-component-categories-catalog.yaml`)
 
 #### Key Database Features
 
@@ -183,7 +221,31 @@ db/changelog/
 
 4. **Automatic Timestamps**: `@CreationTimestamp`, `@UpdateTimestamp` on BaseEntity
 
+5. **Schema Naming**: All tables and columns use `switchscope` schema with snake_case naming
+
 ## Important Implementation Notes
+
+### Key Architectural Decisions
+
+1. **Single Table Inheritance for Components**: All component types (switches, racks, cables) stored in one table
+   - **Pros**: Simple queries, good performance for polymorphic associations
+   - **Cons**: Many nullable columns, less data integrity enforcement
+   - **Trade-off**: Chosen for flexibility and query simplicity over storage optimization
+
+2. **UUID v7 over UUID v4**: Time-ordered UUIDs provide better database index performance
+   - Sequential nature reduces index fragmentation
+   - Still globally unique like UUID v4
+   - Requires Hibernate 7.2+ support
+
+3. **Type-Driven Behavior**: Component capabilities defined by `ComponentTypeEntity` not code
+   - Allows runtime configuration changes
+   - New component types can be added via database without code deployment
+   - Behavioral methods delegated to type entity
+
+4. **Separation of Catalog and Instances**:
+   - `ComponentModel` = product catalog (manufacturer specifications)
+   - `Component` = actual physical instances
+   - Enables tracking multiple instances of same model
 
 ### Working with Components
 
@@ -195,6 +257,13 @@ When adding new component types:
 5. Add Liquibase changelog for type-specific tables
 6. Create Service, Repository, Controller, Mapper, and TO classes
 
+**Example**: To add a new device type like "Firewall":
+- Create `Firewall.java` extending `Device` or `HasPortsImpl`
+- Add `@DiscriminatorValue("FIREWALL")`
+- Create `FirewallService`, `FirewallRepository`, `FirewallController`, `FirewallMapper`, `FirewallTo`
+- Update CSV with new component type entry
+- Create Liquibase changelogs: `init/XX-component-firewall.yaml`, `fill/XX-fill-firewalls.yaml`
+
 ### Working with Entities
 
 - All entities extend `BaseEntity` (or `NamedEntity` for named entities)
@@ -205,11 +274,13 @@ When adding new component types:
 
 ### Working with Liquibase
 
-- **Adding tables**: Create YAML in `init/`, add include in master changelog
+- **Adding tables**: Create YAML in `init/`, add include in master changelog (maintaining sequential order)
 - **Adding data**: Create CSV in `csv/`, create fill YAML in `fill/`
 - **Testing migrations**: Run `./mvnw liquibase:update`, then `python3 validate_schema.py`
 - **Column naming**: Use snake_case in database, camelCase in Java
 - **Always use**: `relativeToChangelogFile: true` in includes
+- **Fresh start**: Use `./mvnw liquibase:dropAll` then `./mvnw liquibase:update` to rebuild from scratch
+- **CSV format**: Use semicolon (`;`) as separator, single quotes (`'`) as quotchar in loadData changesets
 
 ### Security
 
@@ -229,9 +300,12 @@ When adding new component types:
 
 ### Testing
 
-- Testcontainers for integration tests (PostgreSQL, Kafka)
-- Basic test structure in `src/test/java/net/switchscope/`
-- Use `@SpringBootTest` with `TestcontainersConfiguration`
+- **Testcontainers**: Used for integration tests (PostgreSQL, Kafka, Redis)
+  - Docker images: `postgres:latest`, `apache/kafka-native:latest`, `redis:latest`
+  - Configuration in `TestcontainersConfiguration.java`
+- Test structure in `backend/src/test/java/net/switchscope/`
+- Use `@SpringBootTest` with `TestcontainersConfiguration` for integration tests
+- Spring Boot DevTools enabled for development-time testing
 
 ## Technology Stack
 
@@ -265,14 +339,41 @@ This repository has an MCP (Model Context Protocol) server configured for Postgr
 4. **Code style**: Follow Google Java Style Guide → Run checkstyle before commit
 5. **Commits**: Descriptive messages, atomic changes, reference issue numbers
 
+### Common Development Scenarios
+
+**Adding a new entity**:
+1. Create entity class extending `BaseEntity` or `NamedEntity` in `model/`
+2. Create repository interface extending `BaseRepository<YourEntity>` in `repository/`
+3. Create service class implementing `CrudService<YourEntity>` in `service/`
+4. Create controller extending `AbstractCrudController<YourEntity, YourTo>` in `web/`
+5. Create DTO (`YourTo`) in `to/` and mapper in `mapper/`
+6. Create Liquibase changelog in `init/` and data file in `fill/`
+7. Add includes to `db.changelog-master.yaml` in sequential order
+
+**Modifying database schema**:
+1. Create new Liquibase changeset (don't modify existing ones)
+2. Run `cd backend && ./mvnw liquibase:update`
+3. Run `python3 validate_schema.py` from project root
+4. Update entity classes if needed
+5. Test with `./mvnw test`
+
+**Querying the database directly**:
+- Use MCP server: Claude Code can query PostgreSQL via configured MCP server
+- Use `mcp__postgres__query` tool with SQL queries
+- Schema: `switchscope`, all tables use snake_case naming
+
 ## Important Files
 
-- `pom.xml` - Maven dependencies and build configuration
-- `db.changelog-master.yaml` - Master database changelog
-- `validate_schema.py` - Schema validation script
-- `.local.props` - Local database configuration (not in git)
-- `config.properties` - Application configuration (not in git)
-- `BackendApplication.java` - Spring Boot main class
+- **Backend Root**: `backend/pom.xml` - Maven dependencies and build configuration
+- **Database Schema**: `backend/src/main/resources/db/changelog/db.changelog-master.yaml` - Master changelog
+- **Validation**: `validate_schema.py` - Schema validation script (root directory)
+- **Local Config**: `.local.props` - Local database configuration (gitignored, root directory)
+- **App Config**: `backend/src/main/resources/config.properties` - Application configuration (gitignored)
+- **Main Class**: `backend/src/main/java/net/switchscope/BackendApplication.java` - Spring Boot entry point
+- **Base Classes**:
+  - `BaseEntity.java` - UUID v7 entity base with timestamps
+  - `BaseRepository.java` - Repository with `getExisted()`, `deleteExisted()`
+  - `AbstractCrudController.java` - Generic REST controller
 
 ## API Documentation
 
@@ -283,8 +384,31 @@ Once running, access:
 
 ## Troubleshooting
 
-- **Liquibase errors**: Check database connection in `config.properties`, verify schema exists
-- **Hibernate errors**: Ensure Hibernate 7.2.0 is being used (check `pom.xml`)
-- **UUID errors**: Verify using `@UuidGenerator(style = VERSION_7)` from Hibernate 7.2+
-- **Schema validation failures**: Run `python3 validate_schema.py` for detailed diagnostics
-- **MapStruct errors**: Ensure Lombok is processed before MapStruct in compiler config
+- **Liquibase errors**:
+  - Check database connection in `backend/src/main/resources/config.properties`
+  - Verify `switchscope` schema exists in PostgreSQL
+  - Database properties can be overridden in `pom.xml` (see `<properties>` section)
+  - Use `./mvnw liquibase:status` to check migration state
+
+- **Hibernate errors**:
+  - Ensure Hibernate 7.2.0 is being used (check `pom.xml` line 73)
+  - Jakarta Persistence API 3.2.0 required for Hibernate 7.x
+
+- **UUID errors**:
+  - Verify using `@UuidGenerator(style = VERSION_7)` from Hibernate 7.2+
+  - All entities must extend `BaseEntity` which provides UUID v7 generation
+  - CSV data should use pre-generated UUID v7 format: `'01932f00-0004-7000-8000-000000000001'`
+
+- **Schema validation failures**:
+  - Run `python3 validate_schema.py` for detailed diagnostics
+  - Ensure `.local.props` has correct database credentials
+  - Check exit code: 0 (pass), 1 (critical), 2 (warnings)
+
+- **MapStruct errors**:
+  - Ensure Lombok is processed before MapStruct in compiler annotation processor paths (see `pom.xml` lines 271-288)
+  - Clean and rebuild: `./mvnw clean compile`
+  - MapStruct config is in `MapStructConfig.java` with `componentModel = "spring"`
+
+- **Port conflicts**: Backend runs on port 8080 by default (check `application.properties` to change)
+
+- **Database schema not found**: Ensure PostgreSQL search_path includes `switchscope` schema

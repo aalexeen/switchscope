@@ -37,7 +37,7 @@ public class Connector extends Component {
     private ConnectorModel connectorModel;
 
     // Connector specifications
-    @Column(name = "connector_type")
+    @Column(name = "conn_connector_type")
     @Size(max = 64)
     @NoHtml
     private String connectorType; // From model or manual override
