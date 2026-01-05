@@ -110,10 +110,10 @@ public abstract class Device extends Component {
     @Column(name = "has_redundant_power", nullable = false)
     private boolean hasRedundantPower = false;
 
-    @Column(name = "operating_temperature_min")
+    @Column(name = "device_operating_temp_min")
     private Integer operatingTemperatureMin;
 
-    @Column(name = "operating_temperature_max")
+    @Column(name = "device_operating_temp_max")
     private Integer operatingTemperatureMax;
 
     // Device monitoring (common)

@@ -53,13 +53,13 @@ public class PatchPanel extends HasPortsImpl {
     @NoHtml
     private String panelType; // COPPER, FIBER, HYBRID, COAX
 
-    @Column(name = "connector_type")
+    @Column(name = "panel_connector_type")
     @Size(max = 64)
     @NoHtml
     private String connectorType; // RJ45, LC, SC, etc.
 
     // Rack positioning (patch panels require rack space)
-    @Column(name = "rack_units")
+    @Column(name = "panel_rack_units")
     @Min(1)
     @Max(10)
     private Integer rackUnits;
@@ -99,10 +99,10 @@ public class PatchPanel extends HasPortsImpl {
     private boolean shielded = false;
 
     // Cable management
-    @Column(name = "cable_management", nullable = false)
+    @Column(name = "panel_cable_management", nullable = false)
     private boolean cableManagement = false;
 
-    @Column(name = "cable_management_type")
+    @Column(name = "panel_cable_mgmt_type")
     @Size(max = 64)
     @NoHtml
     private String cableManagementType;

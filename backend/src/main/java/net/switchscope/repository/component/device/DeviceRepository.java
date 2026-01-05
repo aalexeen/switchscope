@@ -92,14 +92,6 @@ public interface DeviceRepository extends BaseRepository<Device> {
     List<Device> findBySnmpCommunity(@Param("snmpCommunity") String snmpCommunity);
 
     /**
-     * Find monitored devices
-     *
-     * @return list of monitored devices
-     */
-    @Query("SELECT d FROM Device d WHERE d.isMonitored = true ORDER BY d.name")
-    List<Device> findMonitoredDevices();
-
-    /**
      * Find devices by SNMP version
      *
      * @param snmpVersion SNMP version
@@ -142,19 +134,11 @@ public interface DeviceRepository extends BaseRepository<Device> {
     List<Device> findByDeviceType(@Param("deviceType") Class<? extends Device> deviceType);
 
     /**
-     * Find operational devices
-     *
-     * @return list of operational devices
-     */
-    @Query("SELECT d FROM Device d WHERE d.componentStatus.operational = true ORDER BY d.name")
-    List<Device> findOperationalDevices();
-
-    /**
      * Find devices requiring maintenance
      *
      * @return list of devices requiring maintenance
      */
-    @Query("SELECT d FROM Device d WHERE d.componentStatus.requiresAttention = true OR (d.nextMaintenanceDate IS NOT NULL AND d.nextMaintenanceDate < CURRENT_TIMESTAMP) ORDER BY d.name")
+    @Query("SELECT d FROM Device d WHERE d.nextMaintenanceDate IS NOT NULL AND d.nextMaintenanceDate < CURRENT_TIMESTAMP ORDER BY d.name")
     List<Device> findDevicesRequiringMaintenance();
 
     /**
@@ -183,14 +167,6 @@ public interface DeviceRepository extends BaseRepository<Device> {
      */
     @Query("SELECT COUNT(d) FROM Device d WHERE TYPE(d) = :deviceType")
     long countByDeviceType(@Param("deviceType") Class<? extends Device> deviceType);
-
-    /**
-     * Count monitored devices
-     *
-     * @return count of monitored devices
-     */
-    @Query("SELECT COUNT(d) FROM Device d WHERE d.isMonitored = true")
-    long countMonitoredDevices();
 
     /**
      * Count devices by manufacturer

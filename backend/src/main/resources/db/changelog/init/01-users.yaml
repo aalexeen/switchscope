@@ -18,6 +18,9 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: description
+                  type: TEXT
+              - column:
                   name: email
                   type: VARCHAR(128)
                   constraints:
