@@ -60,6 +60,8 @@ public class RestExceptionHandler {
             put(ServletRequestBindingException.class, BAD_REQUEST);
             put(RequestRejectedException.class, BAD_REQUEST);
             put(AccessDeniedException.class, FORBIDDEN);
+            // Map Spring Security method-level authorization failures to 403
+            put(org.springframework.security.authorization.AuthorizationDeniedException.class, FORBIDDEN);
         }
     };
 
