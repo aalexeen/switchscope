@@ -10,7 +10,7 @@ spring:
     import: optional:application-local.yaml
 
   jpa:
-    show-sql: false
+    show-sql: true
     open-in-view: false
     # https://stackoverflow.com/a/67678945/548473
     #  defer-datasource-initialization: true
@@ -54,6 +54,8 @@ logging:
     liquibase: INFO
     org.springframework.security: INFO
     org.springframework.security.oauth2: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
 
 server.servlet:
   encoding:
