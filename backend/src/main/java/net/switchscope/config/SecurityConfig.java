@@ -63,20 +63,13 @@ public class SecurityConfig {
                 return corsConfig;
             }))
             .authorizeHttpRequests(ac ->
-                    ac.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow all OPTIONS requests
+                    ac.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow all OPTIONS requests (CORS preflight)
                       .requestMatchers("/favicon.ico").permitAll()
-                      .requestMatchers("/", "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**")
-                      .permitAll()
-                      .requestMatchers("/api/auth/login").authenticated()
-                      .requestMatchers("/api/auth/check").authenticated()
-                      .requestMatchers("/api/auth/logout").authenticated()
-                      .requestMatchers("/api/auth/profile").authenticated()
-                      .requestMatchers("/api/closets").authenticated()
-                      .requestMatchers("/api/closets/**").authenticated()
-                      .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
-                      .requestMatchers(HttpMethod.POST, "/api/profile").anonymous()
-                      //.requestMatchers("/", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                      .requestMatchers("/api/**").authenticated())
+                      .requestMatchers("/", "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                      // Future: registration endpoint (currently no controller exists)
+                      // .requestMatchers(HttpMethod.POST, "/api/auth/register").anonymous()
+                      .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name()) // Admin-only endpoints
+                      .requestMatchers("/api/**").authenticated()) // All other API endpoints require authentication
             .httpBasic(hbc -> hbc.authenticationEntryPoint(authenticationEntryPoint))
             .sessionManagement(smc -> smc.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .csrf(AbstractHttpConfigurer::disable);
