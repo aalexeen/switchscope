@@ -10,18 +10,18 @@ import { RouterLink } from 'vue-router';
                 <Card>
                     <h2 class="text-2xl font-bold">For Users</h2>
                     <p class="mt-2 mb-4">
-                        Remove the mac here
+                        View the dashboard here
                     </p>
                     <RouterLink
-                        to="/removemac-table"
+                        to="/dashboard"
                         class="inline-block bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-700">
-                        Remove mac
+                        Dashboard
                     </RouterLink>
                 </Card>
                 <Card bg="bg-green-100">
                     <h2 class="text-2xl font-bold">For Admins</h2>
                     <p class="mt-2 mb-4">
-                        Get the additional information about the history of the mac-addresses removing
+                        Add users and manage them here
                     </p>
                     <RouterLink
                         to="/users/add"

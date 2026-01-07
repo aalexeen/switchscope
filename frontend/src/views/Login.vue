@@ -30,8 +30,8 @@ const handleSubmit = async () => {
 
     toast.success('Login Successful');
 
-    // Redirect to the page the user was trying to access, or home if none specified
-    const redirectPath = route.query.redirect || '/removemac-table';
+    // Redirect to the page the user was trying to access, or dashboard if none specified
+    const redirectPath = route.query.redirect || '/dashboard';
     router.push(redirectPath);
 
   } catch (error) {

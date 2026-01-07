@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
+import DashboardView from "@/views/DashboardView.vue";
 import RemoveMacView from "@/views/RemoveMacView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
 import MacView from "@/views/MacView.vue";
@@ -29,6 +30,15 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: HomeView,
+      meta: { 
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'] // Both users and admins can access
+      },
+    },
+    {
+      path: "/dashboard",
+      name: "dashboard",
+      component: DashboardView,
       meta: { 
         requiresAuth: true,
         roles: ['USER', 'ADMIN'] // Both users and admins can access

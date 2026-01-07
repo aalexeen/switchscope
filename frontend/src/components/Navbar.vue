@@ -65,8 +65,8 @@ const canAccessUserManagement = () => {
         <div class="flex flex-1 items-center justify-center md:items-stretch md:justify-start">
           <!-- Logo -->
           <RouterLink class="flex flex-shrink-0 items-center mr-4" to="/">
-            <img class="h-10 w-auto" :src="logo" alt="Blacklistremover" />
-            <span class="hidden md:block text-white text-2xl font-bold ml-2">Blacklistremover</span>
+            <img class="h-10 w-auto" :src="logo" alt="SwitchScope" />
+            <span class="hidden md:block text-white text-2xl font-bold ml-2">SwitchScope</span>
           </RouterLink>
 
           <!-- Only show navigation when logged in -->
@@ -82,15 +82,15 @@ const canAccessUserManagement = () => {
                 Home
               </RouterLink>
 
-              <!-- Remove MAC - Available to both USER and ADMIN -->
+              <!-- Dashboard - Available to both USER and ADMIN -->
               <RouterLink
                 v-if="hasRole('USER') || hasRole('ADMIN')"
-                to="/removemac-table"
+                to="/dashboard"
                 :class="[isRemoveMacActive()
                   ? 'bg-green-900'
                   : 'hover:bg-gray-900 hover:text-white',
                   'text-white', 'px-3', 'py-2', 'rounded-md']">
-                Remove mac
+                Dashboard
               </RouterLink>
 
               <!-- Admin-only navigation items -->
