@@ -1,0 +1,146 @@
+<script setup>
+import logo from '@/assets/img/logo.png';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useAuth } from '@/composables/useAuth';
+import { useToast } from 'vue-toastification';
+
+const route = useRoute();
+const router = useRouter();
+const toast = useToast();
+
+// Use the composable
+const { 
+  isLoggedIn, 
+  username, 
+  logout, 
+  initializeAuth, 
+  isAdmin, 
+  isUser, 
+  hasRole,
+  userRoles 
+} = useAuth();
+
+onMounted(async () => {
+  // Initialize auth on component mount
+  await initializeAuth();
+});
+
+const handleLogout = async () => {
+  try {
+    await logout();
+    toast.success('Logged out successfully');
+    router.push('/login');
+  } catch (error) {
+    console.error('Logout error:', error);
+    toast.error('Logout failed');
+  }
+};
+
+const isActiveLink = (routerPath) => {
+  return route.path === routerPath;
+};
+
+// Special function for Remove mac button to handle both card and table views
+const isRemoveMacActive = () => {
+  return route.path === '/removemac' || route.path === '/removemac-table';
+};
+
+// Function to check if user can access admin routes
+const canAccessAdminRoutes = () => {
+  return isAdmin.value;
+};
+
+// Function to check if user can access user management
+const canAccessUserManagement = () => {
+  return hasRole('ADMIN');
+};
+
+</script>
+
+<template>
+  <nav class="bg-green-700 border-b border-green-500">
+    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+      <div class="flex h-20 items-center justify-between">
+        <div class="flex flex-1 items-center justify-center md:items-stretch md:justify-start">
+          <!-- Logo -->
+          <RouterLink class="flex flex-shrink-0 items-center mr-4" to="/">
+            <img class="h-10 w-auto" :src="logo" alt="Blacklistremover" />
+            <span class="hidden md:block text-white text-2xl font-bold ml-2">Blacklistremover</span>
+          </RouterLink>
+
+          <!-- Only show navigation when logged in -->
+          <div v-if="isLoggedIn" class="md:ml-auto">
+            <div class="flex space-x-2">
+              <!-- Home - Available to all authenticated users -->
+              <RouterLink
+                to="/"
+                :class="[isActiveLink('/')
+                  ? 'bg-green-900'
+                  : 'hover:bg-gray-900 hover:text-white',
+                  'text-white', 'px-3', 'py-2', 'rounded-md']">
+                Home
+              </RouterLink>
+
+              <!-- Remove MAC - Available to both USER and ADMIN -->
+              <RouterLink
+                v-if="hasRole('USER') || hasRole('ADMIN')"
+                to="/removemac-table"
+                :class="[isRemoveMacActive()
+                  ? 'bg-green-900'
+                  : 'hover:bg-gray-900 hover:text-white',
+                  'text-white', 'px-3', 'py-2', 'rounded-md']">
+                Remove mac
+              </RouterLink>
+
+              <!-- Admin-only navigation items -->
+              <template v-if="canAccessAdminRoutes()">
+                <RouterLink
+                  to="/users/allusers"
+                  :class="[isActiveLink('/users/allusers')
+                    ? 'bg-green-900'
+                    : 'hover:bg-gray-900 hover:text-white',
+                    'text-white', 'px-3', 'py-2', 'rounded-md']">
+                  All Users
+                </RouterLink>
+                
+                <RouterLink
+                  to="/users/add"
+                  :class="[isActiveLink('/users/add')
+                    ? 'bg-green-900'
+                    : 'hover:bg-gray-900 hover:text-white',
+                    'text-white', 'px-3', 'py-2', 'rounded-md']">
+                  Add User
+                </RouterLink>
+              </template>
+
+              <!-- My Account - Available to all authenticated users -->
+              <RouterLink
+                to="/user"
+                :class="[isActiveLink('/user')
+                  ? 'bg-green-900'
+                  : 'hover:bg-gray-900 hover:text-white',
+                  'text-white', 'px-3', 'py-2', 'rounded-md']">
+                My Account
+              </RouterLink>
+
+              <!-- Logout Button -->
+              <button
+                @click="handleLogout"
+                class="text-white px-3 py-2 rounded-md hover:bg-red-700">
+                Logout
+              </button>
+
+              <!-- User Name and Role Display -->
+              <div class="flex items-center space-x-2">
+                <span class="text-white px-3 py-2 bg-green-800 rounded-md">
+                  Welcome, {{ username }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</template>
