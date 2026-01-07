@@ -10,6 +10,7 @@ import UserView from "@/views/UserView.vue";
 import EditUserView from "@/views/EditUserView.vue";
 import Login from "@/views/Login.vue";
 import Registration from "@/views/Registration.vue";
+import ComponentView from "@/views/component/ComponentView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,7 +40,16 @@ const router = createRouter({
       path: "/dashboard",
       name: "dashboard",
       component: DashboardView,
-      meta: { 
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'] // Both users and admins can access
+      },
+    },
+    {
+      path: "/components",
+      name: "components",
+      component: ComponentView,
+      meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'] // Both users and admins can access
       },
@@ -48,7 +58,7 @@ const router = createRouter({
       path: "/removemac",
       name: "removemac",
       component: RemoveMacView,
-      meta: { 
+      meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'] // Both users and admins can access
       },
