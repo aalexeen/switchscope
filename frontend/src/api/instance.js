@@ -64,6 +64,14 @@ const blockedMacsInstance = axios.create({
   },
 });
 
+const componentsInstance = axios.create({
+  baseURL: `${baseURL}`,  // Direct to /api/
+  withCredentials: true,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
 
 // Add request interceptors to automatically include Basic Auth headers
 userInstance.interceptors.request.use(
@@ -118,9 +126,23 @@ blockedMacsInstance.interceptors.request.use(
   }
 );
 
+componentsInstance.interceptors.request.use(
+  (config) => {
+    const authHeader = getBasicAuthHeader();
+    if (authHeader) {
+      config.headers.Authorization = authHeader;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export default {
   user: userInstance,
   admin: adminInstance,
   authentification: authInstance,
   blockedMacs: blockedMacsInstance,
+  components: componentsInstance,
 };
