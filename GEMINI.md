@@ -1,6 +1,6 @@
 # GEMINI.md
 
-This file provides guidance to Gemini (or other AI agents) when working with code in this repository.
+This file provides guidance to Gemini (and other AI agents) when working with code in this repository.
 
 ## Project Overview
 
@@ -28,18 +28,24 @@ switchscope/
 │   │   │   ├── init/                  # DDL changesets
 │   │   │   ├── fill/                  # DML changesets
 │   │   │   └── csv/                   # Seed data
-│   │   └── config.properties          # App configuration (gitignored)
+│   │   └── application.yaml           # App configuration
 │   ├── src/test/                      # Tests with Testcontainers
 │   ├── pom.xml                        # Maven configuration
 │   └── mvnw, mvnw.cmd                 # Maven wrapper
+├── frontend/                          # Vue 3 + Vite Frontend
+│   ├── src/                           # Source code
+│   │   ├── api/                       # Axios API configuration
+│   │   ├── components/                # Vue components
+│   │   ├── views/                     # Vue views/pages
+│   │   └── router/                    # Vue Router
+│   ├── package.json                   # NPM dependencies
+│   └── vite.config.js                 # Vite configuration
 ├── validate_schema.py                 # Database schema validator
 ├── .local.props                       # Local DB config (gitignored)
 ├── .mcp.json                          # MCP server configuration
 ├── GEMINI.md                          # This file
 └── README.md                          # Project documentation
 ```
-
-**Note**: The repository is backend-only currently. Frontend (Vue 3 + Quasar) mentioned in README is planned for future development.
 
 ## Common Development Commands
 
@@ -49,7 +55,7 @@ switchscope/
 # Navigate to backend
 cd backend
 
-# Run the application
+# Run the application (Runs on port 8090)
 ./mvnw spring-boot:run
 
 # Run tests
@@ -72,6 +78,22 @@ cd backend
 ./mvnw spotbugs:check          # Static analysis
 ```
 
+### Frontend (NPM)
+
+```bash
+# Navigate to frontend
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run development server (Runs on port 3000)
+npm run dev
+
+# Build for production
+npm run build
+```
+
 ### Database Schema Validation
 
 ```bash
@@ -82,21 +104,20 @@ python3 validate_schema.py
 This script:
 - Compares actual PostgreSQL schema with Liquibase YAML definitions
 - Identifies missing tables, columns, type mismatches, and constraint issues
-- Provides SQL remediation commands
-- Uses configuration from `.local.props`
 - Exit codes: 0 (pass), 1 (critical issues), 2 (warnings only)
 
 ### Configuration Files
 
-- **Backend config**: `backend/src/main/resources/config.properties` (from `config.properties.example`)
-- **Database credentials**: `.local.props` (for validation script and MCP server, gitignored)
-- **MCP server config**: `.mcp.json` (PostgreSQL connection for AI agents)
-
-**Note**: Configuration files with credentials are gitignored. Copy `.example` files and configure locally.
+- **Backend config**:
+  - `backend/src/main/resources/application.yaml` - Main Spring Boot configuration (Port 8090).
+  - `backend/src/main/resources/application-local.yaml` - Local overrides (gitignored).
+- **Frontend config**:
+  - `frontend/src/api/instance.js` - API Base URL configuration.
+- **Database credentials**: `.local.props` (for validation script and MCP server, gitignored).
 
 ## High-Level Architecture
 
-### Domain Model
+### Domain Model (Backend)
 
 SwitchScope uses a **rich domain model** with deep inheritance hierarchies:
 
@@ -123,292 +144,83 @@ BaseEntity
 
 #### Core Domain Entities
 
-- **Component**: Abstract base for all infrastructure (switches, racks, cables)
-  - Uses **Single Table Inheritance** with `component_class` discriminator
-  - Delegates behavior to `ComponentTypeEntity` (type-driven behavior pattern)
-  - Self-referential parent-child relationships for modular equipment
-  - Key relationships: ComponentType, ComponentStatus, Installation, ComponentModel
-
-- **Location**: Hierarchical physical locations (building → floor → room → rack)
-  - Self-referential parent-child hierarchy
-  - Type-driven behavior via `LocationTypeEntity`
-  - Tracks infrastructure (power, UPS, cooling, rack units)
-
-- **Installation**: Links Component to Location (or Component to parent Component)
-  - Tracks physical installation with rack positioning
-  - Status tracking via `InstallationStatusEntity`
-  - Audit fields: installedBy, removedBy, timestamps
-
-- **Port**: Abstract base for network ports (Single Table Inheritance)
-  - Implementations: `EthernetPort`, `FiberPort`
-  - Comprehensive attributes: status, speed, VLAN, PoE, traffic stats
-  - One-to-one with `Connector` for physical cabling
-
-### Package Structure
-
-```
-net.switchscope/
-├── model/              # Domain entities (Component, Location, Port, Installation)
-│   ├── component/      # Component hierarchy (device, housing, connectivity)
-│   ├── location/       # Location hierarchy
-│   ├── installation/   # Installation tracking
-│   └── port/           # Network ports (Ethernet, Fiber)
-├── repository/         # Spring Data JPA repositories (extends BaseRepository)
-├── service/            # Business logic (implements CrudService interface)
-├── web/                # REST controllers (extends AbstractCrudController)
-├── mapper/             # MapStruct DTO mappers (implements BaseMapper)
-├── to/                 # Transfer Objects (DTOs for API)
-├── config/             # Spring configuration (Security, OpenAPI, etc.)
-├── error/              # Exception handling (NotFoundException, etc.)
-├── validation/         # Custom validators (@NoHtml, etc.)
-└── util/               # Utilities
-```
+- **Component**: Abstract base for all infrastructure. Uses **Single Table Inheritance** with `component_class` discriminator.
+- **Location**: Hierarchical physical locations (building → floor → room → rack).
+- **Installation**: Links Component to Location.
+- **Port**: Abstract base for network ports (Ethernet, Fiber).
 
 ### Architectural Patterns
 
-1. **Layered Architecture**: Entity → Repository → Service → Controller
-   - Clear separation of concerns
-   - Transactional boundaries at service layer
-   - DTOs separate API from domain model
-
-2. **Type-Driven Behavior**:
-   - `ComponentTypeEntity` defines component capabilities at runtime
-   - `LocationTypeEntity` defines hierarchy rules
-   - Allows configuration changes without code deployment
-
-3. **Generic Base Classes**:
-   - `BaseRepository<T>` - adds `getExisted()`, `deleteExisted()`
-   - `CrudService<T>` - generic CRUD operations interface
-   - `AbstractCrudController<T>` - standard REST endpoints
-   - `BaseMapper<E, T>` - MapStruct entity ↔ DTO conversion
-
-4. **Catalog Pattern**:
-   - `ComponentModel` catalog for manufacturer specifications
-   - Separates product catalog from component instances
-   - Concrete models: `SwitchModel`, `RouterModel`, `RackModelEntity`
+1. **Layered Architecture**: Entity → Repository → Service → Controller.
+2. **Type-Driven Behavior**: `ComponentTypeEntity` defines component capabilities at runtime.
+3. **Generic Base Classes**: `BaseRepository<T>`, `CrudService<T>`, `AbstractCrudController<T>`.
+4. **Catalog Pattern**: Separates `ComponentModel` (catalog) from `Component` (instance).
 
 ### Database Management
 
-#### Liquibase Structure
-
-```
-backend/src/main/resources/db/changelog/
-├── db.changelog-master.yaml       # Master changelog (includes all others)
-├── init/                          # DDL: table creation (01-users to 90-fk)
-├── fill/                          # DML: data population
-└── csv/                           # CSV seed data for catalogs
-```
-
-**Execution Order**: Master file includes init files first (DDL), then fill files (DML)
-
-**File Naming Convention**: Sequential numbering determines execution order (e.g., `01-users.yaml`, `10-component-categories-catalog.yaml`)
-
-#### Key Database Features
-
-1. **UUID v7 Primary Keys**: Time-ordered UUIDs via Hibernate 7.2's `@UuidGenerator(style = VERSION_7)`
-   - Better database performance than random UUIDs
-   - Defined in `BaseEntity`, inherited by all entities
-
-2. **Single Table Inheritance**:
-   - Components table stores all component types
-   - Discriminator: `component_class` (RACK, NETWORK_SWITCH, ROUTER, etc.)
-   - Allows polymorphic queries, simpler JOINs
-
-3. **CSV-Based Seed Data**:
-   - Reference data in CSV files (component types, statuses, location types)
-   - Loaded via Liquibase `loadData` changesets
-   - Pre-defined UUID v7 values for referential integrity
-
-4. **Automatic Timestamps**: `@CreationTimestamp`, `@UpdateTimestamp` on BaseEntity
-
-5. **Schema Naming**: All tables and columns use `switchscope` schema with snake_case naming
+- **UUID v7 Primary Keys**: Time-ordered UUIDs for performance.
+- **Single Table Inheritance**: All components in one table for polymorphic queries.
+- **Liquibase**: Manages schema changes. `master` includes `init/` (DDL) and `fill/` (DML).
 
 ## Important Implementation Notes
 
-### Key Architectural Decisions
-
-1. **Single Table Inheritance for Components**: All component types (switches, racks, cables) stored in one table
-   - **Pros**: Simple queries, good performance for polymorphic associations
-   - **Cons**: Many nullable columns, less data integrity enforcement
-   - **Trade-off**: Chosen for flexibility and query simplicity over storage optimization
-
-2. **UUID v7 over UUID v4**: Time-ordered UUIDs provide better database index performance
-   - Sequential nature reduces index fragmentation
-   - Still globally unique like UUID v4
-   - Requires Hibernate 7.2+ support
-
-3. **Type-Driven Behavior**: Component capabilities defined by `ComponentTypeEntity` not code
-   - Allows runtime configuration changes
-   - New component types can be added via database without code deployment
-   - Behavioral methods delegated to type entity
-
-4. **Separation of Catalog and Instances**:
-   - `ComponentModel` = product catalog (manufacturer specifications)
-   - `Component` = actual physical instances
-   - Enables tracking multiple instances of same model
-
-### Working with Components
-
-When adding new component types:
-1. Extend appropriate base class (`Device`, `HasPortsImpl`, or `Component` directly)
-2. Add discriminator value to `@DiscriminatorValue` annotation
-3. Define catalog entry in CSV file: `13-component-types-catalog.csv`
-4. Create corresponding `ComponentModel` subclass if needed
-5. Add Liquibase changelog for type-specific tables
-6. Create Service, Repository, Controller, Mapper, and TO classes
-
-**Example**: To add a new device type like "Firewall":
-- Create `Firewall.java` extending `Device` or `HasPortsImpl`
-- Add `@DiscriminatorValue("FIREWALL")`
-- Create `FirewallService`, `FirewallRepository`, `FirewallController`, `FirewallMapper`, `FirewallTo`
-- Update CSV with new component type entry
-- Create Liquibase changelogs: `init/XX-component-firewall.yaml`, `fill/XX-fill-firewalls.yaml`
-
-### Working with Entities
-
-- All entities extend `BaseEntity` (or `NamedEntity` for named entities)
-- Use `@NoHtml` validation to prevent HTML injection
-- Override `equals()`, `hashCode()`, `toString()` when adding fields
-- Prefer `@ManyToOne(fetch = LAZY)` for relationships
-- Use `@CreationTimestamp`, `@UpdateTimestamp` for audit timestamps
-
-### Working with Liquibase
-
-- **Adding tables**: Create YAML in `init/`, add include in master changelog (maintaining sequential order)
-- **Adding data**: Create CSV in `csv/`, create fill YAML in `fill/`
-- **Testing migrations**: Run `./mvnw liquibase:update`, then `python3 validate_schema.py`
-- **Column naming**: Use snake_case in database, camelCase in Java
-- **Always use**: `relativeToChangelogFile: true` in includes
-- **Fresh start**: Use `./mvnw liquibase:dropAll` then `./mvnw liquibase:update` to rebuild from scratch
-- **CSV format**: Use semicolon (`;`) as separator, single quotes (`'`) as quotchar in loadData changesets
-
 ### Security
 
-- Spring Security with OAuth2 Resource Server
-- User/Role model for RBAC
-- Password encryption via `EncryptedStringConverter`
-- JWT-based authentication (as per README)
-- Custom `@NoHtml` validator prevents HTML injection
+- **Spring Security**: HTTP Basic authentication (stateless).
+- **Frontend Auth**: Vue.js handles login via `authService`, storing credentials in `localStorage` (Basic Auth).
+- **Password Encryption**:
+  - Backend: `EncryptedStringConverter` for entity fields.
+  - CSV Seed Data: `PasswordEncryptionUtil` for generating encrypted strings.
+- **RBAC**: `User` and `Role` entities. Admin endpoints (`/api/admin/**`) require `ADMIN` role.
 
-### MapStruct Mapping
+### Frontend Integration
 
-- All mappers extend `BaseMapper<Entity, To>`
-- Configuration in `MapStructConfig`: `componentModel = "spring"`
-- Use `@Mapping` to handle custom field mappings
-- Ignore audit fields in `updateFromTo()` mappings
-- Handle relationships: map IDs vs full objects
+- **Framework**: Vue 3 with Vite.
+- **Styling**: TailwindCSS.
+- **Connectivity**: Frontend connects to Backend on port **8090**.
+- **Mock Data**: Do not check in `json` files with PII in `frontend/src/`.
 
-### Testing
+### Working with Components (Backend)
 
-- **Testcontainers**: Used for integration tests (PostgreSQL, Kafka, Redis)
-  - Docker images: `postgres:latest`, `apache/kafka-native:latest`, `redis:latest`
-  - Configuration in `TestcontainersConfiguration.java`
-- Test structure in `backend/src/test/java/net/switchscope/`
-- Use `@SpringBootTest` with `TestcontainersConfiguration` for integration tests
-- Spring Boot DevTools enabled for development-time testing
+When adding new component types:
+1. Extend appropriate base class (`Device`, `HasPortsImpl`, etc).
+2. Add `@DiscriminatorValue`.
+3. Define catalog entry in `13-component-types-catalog.csv`.
+4. Create Service, Repository, Controller, Mapper, and TO classes.
+5. Create Liquibase changelogs.
 
-## Technology Stack
+## MCP Server & Tool Usage
 
-- **Java 21** (LTS)
-- **Spring Boot 3.5.5** (Web, Security, Data JPA, Actuator, WebSocket)
-- **Hibernate ORM 7.2.0** (upgraded for UUID v7 support)
-- **Jakarta Persistence API 3.2.0**
-- **PostgreSQL 13+** with switchscope schema
-- **Liquibase 4.30.0** for schema migrations
-- **MapStruct 1.5.5** for DTO mapping
-- **Lombok** for boilerplate reduction
-- **SNMP4J 3.9.6** for SNMP monitoring
-- **SSHJ 0.40.0** for SSH device communication
-- **ExpectIt 0.9.0** for CLI automation
-- **Testcontainers 1.19.3** for integration testing
-- **SpringDoc OpenAPI 2.7.0** for API documentation
+This repository is optimized for use with AI agents via Model Context Protocol (MCP) or native tools.
 
-## MCP Server Integration
+### Available Tools
 
-This repository has an MCP (Model Context Protocol) server configured for PostgreSQL access:
-- Server name: `postgres`
-- Connection string in `.mcp.json`
-- Enables AI agents to query the database directly
-- Use for schema inspection and data validation
+1.  **Database Access (`query`)**:
+    *   Use this to run read-only SQL queries against the PostgreSQL database.
+    *   Schema: `switchscope`. Tables use snake_case.
+
+2.  **Reasoning (`sequentialthinking`)**:
+    *   Use for complex debugging, architectural planning, or root cause analysis.
+
+3.  **Library Docs (`resolve-library-id`, `query-docs`)**:
+    *   Use to query documentation for Spring Boot, Hibernate, Vue.js, etc.
+    *   Always resolve the library ID first.
+
+4.  **Browser Automation (`browser_*`)**:
+    *   Use to interact with the running application or Swagger UI.
+    *   **Swagger UI**: `http://localhost:8090/swagger-ui.html`
+    *   **Frontend**: `http://localhost:3000/`
 
 ## Development Workflow
 
-1. **Schema changes**: Create Liquibase changelog → Apply migration → Validate with script
-2. **Entity changes**: Update entity → Update mapper → Update TO → Update service/controller
-3. **Testing**: Write tests → Run `./mvnw verify` → Check coverage
-4. **Code style**: Follow Google Java Style Guide → Run checkstyle before commit
-5. **Commits**: Descriptive messages, atomic changes, reference issue numbers
-
-### Common Development Scenarios
-
-**Adding a new entity**:
-1. Create entity class extending `BaseEntity` or `NamedEntity` in `model/`
-2. Create repository interface extending `BaseRepository<YourEntity>` in `repository/`
-3. Create service class implementing `CrudService<YourEntity>` in `service/`
-4. Create controller extending `AbstractCrudController<YourEntity, YourTo>` in `web/`
-5. Create DTO (`YourTo`) in `to/` and mapper in `mapper/`
-6. Create Liquibase changelog in `init/` and data file in `fill/`
-7. Add includes to `db.changelog-master.yaml` in sequential order
-
-**Modifying database schema**:
-1. Create new Liquibase changeset (don't modify existing ones)
-2. Run `cd backend && ./mvnw liquibase:update`
-3. Run `python3 validate_schema.py` from project root
-4. Update entity classes if needed
-5. Test with `./mvnw test`
-
-**Querying the database directly**:
-- Use MCP server: AI agents can query PostgreSQL via configured MCP server
-- Use `mcp__postgres__query` tool with SQL queries
-- Schema: `switchscope`, all tables use snake_case naming
-
-## Important Files
-
-- **Backend Root**: `backend/pom.xml` - Maven dependencies and build configuration
-- **Database Schema**: `backend/src/main/resources/db/changelog/db.changelog-master.yaml` - Master changelog
-- **Validation**: `validate_schema.py` - Schema validation script (root directory)
-- **Local Config**: `.local.props` - Local database configuration (gitignored, root directory)
-- **App Config**: `backend/src/main/resources/config.properties` - Application configuration (gitignored)
-- **Main Class**: `backend/src/main/java/net/switchscope/BackendApplication.java` - Spring Boot entry point
-- **Base Classes**:
-  - `BaseEntity.java` - UUID v7 entity base with timestamps
-  - `BaseRepository.java` - Repository with `getExisted()`, `deleteExisted()`
-  - `AbstractCrudController.java` - Generic REST controller
+1.  **Schema changes**: Create Liquibase changelog → Apply migration → Validate with script.
+2.  **Frontend changes**: Verify build with `npm run build`.
+3.  **Testing**:
+    *   Backend: `./mvnw verify` (Integration tests use Testcontainers).
+    *   API: Use Swagger UI.
+4.  **Commits**: Use conventional commits (e.g., `feat:`, `fix:`).
 
 ## API Documentation
 
-Once running, access:
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **OpenAPI Spec**: http://localhost:8080/v3/api-docs
-- **Actuator**: http://localhost:8080/actuator
-
-## Troubleshooting
-
-- **Liquibase errors**:
-  - Check database connection in `backend/src/main/resources/config.properties`
-  - Verify `switchscope` schema exists in PostgreSQL
-  - Database properties can be overridden in `pom.xml` (see `<properties>` section)
-  - Use `./mvnw liquibase:status` to check migration state
-
-- **Hibernate errors**:
-  - Ensure Hibernate 7.2.0 is being used (check `pom.xml` line 73)
-  - Jakarta Persistence API 3.2.0 required for Hibernate 7.x
-
-- **UUID errors**:
-  - Verify using `@UuidGenerator(style = VERSION_7)` from Hibernate 7.2+
-  - All entities must extend `BaseEntity` which provides UUID v7 generation
-  - CSV data should use pre-generated UUID v7 format: `'01932f00-0004-7000-8000-000000000001'`
-
-- **Schema validation failures**:
-  - Run `python3 validate_schema.py` for detailed diagnostics
-  - Ensure `.local.props` has correct database credentials
-  - Check exit code: 0 (pass), 1 (critical), 2 (warnings)
-
-- **MapStruct errors**:
-  - Ensure Lombok is processed before MapStruct in compiler annotation processor paths (see `pom.xml` lines 271-288)
-  - Clean and rebuild: `./mvnw clean compile`
-  - MapStruct config is in `MapStructConfig.java` with `componentModel = "spring"`
-
-- **Port conflicts**: Backend runs on port 8080 by default (check `application.properties` to change)
-
-- **Database schema not found**: Ensure PostgreSQL search_path includes `switchscope` schema
+- **Swagger UI**: http://localhost:8090/swagger-ui.html
+- **OpenAPI Spec**: http://localhost:8090/v3/api-docs
