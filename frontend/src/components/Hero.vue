@@ -4,11 +4,11 @@ import { defineProps } from 'vue';
 defineProps({
     title: {
         type: String,
-        default: "Blacklistremover"
+        default: "SwitchScope"
     },
     subTitle: {
         type: String,
-        default: "The easy way to remove a mac-address from the WLC blacklist"
+        default: "Comprehensive Network Infrastructure Management System"
     }
 })
 </script>
