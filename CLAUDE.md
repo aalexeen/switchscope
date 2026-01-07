@@ -39,7 +39,7 @@ switchscope/
 └── README.md                          # Project documentation
 ```
 
-**Note**: The repository is backend-only currently. Frontend (Vue 3 + Quasar) mentioned in README is planned for future development.
+**Note**: The repository is backend-only currently.
 
 ## Common Development Commands
 
@@ -88,11 +88,15 @@ This script:
 
 ### Configuration Files
 
-- **Backend config**: `backend/src/main/resources/config.properties` (from `config.properties.example`)
+- **Backend config**:
+  - `backend/src/main/resources/application.yaml` - Main Spring Boot configuration
+  - `backend/src/main/resources/application-local.yaml` - Local overrides (gitignored, optional)
+  - Database credentials via environment variables: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`
+  - Encryption key via environment variable: `APP_ENCRYPTION_KEY` (default: `change-me-in-production-32chars`)
 - **Database credentials**: `.local.props` (for validation script and MCP server, gitignored)
-- **MCP server config**: `.mcp.json` (PostgreSQL connection for Claude Code)
+- **MCP server config**: `.mcp.json` (PostgreSQL, context7, sequential-thinking, playwright)
 
-**Note**: Configuration files with credentials are gitignored. Copy `.example` files and configure locally.
+**Note**: Local configuration files are gitignored. Use environment variables or create `application-local.yaml` for local overrides.
 
 ## High-Level Architecture
 
@@ -161,7 +165,7 @@ net.switchscope/
 ├── config/             # Spring configuration (Security, OpenAPI, etc.)
 ├── error/              # Exception handling (NotFoundException, etc.)
 ├── validation/         # Custom validators (@NoHtml, etc.)
-└── util/               # Utilities
+└── util/               # Utilities (PasswordEncryptionUtil, etc.)
 ```
 
 ### Architectural Patterns
@@ -281,14 +285,32 @@ When adding new component types:
 - **Always use**: `relativeToChangelogFile: true` in includes
 - **Fresh start**: Use `./mvnw liquibase:dropAll` then `./mvnw liquibase:update` to rebuild from scratch
 - **CSV format**: Use semicolon (`;`) as separator, single quotes (`'`) as quotchar in loadData changesets
+- **Encrypting passwords in CSV files**:
+  - Use `PasswordEncryptionUtil` to generate encrypted passwords
+  - Run: `java -cp target/classes net.switchscope.util.PasswordEncryptionUtil`
+  - Or run `main()` method from IDE
+  - Copy generated encrypted values to CSV files
+  - Utility loads encryption key from `application-local.yaml` or uses default
 
 ### Security
 
-- Spring Security with OAuth2 Resource Server
-- User/Role model for RBAC
-- Password encryption via `EncryptedStringConverter`
-- JWT-based authentication (as per README)
-- Custom `@NoHtml` validator prevents HTML injection
+- **Spring Security** with HTTP Basic authentication (stateless sessions)
+- **User/Role model** for RBAC (Role-Based Access Control)
+  - Admin endpoints: `/api/admin/**` require `ADMIN` role
+  - API endpoints: `/api/**` require authentication
+  - Public endpoints: Swagger UI, API docs, favicon
+- **Password encryption** via `EncryptedStringConverter` for entity fields
+  - Uses AES/GCM/NoPadding encryption algorithm
+  - Encryption key configured in `application.yaml`: `app.encryption.key`
+  - Device passwords stored encrypted in database
+- **PasswordEncryptionUtil** utility class for encrypting passwords in CSV seed data
+  - Standalone utility: `backend/src/main/java/net/switchscope/util/PasswordEncryptionUtil.java`
+  - Run `main()` method to generate encrypted passwords for CSV files
+  - Loads encryption key from `application-local.yaml` or uses default
+  - Uses same encryption algorithm as `EncryptedStringConverter`
+- **CORS configuration** allows localhost and local network origins
+- **Custom validators**: `@NoHtml` prevents HTML injection attacks
+- **Authentication**: HTTP Basic with `UserDetailsService` backed by database
 
 ### MapStruct Mapping
 
@@ -300,12 +322,17 @@ When adding new component types:
 
 ### Testing
 
-- **Testcontainers**: Used for integration tests (PostgreSQL, Kafka, Redis)
-  - Docker images: `postgres:latest`, `apache/kafka-native:latest`, `redis:latest`
-  - Configuration in `TestcontainersConfiguration.java`
-- Test structure in `backend/src/test/java/net/switchscope/`
-- Use `@SpringBootTest` with `TestcontainersConfiguration` for integration tests
-- Spring Boot DevTools enabled for development-time testing
+- **Test structure**: `backend/src/test/java/net/switchscope/`
+- **Test base classes** for reusable test logic:
+  - `AbstractCrudControllerTest` - Base class for CRUD controller tests
+  - `AbstractCatalogControllerTest` - Base class for catalog controller tests
+  - `CrudSmokeControllerTest` - Smoke tests for basic CRUD operations
+- **Integration tests**: Use `@SpringBootTest` with `TestcontainersConfiguration`
+  - Testcontainers provides PostgreSQL, Kafka, Redis containers for testing
+- **Controller tests**: Use `@WebMvcTest` with `MockMvc` for REST controller testing
+  - Custom `TestSecurityConfig` disables security for easier testing
+- **Test utilities**: `TestEntity` and `TestEntityController` for testing base classes
+- **Spring Boot DevTools** enabled for development-time testing
 
 ## Technology Stack
 
@@ -325,11 +352,34 @@ When adding new component types:
 
 ## MCP Server Integration
 
-This repository has an MCP (Model Context Protocol) server configured for PostgreSQL access:
-- Server name: `postgres`
-- Connection string in `.mcp.json`
-- Enables Claude Code to query the database directly
-- Use for schema inspection and data validation
+This repository has MCP (Model Context Protocol) servers configured in `.mcp.json`:
+
+### Available MCP Servers
+
+1. **postgres** - PostgreSQL Database Access
+   - Direct database querying capabilities
+   - Schema inspection and data validation
+   - Use `mcp__postgres__query` tool for SQL queries
+   - Connection configured for `switchscope` schema
+
+2. **sequential-thinking** - Advanced Reasoning
+   - Structured problem-solving through chain-of-thought
+   - Useful for complex debugging and architectural decisions
+   - Use `mcp__sequential-thinking__sequentialthinking` tool
+   - Supports hypothesis generation and verification
+
+3. **context7** - Library Documentation
+   - Up-to-date documentation for Java libraries and frameworks
+   - Query Spring Boot, Hibernate, and other dependencies
+   - Use `mcp__context7__resolve-library-id` to find libraries
+   - Use `mcp__context7__query-docs` for specific documentation
+
+4. **playwright** - Browser Automation for E2E Testing
+   - Automated browser testing capabilities for Swagger UI and web interfaces
+   - Useful for end-to-end testing scenarios
+   - Can interact with Swagger UI at http://localhost:8090/
+   - Multiple browser interaction tools available (navigate, click, fill forms, screenshots)
+   - Use for testing API documentation accessibility and UI flows
 
 ## Development Workflow
 
@@ -338,6 +388,9 @@ This repository has an MCP (Model Context Protocol) server configured for Postgr
 3. **Testing**: Write tests → Run `./mvnw verify` → Check coverage
 4. **Code style**: Follow Google Java Style Guide → Run checkstyle before commit
 5. **Commits**: Descriptive messages, atomic changes, reference issue numbers
+6. **Security**: Encrypt sensitive data in CSV files using `PasswordEncryptionUtil`
+7. **API testing**: Use Swagger UI at http://localhost:8090/ for interactive API testing
+8. **Browser testing**: Use MCP `playwright` for automated E2E testing of Swagger UI
 
 ### Common Development Scenarios
 
@@ -357,10 +410,30 @@ This repository has an MCP (Model Context Protocol) server configured for Postgr
 4. Update entity classes if needed
 5. Test with `./mvnw test`
 
+**Adding encrypted passwords to CSV seed data**:
+1. Add plain text passwords to `PasswordEncryptionUtil.main()` method
+2. Run the utility: `java -cp target/classes net.switchscope.util.PasswordEncryptionUtil`
+3. Copy encrypted output values to CSV files (e.g., `51-network-switches.csv`)
+4. Ensure encryption key is configured in `application-local.yaml` under `app.encryption.key`
+5. Test that application can decrypt passwords after loading from CSV
+
 **Querying the database directly**:
-- Use MCP server: Claude Code can query PostgreSQL via configured MCP server
+- Use MCP `postgres` server: Claude Code can query PostgreSQL via configured MCP server
 - Use `mcp__postgres__query` tool with SQL queries
 - Schema: `switchscope`, all tables use snake_case naming
+
+**Getting library documentation**:
+- Use MCP `context7` server for up-to-date library documentation
+- First resolve library ID: `mcp__context7__resolve-library-id`
+- Then query docs: `mcp__context7__query-docs`
+- Useful for Spring Boot, Hibernate, Jakarta Persistence API questions
+
+**Testing Swagger UI and API endpoints**:
+- Use MCP `playwright` server for browser automation testing
+- Navigate to Swagger UI: `mcp__playwright__browser_navigate` with http://localhost:8090/
+- Take screenshots: `mcp__playwright__browser_take_screenshot`
+- Test API documentation accessibility and functionality
+- Useful for E2E testing of web interfaces
 
 ## Important Files
 
@@ -368,47 +441,31 @@ This repository has an MCP (Model Context Protocol) server configured for Postgr
 - **Database Schema**: `backend/src/main/resources/db/changelog/db.changelog-master.yaml` - Master changelog
 - **Validation**: `validate_schema.py` - Schema validation script (root directory)
 - **Local Config**: `.local.props` - Local database configuration (gitignored, root directory)
-- **App Config**: `backend/src/main/resources/config.properties` - Application configuration (gitignored)
+- **App Config**:
+  - `backend/src/main/resources/application.yaml` - Main application configuration
+  - `backend/src/main/resources/application-local.yaml` - Local overrides (gitignored, optional)
 - **Main Class**: `backend/src/main/java/net/switchscope/BackendApplication.java` - Spring Boot entry point
 - **Base Classes**:
   - `BaseEntity.java` - UUID v7 entity base with timestamps
   - `BaseRepository.java` - Repository with `getExisted()`, `deleteExisted()`
   - `AbstractCrudController.java` - Generic REST controller
+- **Utilities**:
+  - `PasswordEncryptionUtil.java` - Utility for encrypting passwords in CSV files
 
 ## API Documentation
 
 Once running, access:
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **OpenAPI Spec**: http://localhost:8080/v3/api-docs
-- **Actuator**: http://localhost:8080/actuator
+- **Swagger UI**: http://localhost:8090/swagger-ui.html
+- **OpenAPI Spec**: http://localhost:8090/v3/api-docs
+- **Actuator**: http://localhost:8090/actuator
+
+**Note**: Application runs on port **8090** (configured in `application.yaml`)
+
+**Swagger UI Features**:
+- Interactive API testing interface at root path `/`
+- All REST endpoints documented with request/response schemas
+- Try-it-out functionality with authentication support
+- Accessible via MCP `playwright` server for automated testing
 
 ## Troubleshooting
 
-- **Liquibase errors**:
-  - Check database connection in `backend/src/main/resources/config.properties`
-  - Verify `switchscope` schema exists in PostgreSQL
-  - Database properties can be overridden in `pom.xml` (see `<properties>` section)
-  - Use `./mvnw liquibase:status` to check migration state
-
-- **Hibernate errors**:
-  - Ensure Hibernate 7.2.0 is being used (check `pom.xml` line 73)
-  - Jakarta Persistence API 3.2.0 required for Hibernate 7.x
-
-- **UUID errors**:
-  - Verify using `@UuidGenerator(style = VERSION_7)` from Hibernate 7.2+
-  - All entities must extend `BaseEntity` which provides UUID v7 generation
-  - CSV data should use pre-generated UUID v7 format: `'01932f00-0004-7000-8000-000000000001'`
-
-- **Schema validation failures**:
-  - Run `python3 validate_schema.py` for detailed diagnostics
-  - Ensure `.local.props` has correct database credentials
-  - Check exit code: 0 (pass), 1 (critical), 2 (warnings)
-
-- **MapStruct errors**:
-  - Ensure Lombok is processed before MapStruct in compiler annotation processor paths (see `pom.xml` lines 271-288)
-  - Clean and rebuild: `./mvnw clean compile`
-  - MapStruct config is in `MapStructConfig.java` with `componentModel = "spring"`
-
-- **Port conflicts**: Backend runs on port 8080 by default (check `application.properties` to change)
-
-- **Database schema not found**: Ensure PostgreSQL search_path includes `switchscope` schema
