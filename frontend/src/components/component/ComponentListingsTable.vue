@@ -24,10 +24,6 @@ const props = defineProps({
     filteredComponents: {
         type: Array,
         default: null
-    },
-    searchQuery: {
-        type: String,
-        default: ''
     }
 });
 
@@ -35,11 +31,6 @@ const props = defineProps({
 const displayedComponents = computed(() => {
   const comps = props.filteredComponents !== null ? props.filteredComponents : components.value;
   return props.limit ? comps.slice(0, props.limit) : comps;
-});
-
-// Show search info if search is active
-const hasActiveSearch = computed(() => {
-  return props.searchQuery && props.searchQuery.trim() !== '';
 });
 
 onMounted(async () => {
@@ -57,9 +48,6 @@ onMounted(async () => {
         <div class="container-xl lg:container m-auto">
             <h2 class="text-3xl font-bold text-green-500 mb-6 text-center">
                 Browse Components - Table View
-                <span v-if="hasActiveSearch" class="text-lg text-gray-600 block mt-2">
-                    Search results for: "{{ searchQuery }}"
-                </span>
             </h2>
 
             <!-- Statistics -->
@@ -67,14 +55,11 @@ onMounted(async () => {
                 <div class="flex justify-between items-center">
                     <div class="text-sm text-gray-600">
                         <span class="font-medium">
-                            <template v-if="hasActiveSearch">
-                                Found: {{ displayedComponents.length }} of {{ totalComponents }} total
-                            </template>
-                            <template v-else>
-                                Total Components: {{ totalComponents }}
-                            </template>
+                            Displaying: {{ displayedComponents.length }} components
                         </span>
-                        <span v-if="props.limit" class="ml-4">Showing: {{ Math.min(props.limit, displayedComponents.length) }}</span>
+                        <span v-if="props.limit" class="ml-4">
+                            (Limit: {{ Math.min(props.limit, displayedComponents.length) }} of {{ totalComponents }})
+                        </span>
                     </div>
                     <button
                         @click="fetchComponents(true)"
@@ -146,8 +131,7 @@ onMounted(async () => {
 
             <!-- Show message when no components are available -->
             <div v-else class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-                <p v-if="hasActiveSearch">No components found matching your search: "{{ searchQuery }}"</p>
-                <p v-else>No components found.</p>
+                <p>No components found.</p>
             </div>
         </div>
     </section>

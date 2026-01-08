@@ -32,14 +32,36 @@ switchscope/
 │   ├── src/test/                      # Tests with Testcontainers
 │   ├── pom.xml                        # Maven configuration
 │   └── mvnw, mvnw.cmd                 # Maven wrapper
+├── frontend/                          # Vue.js 3 frontend
+│   ├── src/
+│   │   ├── api/                       # API client modules (axios)
+│   │   ├── components/                # Reusable Vue components
+│   │   │   └── component/             # Component-specific components
+│   │   ├── composables/               # Vue 3 Composition API composables
+│   │   ├── plugins/                   # Vue plugins configuration
+│   │   ├── router/                    # Vue Router configuration
+│   │   ├── services/                  # Business logic services
+│   │   ├── utils/                     # Utility functions
+│   │   ├── views/                     # Page-level components (routed views)
+│   │   │   ├── catalog/               # Catalog management views
+│   │   │   ├── component/             # Component management views
+│   │   │   ├── installation/          # Installation tracking views
+│   │   │   ├── location/              # Location management views
+│   │   │   └── port/                  # Port management views
+│   │   ├── App.vue                    # Root Vue component
+│   │   └── main.js                    # Application entry point
+│   ├── public/                        # Static assets
+│   ├── dist/                          # Production build output
+│   ├── package.json                   # NPM dependencies
+│   ├── vite.config.js                 # Vite configuration (dev server on port 3001)
+│   ├── tailwind.config.js             # Tailwind CSS configuration
+│   └── postcss.config.js              # PostCSS configuration
 ├── validate_schema.py                 # Database schema validator
 ├── .local.props                       # Local DB config (gitignored)
 ├── .mcp.json                          # MCP server configuration
 ├── CLAUDE.md                          # This file
 └── README.md                          # Project documentation
 ```
-
-**Note**: The repository is backend-only currently.
 
 ## Common Development Commands
 
@@ -70,6 +92,28 @@ cd backend
 # Code quality
 ./mvnw checkstyle:check        # Check code style
 ./mvnw spotbugs:check          # Static analysis
+```
+
+### Frontend (NPM/Vite)
+
+```bash
+# Navigate to frontend
+cd frontend
+
+# Install dependencies
+npm install
+
+# Run development server (http://localhost:3001)
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Run mock JSON server (development only)
+npm run server
 ```
 
 ### Database Schema Validation
@@ -334,8 +378,115 @@ When adding new component types:
 - **Test utilities**: `TestEntity` and `TestEntityController` for testing base classes
 - **Spring Boot DevTools** enabled for development-time testing
 
+### Frontend Implementation Notes
+
+#### API Module Pattern (Critical)
+
+**ALWAYS use the factory function pattern** when creating new API modules:
+
+```javascript
+// ✅ CORRECT Pattern
+const baseURL = "your/endpoint/path";
+
+export default function ({components}) {  // Receives axios instance
+    return {
+        getAll() {
+            return components.get(baseURL);
+        },
+        get(id) {
+            return components.get(`${baseURL}/${id}`);
+        }
+        // ... other methods
+    };
+}
+```
+
+**Common Mistakes to Avoid**:
+- ❌ Direct import of axios instance: `import instance from './instance'`
+- ❌ Named exports instead of default: `export const myAPI = { ... }`
+- ❌ Async/await in module definition (handle in composables)
+- ❌ Extracting `.data` in module (return full axios response)
+
+**Module Registration Checklist**:
+1. Create module file with factory function
+2. Add import to `api/index.js`
+3. Add to exports object with instance: `myModule: myModule(instance)`
+4. Use in composables via: `import api from '@/api'`
+5. Extract data in composable: `response.data`
+
+#### Component Architecture Pattern
+
+**Container/Presentational Pattern** (recommended for all pages):
+
+```
+PageView.vue (Container Component)
+├── Manages state (search, filters, etc.)
+├── Calls composables (useMyData)
+├── Handles events (view, edit, delete)
+│
+├─► SearchBar.vue (Presentational)
+│   ├── Props: searchQuery, foundCount, totalCount
+│   ├── Emits: update:searchQuery, clear
+│   └── Pure UI component
+│
+└─► ListingsTable.vue (Presentational)
+    ├── Props: filteredData
+    ├── Emits: view, edit, delete
+    ├── Uses composable for data loading
+    │
+    └─► ListTable.vue (Row Component)
+        ├── Props: item
+        ├── Emits: view, edit, delete
+        └── Renders single row
+```
+
+**Benefits**:
+- Clear separation of concerns
+- Reusable components
+- Easy to test
+- Consistent patterns across codebase
+
+#### Composables Pattern
+
+**Use Singleton Pattern** for shared data:
+
+```javascript
+// Shared state OUTSIDE the composable function
+const items = ref([]);
+const isLoading = ref(false);
+const isInitialized = ref(false);
+
+export function useMyData() {
+  // Only fetch if not initialized
+  const fetchItems = async (force = false) => {
+    if (isInitialized.value && !force) return;
+    // ... fetch logic
+  };
+
+  return { items, fetchItems, ... };
+}
+```
+
+**When to use singleton**:
+- Catalog data (component types, statuses, etc.)
+- Data that should be shared across views
+- Expensive data that shouldn't be re-fetched
+
+**When NOT to use singleton**:
+- Form state (local to component)
+- Temporary UI state
+- User-specific filters
+
+#### Routing Best Practices
+
+- Always add `meta: { requiresAuth: true }` for protected routes
+- Specify roles: `roles: ['USER', 'ADMIN']`
+- Import views at top of router file (not lazy loading for now)
+- Use consistent naming: route `name` should match component name (kebab-case)
+
 ## Technology Stack
 
+### Backend
 - **Java 21** (LTS)
 - **Spring Boot 3.5.5** (Web, Security, Data JPA, Actuator, WebSocket)
 - **Hibernate ORM 7.2.0** (upgraded for UUID v7 support)
@@ -349,6 +500,177 @@ When adding new component types:
 - **ExpectIt 0.9.0** for CLI automation
 - **Testcontainers 1.19.3** for integration testing
 - **SpringDoc OpenAPI 2.7.0** for API documentation
+
+### Frontend
+- **Vue.js 3.5.13** with Composition API
+- **Vue Router 4.5.0** for client-side routing
+- **Vite 6.0.5** for fast build tooling
+- **Axios 1.7.9** for HTTP client
+- **Tailwind CSS 3.4.17** for utility-first styling
+- **PrimeIcons 7.0.0** for iconography
+- **Vue Toastification 2.0.0** for notifications
+- **Vue DevTools 7.6.8** for development debugging
+
+## Frontend Architecture
+
+### Project Structure
+
+The frontend follows a standard Vue.js 3 application structure with Composition API:
+
+```
+frontend/src/
+├── api/                    # API client layer
+│   ├── instance.js         # Axios instance configuration (base URL, interceptors)
+│   ├── index.js            # API exports barrel
+│   ├── authentication.js   # Auth API endpoints
+│   ├── components.js       # Components API endpoints
+│   └── blockedmacs.js      # Legacy API (to be migrated)
+├── components/             # Reusable UI components
+│   ├── component/          # Component management UI components
+│   ├── Navbar.vue          # Main navigation
+│   ├── Hero.vue            # Hero section
+│   ├── HomeCards.vue       # Dashboard cards
+│   └── [other components]  # Various UI components
+├── composables/            # Vue 3 Composition API composables
+│   └── [reusable logic]    # Shared reactive state and logic
+├── views/                  # Page-level components (routed)
+│   ├── DashboardView.vue   # Main dashboard
+│   ├── Login.vue           # Authentication view
+│   ├── catalog/            # Catalog management pages
+│   ├── component/          # Component management pages
+│   ├── installation/       # Installation tracking pages
+│   ├── location/           # Location management pages
+│   └── port/               # Port management pages
+├── router/                 # Vue Router configuration
+├── services/               # Business logic services
+├── utils/                  # Utility functions
+├── plugins/                # Vue plugins
+├── App.vue                 # Root component
+└── main.js                 # Application entry point
+```
+
+### Key Frontend Features
+
+1. **Vue 3 Composition API**: Modern reactive programming with `<script setup>` syntax
+2. **Vue Router**: Client-side routing for single-page application navigation
+3. **Axios HTTP Client**: Centralized API communication with interceptors
+4. **Tailwind CSS**: Utility-first CSS framework for rapid UI development
+5. **Vite Dev Server**: Fast hot module replacement (HMR) on port 3001
+6. **Component-Based Architecture**: Reusable Vue components with props and events
+7. **Authentication**: Login system integrated with backend JWT/session authentication
+8. **Toast Notifications**: User feedback via vue-toastification
+9. **Responsive Design**: Mobile-first approach with Tailwind CSS
+
+### API Integration
+
+The frontend communicates with the Spring Boot backend via REST API using a **modular factory pattern**.
+
+#### API Architecture
+
+**Three-Step Pattern**:
+
+1. **Step 1: Instance Configuration** (`api/instance.js`)
+   - Creates named axios instances with base URLs and interceptors
+   - Available instances: `user`, `admin`, `authentification`, `blockedMacs`, `components`
+   - Each instance has automatic Basic Auth injection via interceptors
+
+2. **Step 2: Module Definition** (e.g., `api/components.js`, `api/componentNatures.js`)
+   - Modules are **factory functions** that receive instance object
+   - Return object with CRUD methods: `getAll()`, `get(id)`, `create()`, `update()`, `delete()`
+   - Each module defines its own `baseURL` relative to instance
+
+3. **Step 3: Module Export** (`api/index.js`)
+   - Imports all modules and instance
+   - Exports unified API object with all modules initialized
+
+#### API Module Pattern
+
+**IMPORTANT**: All API modules must follow this factory function pattern:
+
+```javascript
+// ✅ CORRECT: Factory function pattern
+// api/componentNatures.js
+const baseURL = "catalogs/component-natures";
+
+export default function ({components}) {  // Factory receives instance
+    return {
+        getAll() {
+            return components.get(baseURL);  // Returns axios response
+        },
+        get(id) {
+            return components.get(`${baseURL}/${id}`);
+        },
+        create(payload) {
+            return components.post(baseURL, payload);
+        },
+        update(id, payload) {
+            return components.put(`${baseURL}/${id}`, payload);
+        },
+        delete(id) {
+            return components.delete(`${baseURL}/${id}`);
+        }
+    };
+}
+```
+
+```javascript
+// ❌ INCORRECT: Direct API calls (will not work)
+import instance from './instance';
+
+export const myAPI = {
+    async getAll() {
+        return await instance.get('/path');  // Wrong!
+    }
+};
+```
+
+**Module Registration** (`api/index.js`):
+
+```javascript
+import instance from "./instance";
+import componentsModule from "./components";
+import componentNaturesModule from "./componentNatures";
+
+export default {
+    components: componentsModule(instance),        // Initialize with instance
+    componentNatures: componentNaturesModule(instance)
+}
+```
+
+**Usage in Composables**:
+
+```javascript
+import api from '@/api';
+
+// Access initialized modules
+const response = await api.componentNatures.getAll();
+const data = response.data;  // Extract data from axios response
+```
+
+#### API Configuration
+
+- **Base URL**: `http://localhost:8090/api/` (configured in `api/instance.js`)
+- **Authentication**: HTTP Basic auth via interceptors (credentials from localStorage)
+- **Interceptors**: Automatic auth header injection for all requests
+- **Error Handling**: Handled in composables with toast notifications
+- **Response Format**: All methods return axios response objects (access `.data` property)
+
+### Development Workflow (Frontend)
+
+1. **Component Development**: Create Vue components in `components/` or `views/`
+2. **API Integration**: Add API methods in `api/` modules
+3. **Routing**: Configure routes in `router/`
+4. **Styling**: Use Tailwind CSS utility classes
+5. **State Management**: Use composables for shared reactive state
+6. **Testing**: Manual testing via dev server (http://localhost:3001)
+
+### Frontend Configuration
+
+- **Dev Server Port**: 3001 (configured in `vite.config.js`)
+- **Backend API**: http://localhost:8090 (Spring Boot backend)
+- **Path Alias**: `@` maps to `src/` directory
+- **CSS Framework**: Tailwind CSS with PostCSS processing
+- **Build Output**: `frontend/dist/` directory
 
 ## MCP Server Integration
 
@@ -383,14 +705,28 @@ This repository has MCP (Model Context Protocol) servers configured in `.mcp.jso
 
 ## Development Workflow
 
+### Backend Workflow
 1. **Schema changes**: Create Liquibase changelog → Apply migration → Validate with script
 2. **Entity changes**: Update entity → Update mapper → Update TO → Update service/controller
 3. **Testing**: Write tests → Run `./mvnw verify` → Check coverage
 4. **Code style**: Follow Google Java Style Guide → Run checkstyle before commit
-5. **Commits**: Descriptive messages, atomic changes, reference issue numbers
-6. **Security**: Encrypt sensitive data in CSV files using `PasswordEncryptionUtil`
-7. **API testing**: Use Swagger UI at http://localhost:8090/ for interactive API testing
-8. **Browser testing**: Use MCP `playwright` for automated E2E testing of Swagger UI
+5. **Security**: Encrypt sensitive data in CSV files using `PasswordEncryptionUtil`
+6. **API testing**: Use Swagger UI at http://localhost:8090/ for interactive API testing
+
+### Frontend Workflow
+1. **Component development**: Create/modify Vue components in `components/` or `views/`
+2. **API integration**: Add/update API methods in `api/` modules
+3. **Routing**: Configure routes in `router/index.js`
+4. **Styling**: Apply Tailwind CSS utility classes for UI styling
+5. **Testing**: Manual testing via dev server at http://localhost:3001
+6. **Build**: Run `npm run build` before deployment
+
+### Full-Stack Workflow
+1. **Start backend**: `cd backend && ./mvnw spring-boot:run` (port 8090)
+2. **Start frontend**: `cd frontend && npm run dev` (port 3001)
+3. **Development**: Make changes, test via browser at http://localhost:3001
+4. **Commits**: Descriptive messages, atomic changes, reference issue numbers
+5. **Browser testing**: Use MCP `playwright` for automated E2E testing
 
 ### Common Development Scenarios
 
@@ -435,8 +771,62 @@ This repository has MCP (Model Context Protocol) servers configured in `.mcp.jso
 - Test API documentation accessibility and functionality
 - Useful for E2E testing of web interfaces
 
+**Adding a new Vue component**:
+1. Create component file in `frontend/src/components/` (e.g., `MyComponent.vue`)
+2. Define component structure with `<template>`, `<script setup>`, and `<style>` sections
+3. Import and use in parent components or views
+4. Apply Tailwind CSS classes for styling
+5. Test in browser via dev server
+
+**Adding a new page/view**:
+1. Create view component in `frontend/src/views/` (e.g., `MyPageView.vue`)
+2. Add route configuration in `frontend/src/router/index.js`
+3. Link to the new page from navigation components
+4. Implement page layout and functionality
+5. Test navigation and page rendering
+
+**Adding a new API module (Frontend)**:
+1. Create new API module file in `frontend/src/api/` (e.g., `myModule.js`)
+2. **IMPORTANT**: Use factory function pattern (NOT direct exports):
+   ```javascript
+   const baseURL = "path/to/endpoint";
+   export default function ({components}) {  // Receive instance
+       return {
+           getAll() { return components.get(baseURL); },
+           get(id) { return components.get(`${baseURL}/${id}`); },
+           // ... other methods
+       };
+   }
+   ```
+3. Register module in `frontend/src/api/index.js`:
+   ```javascript
+   import myModule from "./myModule";
+   export default {
+       // ... existing modules
+       myModule: myModule(instance)  // Initialize with instance
+   }
+   ```
+4. Create composable in `frontend/src/composables/` (e.g., `useMyModule.js`):
+   - Import: `import api from '@/api';`
+   - Call methods: `const response = await api.myModule.getAll();`
+   - Extract data: `const data = response.data;`
+   - Add error handling and toast notifications
+   - Use singleton pattern for shared state if needed
+5. Create Vue components and views using the composable
+6. Add route in `router/index.js` if creating a new page
+
+**Integrating a new API endpoint (existing module)**:
+1. Add method to existing API module in `frontend/src/api/` (e.g., `components.js`)
+2. Follow factory function pattern: return method from factory
+3. Update composable to expose the new method
+4. Call API method from Vue component (typically in `onMounted` or event handler)
+5. Handle response data and errors appropriately
+6. Display results in component template
+7. Show user feedback via toast notifications
+
 ## Important Files
 
+### Backend Files
 - **Backend Root**: `backend/pom.xml` - Maven dependencies and build configuration
 - **Database Schema**: `backend/src/main/resources/db/changelog/db.changelog-master.yaml` - Master changelog
 - **Validation**: `validate_schema.py` - Schema validation script (root directory)
@@ -452,20 +842,46 @@ This repository has MCP (Model Context Protocol) servers configured in `.mcp.jso
 - **Utilities**:
   - `PasswordEncryptionUtil.java` - Utility for encrypting passwords in CSV files
 
-## API Documentation
+### Frontend Files
+- **Frontend Root**: `frontend/package.json` - NPM dependencies and scripts
+- **Build Config**: `frontend/vite.config.js` - Vite build and dev server configuration
+- **Styling Config**:
+  - `frontend/tailwind.config.js` - Tailwind CSS configuration
+  - `frontend/postcss.config.js` - PostCSS processing configuration
+- **App Entry**: `frontend/src/main.js` - Application initialization and plugin setup
+- **Root Component**: `frontend/src/App.vue` - Root Vue component
+- **API Configuration**:
+  - `frontend/src/api/instance.js` - Axios instance with base URL and interceptors
+  - `frontend/src/api/index.js` - API exports barrel
+- **Router**: `frontend/src/router/index.js` - Vue Router configuration
+- **Key Views**:
+  - `frontend/src/views/DashboardView.vue` - Main dashboard
+  - `frontend/src/views/Login.vue` - Authentication view
+  - `frontend/src/views/component/` - Component management views
 
+## Application URLs
+
+### Backend (Spring Boot)
 Once running, access:
 - **Swagger UI**: http://localhost:8090/swagger-ui.html
 - **OpenAPI Spec**: http://localhost:8090/v3/api-docs
 - **Actuator**: http://localhost:8090/actuator
+- **REST API Base**: http://localhost:8090/api
 
-**Note**: Application runs on port **8090** (configured in `application.yaml`)
+**Note**: Backend runs on port **8090** (configured in `application.yaml`)
 
 **Swagger UI Features**:
 - Interactive API testing interface at root path `/`
 - All REST endpoints documented with request/response schemas
 - Try-it-out functionality with authentication support
 - Accessible via MCP `playwright` server for automated testing
+
+### Frontend (Vue.js)
+Once running, access:
+- **Dev Server**: http://localhost:3001
+- **Production Build**: Served via backend or separate web server from `frontend/dist/`
+
+**Note**: Frontend dev server runs on port **3001** (configured in `vite.config.js`)
 
 ## Troubleshooting
 
