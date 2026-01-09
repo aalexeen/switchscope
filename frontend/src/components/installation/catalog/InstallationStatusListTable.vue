@@ -20,19 +20,6 @@ const getIconClass = (iconClass) => {
   return iconClass || 'pi pi-flag';
 };
 
-// Get color category badge
-const getColorCategoryBadge = (colorCategory) => {
-  const categories = {
-    'success': 'bg-green-100 text-green-800',
-    'info': 'bg-blue-100 text-blue-800',
-    'warning': 'bg-yellow-100 text-yellow-800',
-    'danger': 'bg-red-100 text-red-800',
-    'progress': 'bg-purple-100 text-purple-800',
-    'neutral': 'bg-gray-100 text-gray-800'
-  };
-  return categories[colorCategory?.toLowerCase()] || 'bg-gray-100 text-gray-800';
-};
-
 // Get status category badge
 const getStatusCategoryBadge = (category) => {
   const categories = {
@@ -110,18 +97,6 @@ const getUrgencyLabel = (level) => {
       <span v-else class="text-gray-400 text-sm">-</span>
     </td>
 
-    <!-- Color Category -->
-    <td class="px-4 py-3">
-      <span
-        v-if="installationStatus.colorCategory"
-        :class="getColorCategoryBadge(installationStatus.colorCategory)"
-        class="px-2 py-1 rounded-full text-xs font-medium capitalize"
-      >
-        {{ installationStatus.colorCategory }}
-      </span>
-      <span v-else class="text-gray-400 text-sm">-</span>
-    </td>
-
     <!-- Urgency Level -->
     <td class="px-4 py-3 text-center">
       <span
@@ -165,14 +140,6 @@ const getUrgencyLabel = (level) => {
         :class="installationStatus.finalStatus ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
       ></i>
-    </td>
-
-    <!-- Auto Transition -->
-    <td class="px-4 py-3 text-center">
-      <span v-if="installationStatus.autoTransitionMinutes" class="text-sm text-gray-700">
-        {{ installationStatus.autoTransitionMinutes }}m
-      </span>
-      <span v-else class="text-gray-400 text-sm">-</span>
     </td>
 
     <!-- Description -->
