@@ -1,28 +1,31 @@
 // api - 3rd step
 import instance from "./instance";
+import { createApiModule } from "./apiFactory";
 
+// Legacy modules (not yet migrated to factory pattern)
 import blockedmacsModule from "./blockedmacs";
 import authModule from "./authentication";
 import componentsModule from "./components/components";
-import componentNaturesModule from "./components/componentNatures";
-import componentCategoriesModule from "./components/componentCategories";
-import componentTypesModule from "./components/componentTypes";
-import componentStatusesModule from "./components/componentStatuses";
-import componentModelsModule from "./components/catalog/componentModels";
-import locationTypesModule from "./locations/locationTypes";
-import installationStatusesModule from "./installations/installationStatuses";
-import installableTypesModule from "./installations/installableTypes";
 
+/**
+ * API Modules Registry
+ *
+ * Most modules use the createApiModule factory for standard CRUD operations.
+ * Legacy modules (blockedmacs, authentication, components) retain custom implementations.
+ */
 export default {
+    // Legacy modules with custom logic
     blockedmacs: blockedmacsModule(instance),
     authentication: authModule(instance),
     components: componentsModule(instance),
-    componentNatures: componentNaturesModule(instance),
-    componentCategories: componentCategoriesModule(instance),
-    componentTypes: componentTypesModule(instance),
-    componentStatuses: componentStatusesModule(instance),
-    componentModels: componentModelsModule(instance),
-    locationTypes: locationTypesModule(instance),
-    installationStatuses: installationStatusesModule(instance),
-    installableTypes: installableTypesModule(instance)
+
+    // Standard catalog modules using factory pattern
+    componentNatures: createApiModule('catalogs/component-natures')(instance),
+    componentCategories: createApiModule('catalogs/component-categories')(instance),
+    componentTypes: createApiModule('catalogs/component-types')(instance),
+    componentStatuses: createApiModule('catalogs/component-statuses')(instance),
+    componentModels: createApiModule('catalogs/component-models')(instance),
+    locationTypes: createApiModule('catalogs/location-types')(instance),
+    installationStatuses: createApiModule('catalogs/installation-statuses')(instance),
+    installableTypes: createApiModule('catalogs/installable-types')(instance)
 }
