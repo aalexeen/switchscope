@@ -14,7 +14,9 @@ import ComponentView from "@/views/component/ComponentView.vue";
 import ComponentNatureView from "@/views/catalog/ComponentNatureView.vue";
 import ComponentCategoryView from "@/views/catalog/ComponentCategoryView.vue";
 import ComponentTypeView from "@/views/catalog/ComponentTypeView.vue";
+import ComponentStatusView from "@/views/catalog/ComponentStatusView.vue";
 import ComponentModelView from "@/views/catalog/ComponentModelView.vue";
+import LocationTypeView from "@/views/catalog/LocationTypeView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -86,9 +88,27 @@ const router = createRouter({
       },
     },
     {
+      path: "/catalog/component-statuses",
+      name: "component-statuses",
+      component: ComponentStatusView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'] // Both users and admins can access
+      },
+    },
+    {
       path: "/catalog/component-models",
       name: "component-models",
       component: ComponentModelView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'] // Both users and admins can access
+      },
+    },
+    {
+      path: "/catalog/location-types",
+      name: "location-types",
+      component: LocationTypeView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'] // Both users and admins can access

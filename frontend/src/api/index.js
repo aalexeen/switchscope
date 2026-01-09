@@ -7,7 +7,9 @@ import componentsModule from "./components/components";
 import componentNaturesModule from "./components/componentNatures";
 import componentCategoriesModule from "./components/componentCategories";
 import componentTypesModule from "./components/componentTypes";
+import componentStatusesModule from "./components/componentStatuses";
 import componentModelsModule from "./components/catalog/componentModels";
+import locationTypesModule from "./locations/locationTypes";
 
 export default {
     blockedmacs: blockedmacsModule(instance),
@@ -16,5 +18,7 @@ export default {
     componentNatures: componentNaturesModule(instance),
     componentCategories: componentCategoriesModule(instance),
     componentTypes: componentTypesModule(instance),
-    componentModels: componentModelsModule(instance)
+    componentStatuses: componentStatusesModule(instance),
+    componentModels: componentModelsModule(instance),
+    locationTypes: locationTypesModule(instance)
 }
