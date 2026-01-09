@@ -3,9 +3,9 @@ import instance from "./instance";
 
 import blockedmacsModule from "./blockedmacs";
 import authModule from "./authentication";
-import componentsModule from "./components";
-import componentNaturesModule from "./componentNatures";
-import componentModelsModule from "./componentModels";
+import componentsModule from "./components/components";
+import componentNaturesModule from "./components/componentNatures";
+import componentModelsModule from "./components/catalog/componentModels";
 
 export default {
     blockedmacs: blockedmacsModule(instance),
