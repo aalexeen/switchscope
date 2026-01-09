@@ -10,6 +10,7 @@ import componentTypesModule from "./components/componentTypes";
 import componentStatusesModule from "./components/componentStatuses";
 import componentModelsModule from "./components/catalog/componentModels";
 import locationTypesModule from "./locations/locationTypes";
+import installationStatusesModule from "./installations/installationStatuses";
 
 export default {
     blockedmacs: blockedmacsModule(instance),
@@ -20,5 +21,6 @@ export default {
     componentTypes: componentTypesModule(instance),
     componentStatuses: componentStatusesModule(instance),
     componentModels: componentModelsModule(instance),
-    locationTypes: locationTypesModule(instance)
+    locationTypes: locationTypesModule(instance),
+    installationStatuses: installationStatusesModule(instance)
 }
