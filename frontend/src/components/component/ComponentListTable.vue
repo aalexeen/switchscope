@@ -4,7 +4,10 @@ import { RouterLink } from 'vue-router';
 import { useComponents } from '@/composables/useComponents';
 
 const props = defineProps({
-    component: Object,
+  component: {
+    type: Object,
+    default: () => ({})
+  },
 });
 
 const { deleteComponent } = useComponents();

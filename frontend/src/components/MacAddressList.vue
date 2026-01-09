@@ -3,7 +3,10 @@ import { defineProps, ref, computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
 const props = defineProps({
-    mac: Object,
+  mac: {
+    type: Object,
+    default: () => ({})
+  },
 });
 
 const showFullBlockTime = ref(false);

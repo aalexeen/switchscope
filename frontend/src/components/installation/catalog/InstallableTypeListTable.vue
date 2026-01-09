@@ -1,4 +1,6 @@
 <script setup>
+defineEmits(['view', 'edit', 'delete']);
+
 defineProps({
   installableType: {
     type: Object,

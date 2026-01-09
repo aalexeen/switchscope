@@ -4,7 +4,10 @@ import { RouterLink } from 'vue-router';
 import { useMacAddresses } from '@/composables/useMacAddresses';
 
 const props = defineProps({
-    mac: Object,
+  mac: {
+    type: Object,
+    default: () => ({})
+  },
 });
 
 const { deleteMacAddress } = useMacAddresses();

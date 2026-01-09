@@ -3,7 +3,10 @@ import { defineProps, ref, computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
 const props = defineProps({
-    user: Object,
+  user: {
+    type: Object,
+    default: () => ({})
+  },
 });
 
 const showFullDescrition = ref(false);
