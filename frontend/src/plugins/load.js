@@ -1,6 +1,6 @@
 export default {
     install(Vue) {
-        Vue.config.globalProperties.$load = async (action, errHandler, bool) => {
+        Vue.config.globalProperties.$load = async (action, errHandler) => {
             try{
                 await action();
             } catch (error) {
@@ -9,8 +9,6 @@ export default {
                 } else {
                     console.log(error);
                 }
-            } finally {
-                state.isLoading = bool;
             }
         };
     }

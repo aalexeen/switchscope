@@ -124,7 +124,7 @@ const authService = {
         isAuthenticated: true, 
         user: response.data 
       };
-    } catch (error) {
+    } catch {
       // Server says user is not authenticated
       this.logout();
       return { 
@@ -229,7 +229,7 @@ const authService = {
     try {
       const authStatus = await this.checkAuth();
       return authStatus.isAuthenticated;
-    } catch (error) {
+    } catch {
       return false;
     }
   },
