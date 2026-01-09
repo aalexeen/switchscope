@@ -4,7 +4,7 @@ This file provides guidance to Gemini (and other AI agents) when working with co
 
 ## Project Overview
 
-**SwitchScope** is a comprehensive Network Infrastructure Management System built with Java 21, Spring Boot 3.5, Hibernate 7.2, and PostgreSQL. It manages network devices (switches, routers, access points), physical housing (racks), connectivity (cables, patch panels), and their installations across hierarchical physical locations.
+**SwitchScope** is a comprehensive Network Infrastructure Management System built with Java 21, Spring Boot 3.5.5, Hibernate 7.2.0, and PostgreSQL. It manages network devices (switches, routers, access points), physical housing (racks), connectivity (cables, patch panels), and their installations across hierarchical physical locations.
 
 **License**: Business Source License 1.1 (free for healthcare, education, government; becomes Apache 2.0 on Jan 1, 2029)
 
@@ -34,12 +34,25 @@ switchscope/
 │   └── mvnw, mvnw.cmd                 # Maven wrapper
 ├── frontend/                          # Vue 3 + Vite Frontend
 │   ├── src/                           # Source code
-│   │   ├── api/                       # Axios API configuration
-│   │   ├── components/                # Vue components
-│   │   ├── views/                     # Vue views/pages
-│   │   └── router/                    # Vue Router
+│   │   ├── api/                       # API client modules (axios)
+│   │   ├── components/                # Reusable Vue components
+│   │   │   └── component/             # Component-specific components
+│   │   ├── composables/               # Vue 3 Composition API composables
+│   │   ├── plugins/                   # Vue plugins configuration
+│   │   ├── router/                    # Vue Router configuration
+│   │   ├── services/                  # Business logic services
+│   │   ├── utils/                     # Utility functions
+│   │   ├── views/                     # Page-level components (routed views)
+│   │   │   ├── catalog/               # Catalog management views
+│   │   │   ├── component/             # Component management views
+│   │   │   ├── installation/          # Installation tracking views
+│   │   │   ├── location/              # Location management views
+│   │   │   └── port/                  # Port management views
+│   │   ├── App.vue                    # Root Vue component
+│   │   └── main.js                    # Application entry point
 │   ├── package.json                   # NPM dependencies
-│   └── vite.config.js                 # Vite configuration
+│   ├── vite.config.js                 # Vite configuration
+│   └── tailwind.config.js             # Tailwind CSS configuration
 ├── validate_schema.py                 # Database schema validator
 ├── .local.props                       # Local DB config (gitignored)
 ├── .mcp.json                          # MCP server configuration
@@ -78,7 +91,7 @@ cd backend
 ./mvnw spotbugs:check          # Static analysis
 ```
 
-### Frontend (NPM)
+### Frontend (NPM/Vite)
 
 ```bash
 # Navigate to frontend
@@ -87,11 +100,14 @@ cd frontend
 # Install dependencies
 npm install
 
-# Run development server (Runs on port 3000)
+# Run development server (Runs on port 3001)
 npm run dev
 
 # Build for production
 npm run build
+
+# Preview production build
+npm run preview
 ```
 
 ### Database Schema Validation
@@ -113,6 +129,7 @@ This script:
   - `backend/src/main/resources/application-local.yaml` - Local overrides (gitignored).
 - **Frontend config**:
   - `frontend/src/api/instance.js` - API Base URL configuration.
+  - `frontend/vite.config.js` - Vite config (Port 3001).
 - **Database credentials**: `.local.props` (for validation script and MCP server, gitignored).
 
 ## High-Level Architecture
@@ -161,6 +178,86 @@ BaseEntity
 - **UUID v7 Primary Keys**: Time-ordered UUIDs for performance.
 - **Single Table Inheritance**: All components in one table for polymorphic queries.
 - **Liquibase**: Manages schema changes. `master` includes `init/` (DDL) and `fill/` (DML).
+- **Seed Data**: CSV files in `src/main/resources/db/changelog/csv/`.
+
+## Frontend Architecture
+
+### Project Structure
+
+The frontend follows a standard Vue.js 3 application structure with Composition API:
+
+```
+frontend/src/
+├── api/                    # API client layer (Factory Pattern)
+├── components/             # Reusable UI components
+├── composables/            # Vue 3 Composition API composables
+├── views/                  # Page-level components (routed)
+├── router/                 # Vue Router configuration
+├── services/               # Business logic services
+├── utils/                  # Utility functions
+├── plugins/                # Vue plugins
+├── App.vue                 # Root component
+└── main.js                 # Application entry point
+```
+
+### API Module Pattern (CRITICAL)
+
+**ALWAYS use the factory function pattern** when creating new API modules.
+
+**Correct Pattern:**
+```javascript
+// api/componentNatures.js
+const baseURL = "catalogs/component-natures";
+
+export default function ({components}) {  // Factory receives instance
+    return {
+        getAll() {
+            return components.get(baseURL);
+        },
+        get(id) {
+            return components.get(`${baseURL}/${id}`);
+        },
+        create(payload) {
+            return components.post(baseURL, payload);
+        }
+    };
+}
+```
+
+**Module Registration (`api/index.js`):**
+```javascript
+import instance from "./instance";
+import componentNaturesModule from "./componentNatures";
+
+export default {
+    componentNatures: componentNaturesModule(instance) // Initialize with instance
+}
+```
+
+### Component Architecture Pattern
+
+**Container/Presentational Pattern** (recommended for all pages):
+
+1.  **PageView.vue (Container)**: Manages state, calls composables, handles events.
+2.  **ListingsTable.vue (Presentational)**: Props for data, emits events (view, edit, delete).
+3.  **ListTable.vue (Row)**: Renders single row.
+
+### Composables Pattern
+
+**Use Singleton Pattern** for shared data (like catalogs):
+
+```javascript
+const items = ref([]);
+const isInitialized = ref(false);
+
+export function useMyData() {
+  const fetchItems = async (force = false) => {
+    if (isInitialized.value && !force) return;
+    // ... fetch logic
+  };
+  return { items, fetchItems };
+}
+```
 
 ## Important Implementation Notes
 
@@ -169,15 +266,15 @@ BaseEntity
 - **Spring Security**: HTTP Basic authentication (stateless).
 - **Frontend Auth**: Vue.js handles login via `authService`, storing credentials in `localStorage` (Basic Auth).
 - **Password Encryption**:
-  - Backend: `EncryptedStringConverter` for entity fields.
-  - CSV Seed Data: `PasswordEncryptionUtil` for generating encrypted strings.
-- **RBAC**: `User` and `Role` entities. Admin endpoints (`/api/admin/**`) require `ADMIN` role.
+  - Backend: `EncryptedStringConverter` for entity fields (AES/GCM/NoPadding).
+  - CSV Seed Data: Use `PasswordEncryptionUtil` to generate encrypted strings.
+  - Encryption key: Configured in `application.yaml` (`app.encryption.key`).
 
 ### Frontend Integration
 
 - **Framework**: Vue 3 with Vite.
 - **Styling**: TailwindCSS.
-- **Connectivity**: Frontend connects to Backend on port **8090**.
+- **Connectivity**: Frontend (3001) connects to Backend (8090).
 - **Mock Data**: Do not check in `json` files with PII in `frontend/src/`.
 
 ### Working with Components (Backend)
@@ -191,12 +288,12 @@ When adding new component types:
 
 ## MCP Server & Tool Usage
 
-This repository is optimized for use with AI agents via Model Context Protocol (MCP) or native tools.
+This repository is optimized for use with AI agents.
 
 ### Available Tools
 
 1.  **Database Access (`query`)**:
-    *   Use this to run read-only SQL queries against the PostgreSQL database.
+    *   Run read-only SQL queries against the PostgreSQL database.
     *   Schema: `switchscope`. Tables use snake_case.
 
 2.  **Reasoning (`sequentialthinking`)**:
@@ -209,12 +306,15 @@ This repository is optimized for use with AI agents via Model Context Protocol (
 4.  **Browser Automation (`browser_*`)**:
     *   Use to interact with the running application or Swagger UI.
     *   **Swagger UI**: `http://localhost:8090/swagger-ui.html`
-    *   **Frontend**: `http://localhost:3000/`
+    *   **Frontend**: `http://localhost:3001/`
 
 ## Development Workflow
 
 1.  **Schema changes**: Create Liquibase changelog → Apply migration → Validate with script.
-2.  **Frontend changes**: Verify build with `npm run build`.
+2.  **Frontend changes**:
+    *   Develop components in `components/` or `views/`.
+    *   Add API methods using the **Factory Pattern** in `api/`.
+    *   Verify with `npm run dev`.
 3.  **Testing**:
     *   Backend: `./mvnw verify` (Integration tests use Testcontainers).
     *   API: Use Swagger UI.

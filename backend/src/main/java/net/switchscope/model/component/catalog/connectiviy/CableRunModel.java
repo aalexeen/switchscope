@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  * Cable Run Model Catalog Entry - represents a specific cable type and specifications
  */
 @Entity
-@DiscriminatorValue("CABLE_RUN")
+@DiscriminatorValue("CABLE_RUN_MODEL")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -12,6 +12,7 @@ import Login from "@/views/Login.vue";
 import Registration from "@/views/Registration.vue";
 import ComponentView from "@/views/component/ComponentView.vue";
 import ComponentNatureView from "@/views/catalog/ComponentNatureView.vue";
+import ComponentModelView from "@/views/catalog/ComponentModelView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,6 +60,15 @@ const router = createRouter({
       path: "/catalog/component-natures",
       name: "component-natures",
       component: ComponentNatureView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'] // Both users and admins can access
+      },
+    },
+    {
+      path: "/catalog/component-models",
+      name: "component-models",
+      component: ComponentModelView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'] // Both users and admins can access
