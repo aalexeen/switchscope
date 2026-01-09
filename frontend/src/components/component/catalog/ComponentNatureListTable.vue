@@ -1,15 +1,12 @@
 <script setup>
 import { defineProps } from 'vue';
 
-const props = defineProps({
+defineProps({
   nature: {
     type: Object,
     required: true
   }
 });
-
-// Helper to format boolean values
-const formatBoolean = (value) => value ? 'Yes' : 'No';
 
 // Get badge color based on activity status
 const getStatusBadgeClass = (active) => {
@@ -32,7 +29,7 @@ const getIconClass = (iconClass) => {
         <i
           :class="[getIconClass(nature.iconClass), nature.colorClass]"
           class="text-xl"
-        ></i>
+        />
         <span class="font-medium text-gray-900">{{ nature.name }}</span>
       </div>
     </td>
@@ -64,7 +61,7 @@ const getIconClass = (iconClass) => {
       <i
         :class="nature.requiresManagement ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Has IP Address -->
@@ -72,7 +69,7 @@ const getIconClass = (iconClass) => {
       <i
         :class="nature.canHaveIpAddress ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Has Firmware -->
@@ -80,7 +77,7 @@ const getIconClass = (iconClass) => {
       <i
         :class="nature.hasFirmware ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Processes Traffic -->
@@ -88,7 +85,7 @@ const getIconClass = (iconClass) => {
       <i
         :class="nature.processesNetworkTraffic ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- SNMP -->
@@ -96,7 +93,7 @@ const getIconClass = (iconClass) => {
       <i
         :class="nature.supportsSnmpMonitoring ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Power -->
@@ -115,22 +112,25 @@ const getIconClass = (iconClass) => {
     <td class="px-4 py-3">
       <div class="flex space-x-2">
         <button
-          @click="$emit('view', nature)"
           class="text-blue-600 hover:text-blue-800 transition-colors"
-          title="View Details">
-          <i class="pi pi-eye"></i>
+          title="View Details"
+          @click="$emit('view', nature)"
+        >
+          <i class="pi pi-eye" />
         </button>
         <button
-          @click="$emit('edit', nature)"
           class="text-green-600 hover:text-green-800 transition-colors"
-          title="Edit">
-          <i class="pi pi-pencil"></i>
+          title="Edit"
+          @click="$emit('edit', nature)"
+        >
+          <i class="pi pi-pencil" />
         </button>
         <button
-          @click="$emit('delete', nature)"
           class="text-red-600 hover:text-red-800 transition-colors"
-          title="Delete">
-          <i class="pi pi-trash"></i>
+          title="Delete"
+          @click="$emit('delete', nature)"
+        >
+          <i class="pi pi-trash" />
         </button>
       </div>
     </td>

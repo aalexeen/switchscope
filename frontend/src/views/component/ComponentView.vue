@@ -1,11 +1,11 @@
 <script setup>
-import ComponentSearchBar from '@/components/component/ComponentSearchBar.vue';
+import GenericSearchBar from '@/components/common/GenericSearchBar.vue';
 import ComponentListingsTable from '@/components/component/ComponentListingsTable.vue';
 import { ref, computed } from 'vue';
 import { useComponents } from '@/composables/useComponents';
 
 // Get search functionality from composable
-const { searchComponents, components, totalComponents } = useComponents();
+const { searchComponents, totalComponents } = useComponents();
 
 // Reactive state for search
 const searchQuery = ref('');
@@ -23,10 +23,16 @@ const clearSearch = () => {
 
 <template>
   <!-- Search Bar Component -->
-  <ComponentSearchBar
-    v-model:search-query="searchQuery"
+  <GenericSearchBar
+    entity-name="Components"
+    :search-query="searchQuery"
     :found-count="filteredComponents.length"
     :total-count="totalComponents"
+    theme="green"
+    intensity="500"
+    title-suffix="Table View"
+    :search-fields="['name', 'manufacturer', 'model', 'serial number']"
+    @update:search-query="searchQuery = $event"
     @clear="clearSearch"
   />
 

@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps } from 'vue';
 
-const props = defineProps({
+defineProps({
   installationStatus: {
     type: Object,
     required: true
@@ -58,7 +58,7 @@ const getUrgencyLabel = (level) => {
         <i
           :class="getIconClass(installationStatus.iconClass)"
           class="text-xl text-blue-600"
-        ></i>
+        />
         <span class="font-medium text-gray-900">{{ installationStatus.name }}</span>
       </div>
     </td>
@@ -94,7 +94,10 @@ const getUrgencyLabel = (level) => {
       >
         {{ installationStatus.statusCategory.replace('-', ' ') }}
       </span>
-      <span v-else class="text-gray-400 text-sm">-</span>
+      <span
+        v-else
+        class="text-gray-400 text-sm"
+      >-</span>
     </td>
 
     <!-- Urgency Level -->
@@ -106,7 +109,10 @@ const getUrgencyLabel = (level) => {
       >
         {{ getUrgencyLabel(installationStatus.urgencyLevel) }}
       </span>
-      <span v-else class="text-gray-400 text-sm">-</span>
+      <span
+        v-else
+        class="text-gray-400 text-sm"
+      >-</span>
     </td>
 
     <!-- Physically Present -->
@@ -114,7 +120,7 @@ const getUrgencyLabel = (level) => {
       <i
         :class="installationStatus.physicallyPresent ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Operational -->
@@ -122,7 +128,7 @@ const getUrgencyLabel = (level) => {
       <i
         :class="installationStatus.operational ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Requires Attention -->
@@ -131,7 +137,7 @@ const getUrgencyLabel = (level) => {
         :class="installationStatus.requiresAttention ? 'pi pi-exclamation-triangle text-orange-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
         :title="installationStatus.requiresAttention ? 'Requires attention' : 'No attention required'"
-      ></i>
+      />
     </td>
 
     <!-- Final Status -->
@@ -139,7 +145,7 @@ const getUrgencyLabel = (level) => {
       <i
         :class="installationStatus.finalStatus ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Description -->
@@ -151,22 +157,25 @@ const getUrgencyLabel = (level) => {
     <td class="px-4 py-3">
       <div class="flex space-x-2">
         <button
-          @click="$emit('view', installationStatus)"
           class="text-blue-600 hover:text-blue-800 transition-colors"
-          title="View Details">
-          <i class="pi pi-eye"></i>
+          title="View Details"
+          @click="$emit('view', installationStatus)"
+        >
+          <i class="pi pi-eye" />
         </button>
         <button
-          @click="$emit('edit', installationStatus)"
           class="text-green-600 hover:text-green-800 transition-colors"
-          title="Edit">
-          <i class="pi pi-pencil"></i>
+          title="Edit"
+          @click="$emit('edit', installationStatus)"
+        >
+          <i class="pi pi-pencil" />
         </button>
         <button
-          @click="$emit('delete', installationStatus)"
           class="text-red-600 hover:text-red-800 transition-colors"
-          title="Delete">
-          <i class="pi pi-trash"></i>
+          title="Delete"
+          @click="$emit('delete', installationStatus)"
+        >
+          <i class="pi pi-trash" />
         </button>
       </div>
     </td>

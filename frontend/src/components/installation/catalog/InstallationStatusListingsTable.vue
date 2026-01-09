@@ -57,37 +57,55 @@ onMounted(async () => {
             <span class="font-medium">
               Displaying: {{ displayedStatuses.length }} statuses
             </span>
-            <span v-if="props.limit" class="ml-4">
+            <span
+              v-if="props.limit"
+              class="ml-4"
+            >
               (Limit: {{ Math.min(props.limit, displayedStatuses.length) }} of {{ totalInstallationStatuses }})
             </span>
           </div>
           <button
-            @click="fetchInstallationStatuses(true)"
             :disabled="isLoading"
-            class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded text-sm">
+            class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded text-sm"
+            @click="fetchInstallationStatuses(true)"
+          >
             {{ isLoading ? 'Refreshing...' : 'Refresh' }}
           </button>
         </div>
       </div>
 
       <!-- Show error message if there's an error -->
-      <div v-if="error" class="bg-white rounded-lg shadow p-6 text-center text-red-500">
-        <p class="mb-4">Error loading installation statuses. Please try again.</p>
+      <div
+        v-if="error"
+        class="bg-white rounded-lg shadow p-6 text-center text-red-500"
+      >
+        <p class="mb-4">
+          Error loading installation statuses. Please try again.
+        </p>
         <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded"
           @click="fetchInstallationStatuses(true)"
-          class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded">
+        >
           Retry
         </button>
       </div>
 
       <!-- Show loading spinner while loading -->
-      <div v-else-if="isLoading" class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div
+        v-else-if="isLoading"
+        class="bg-white rounded-lg shadow p-8 text-center text-gray-500"
+      >
         <PulseLoader />
-        <p class="mt-4">Loading installation statuses...</p>
+        <p class="mt-4">
+          Loading installation statuses...
+        </p>
       </div>
 
       <!-- Show installation status listing table when done loading -->
-      <div v-else-if="displayedStatuses.length > 0" class="bg-white rounded-lg shadow overflow-hidden">
+      <div
+        v-else-if="displayedStatuses.length > 0"
+        class="bg-white rounded-lg shadow overflow-hidden"
+      >
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -110,16 +128,28 @@ onMounted(async () => {
                 <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Urgency
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Physically Present">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Physically Present"
+                >
                   Physical
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Operational">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Operational"
+                >
                   Oper
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Requires Attention">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Requires Attention"
+                >
                   Attn
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Final Status">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Final Status"
+                >
                   Final
                 </th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -145,16 +175,23 @@ onMounted(async () => {
       </div>
 
       <!-- Show message when no statuses are available -->
-      <div v-else class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div
+        v-else
+        class="bg-white rounded-lg shadow p-8 text-center text-gray-500"
+      >
         <p>No installation statuses found.</p>
       </div>
     </div>
   </section>
 
-  <section v-if="showButton" class="m-auto max-w-lg my-10 px-6">
+  <section
+    v-if="showButton"
+    class="m-auto max-w-lg my-10 px-6"
+  >
     <RouterLink
       to="/catalog/installation-statuses"
-      class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700">
+      class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
+    >
       View All Installation Statuses
     </RouterLink>
   </section>

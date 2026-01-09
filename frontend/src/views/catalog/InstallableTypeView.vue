@@ -1,5 +1,5 @@
 <script setup>
-import InstallableTypeSearchBar from '@/components/installation/catalog/InstallableTypeSearchBar.vue';
+import GenericSearchBar from '@/components/common/GenericSearchBar.vue';
 import InstallableTypeListingsTable from '@/components/installation/catalog/InstallableTypeListingsTable.vue';
 import { ref, computed } from 'vue';
 import { useInstallableTypes } from '@/composables/useInstallableTypes';
@@ -8,7 +8,7 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 
 // Get search functionality from composable
-const { searchInstallableTypes, installableTypes, totalInstallableTypes } = useInstallableTypes();
+const { searchInstallableTypes, totalInstallableTypes } = useInstallableTypes();
 
 // Reactive state for search
 const searchQuery = ref('');
@@ -45,10 +45,14 @@ const handleDelete = (installableType) => {
 
 <template>
   <!-- Search Bar Component -->
-  <InstallableTypeSearchBar
+  <GenericSearchBar
+    entity-name="Installable Types"
     :search-query="searchQuery"
     :found-count="filteredTypes.length"
     :total-count="totalInstallableTypes"
+    theme="indigo"
+    intensity="600"
+    :search-fields="['name', 'code', 'display name', 'entity class', 'description']"
     @update:search-query="searchQuery = $event"
     @clear="clearSearch"
   />

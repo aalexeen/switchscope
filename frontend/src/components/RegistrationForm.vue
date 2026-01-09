@@ -3,7 +3,7 @@ import { reactive, ref } from 'vue';
 import { useAuth } from '@/composables/useAuth';
 
 // Props and emits
-const props = defineProps({
+defineProps({
   loading: {
     type: Boolean,
     default: false
@@ -193,42 +193,38 @@ const handleSubmit = async () => {
     emit('error', errorInfo);
   }
 };
-
-// Reset form
-const resetForm = () => {
-  Object.assign(form, {
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-  validationErrors.value = {};
-};
 </script>
 
 <template>
   <div class="bg-white px-6 py-8 mb-4 shadow-md rounded-md border m-4 md:m-0">
     <form @submit.prevent="handleSubmit">
-      <h2 class="text-3xl text-center font-semibold mb-6">Create Account</h2>
+      <h2 class="text-3xl text-center font-semibold mb-6">
+        Create Account
+      </h2>
 
       <!-- Full Name Field -->
       <div class="mb-4">
         <label
           for="name"
-          class="block text-gray-700 font-bold mb-2">
+          class="block text-gray-700 font-bold mb-2"
+        >
           Full Name
         </label>
         <input
-          type="text"
-          v-model="form.name"
           id="name"
+          v-model="form.name"
+          type="text"
           name="name"
           class="border rounded w-full py-2 px-3"
           :class="{ 'border-red-500': validationErrors.name }"
           placeholder="Enter your full name"
           :disabled="loading"
-          required />
-        <p v-if="validationErrors.name" class="text-red-500 text-sm mt-1">
+          required
+        >
+        <p
+          v-if="validationErrors.name"
+          class="text-red-500 text-sm mt-1"
+        >
           {{ validationErrors.name }}
         </p>
       </div>
@@ -237,20 +233,25 @@ const resetForm = () => {
       <div class="mb-4">
         <label
           for="email"
-          class="block text-gray-700 font-bold mb-2">
+          class="block text-gray-700 font-bold mb-2"
+        >
           Email Address
         </label>
         <input
-          type="email"
-          v-model="form.email"
           id="email"
+          v-model="form.email"
+          type="email"
           name="email"
           class="border rounded w-full py-2 px-3"
           :class="{ 'border-red-500': validationErrors.email }"
           placeholder="Enter your email"
           :disabled="loading"
-          required />
-        <p v-if="validationErrors.email" class="text-red-500 text-sm mt-1">
+          required
+        >
+        <p
+          v-if="validationErrors.email"
+          class="text-red-500 text-sm mt-1"
+        >
           {{ validationErrors.email }}
         </p>
       </div>
@@ -259,21 +260,26 @@ const resetForm = () => {
       <div class="mb-4">
         <label
           for="password"
-          class="block text-gray-700 font-bold mb-2">
+          class="block text-gray-700 font-bold mb-2"
+        >
           Password
         </label>
         <input
-          type="password"
-          v-model="form.password"
           id="password"
+          v-model="form.password"
+          type="password"
           name="password"
           class="border rounded w-full py-2 px-3"
           :class="{ 'border-red-500': validationErrors.password }"
           placeholder="Enter your password"
           :disabled="loading"
           minlength="6"
-          required />
-        <p v-if="validationErrors.password" class="text-red-500 text-sm mt-1">
+          required
+        >
+        <p
+          v-if="validationErrors.password"
+          class="text-red-500 text-sm mt-1"
+        >
           {{ validationErrors.password }}
         </p>
       </div>
@@ -282,21 +288,26 @@ const resetForm = () => {
       <div class="mb-6">
         <label
           for="confirmPassword"
-          class="block text-gray-700 font-bold mb-2">
+          class="block text-gray-700 font-bold mb-2"
+        >
           Confirm Password
         </label>
         <input
-          type="password"
-          v-model="form.confirmPassword"
           id="confirmPassword"
+          v-model="form.confirmPassword"
+          type="password"
           name="confirmPassword"
           class="border rounded w-full py-2 px-3"
           :class="{ 'border-red-500': validationErrors.confirmPassword }"
           placeholder="Confirm your password"
           :disabled="loading"
           minlength="6"
-          required />
-        <p v-if="validationErrors.confirmPassword" class="text-red-500 text-sm mt-1">
+          required
+        >
+        <p
+          v-if="validationErrors.confirmPassword"
+          class="text-red-500 text-sm mt-1"
+        >
           {{ validationErrors.confirmPassword }}
         </p>
       </div>
@@ -306,11 +317,31 @@ const resetForm = () => {
         <button
           class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
           type="submit"
-          :disabled="loading">
-          <span v-if="loading" class="flex items-center justify-center">
-            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          :disabled="loading"
+        >
+          <span
+            v-if="loading"
+            class="flex items-center justify-center"
+          >
+            <svg
+              class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
             </svg>
             Creating Account...
           </span>
@@ -324,7 +355,8 @@ const resetForm = () => {
           Already have an account?
           <router-link 
             :to="{ name: 'login' }" 
-            class="text-green-500 hover:text-green-600 font-medium">
+            class="text-green-500 hover:text-green-600 font-medium"
+          >
             Login
           </router-link>
         </p>

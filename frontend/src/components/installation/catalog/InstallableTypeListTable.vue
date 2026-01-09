@@ -1,7 +1,5 @@
 <script setup>
-import { defineProps } from 'vue';
-
-const props = defineProps({
+defineProps({
   installableType: {
     type: Object,
     required: true
@@ -15,44 +13,40 @@ const getStatusBadgeClass = (active) => {
     : 'bg-gray-100 text-gray-800';
 };
 
-// Get priority badge
+// Get type category badge styling
+const getTypeCategoryBadge = (type) => {
+  if (type.deviceType) return 'bg-blue-100 text-blue-800';
+  if (type.connectivityType) return 'bg-purple-100 text-purple-800';
+  if (type.supportType) return 'bg-orange-100 text-orange-800';
+  return 'bg-gray-100 text-gray-800';
+};
+
+// Get type category label
+const getTypeCategoryLabel = (type) => {
+  if (type.deviceType) return 'Device';
+  if (type.connectivityType) return 'Connectivity';
+  if (type.supportType) return 'Support';
+  return 'Other';
+};
+
+// Get priority badge styling
 const getPriorityBadge = (priority) => {
-  if (priority >= 8) return 'bg-red-100 text-red-800';
-  if (priority >= 5) return 'bg-orange-100 text-orange-800';
-  if (priority >= 3) return 'bg-yellow-100 text-yellow-800';
-  return 'bg-green-100 text-green-800';
+  const badges = {
+    HIGH: 'bg-red-100 text-red-800',
+    MEDIUM: 'bg-yellow-100 text-yellow-800',
+    LOW: 'bg-green-100 text-green-800'
+  };
+  return badges[priority] || 'bg-gray-100 text-gray-800';
 };
 
 // Get priority label
 const getPriorityLabel = (priority) => {
-  if (priority >= 8) return 'Critical';
-  if (priority >= 5) return 'High';
-  if (priority >= 3) return 'Medium';
-  return 'Low';
-};
-
-// Get type category badge
-const getTypeCategoryBadge = (installableType) => {
-  if (installableType.deviceType) return 'bg-blue-100 text-blue-800';
-  if (installableType.connectivityType) return 'bg-purple-100 text-purple-800';
-  if (installableType.supportType) return 'bg-teal-100 text-teal-800';
-  return 'bg-gray-100 text-gray-800';
-};
-
-const getTypeCategoryLabel = (installableType) => {
-  if (installableType.deviceType) return 'Device';
-  if (installableType.connectivityType) return 'Connectivity';
-  if (installableType.supportType) return 'Support';
-  return 'Other';
-};
-
-// Format installation time
-const formatInstallTime = (minutes) => {
-  if (!minutes) return '-';
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  const labels = {
+    HIGH: 'High',
+    MEDIUM: 'Medium',
+    LOW: 'Low'
+  };
+  return labels[priority] || priority;
 };
 </script>
 
@@ -61,7 +55,7 @@ const formatInstallTime = (minutes) => {
     <!-- Icon & Name -->
     <td class="px-4 py-3">
       <div class="flex items-center space-x-2">
-        <i class="pi pi-box text-xl text-blue-600"></i>
+        <i class="pi pi-box text-xl text-blue-600" />
         <span class="font-medium text-gray-900">{{ installableType.name }}</span>
       </div>
     </td>
@@ -107,7 +101,10 @@ const formatInstallTime = (minutes) => {
       >
         {{ getPriorityLabel(installableType.installationPriority) }}
       </span>
-      <span v-else class="text-gray-400 text-sm">-</span>
+      <span
+        v-else
+        class="text-gray-400 text-sm"
+      >-</span>
     </td>
 
     <!-- Rack Position -->
@@ -115,7 +112,7 @@ const formatInstallTime = (minutes) => {
       <i
         :class="installableType.requiresRackPosition ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Hot Swappable -->
@@ -124,7 +121,7 @@ const formatInstallTime = (minutes) => {
         :class="installableType.hotSwappable ? 'pi pi-bolt text-yellow-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
         :title="installableType.hotSwappable ? 'Hot swappable' : 'Not hot swappable'"
-      ></i>
+      />
     </td>
 
     <!-- Power Management -->
@@ -132,7 +129,7 @@ const formatInstallTime = (minutes) => {
       <i
         :class="installableType.supportsPowerManagement ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Environmental Control -->
@@ -141,7 +138,7 @@ const formatInstallTime = (minutes) => {
         :class="installableType.requiresEnvironmentalControl ? 'pi pi-sun text-orange-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
         :title="installableType.requiresEnvironmentalControl ? 'Requires environmental control' : 'No special requirements'"
-      ></i>
+      />
     </td>
 
     <!-- Description -->
@@ -153,22 +150,25 @@ const formatInstallTime = (minutes) => {
     <td class="px-4 py-3">
       <div class="flex space-x-2">
         <button
-          @click="$emit('view', installableType)"
           class="text-blue-600 hover:text-blue-800 transition-colors"
-          title="View Details">
-          <i class="pi pi-eye"></i>
+          title="View Details"
+          @click="$emit('view', installableType)"
+        >
+          <i class="pi pi-eye" />
         </button>
         <button
-          @click="$emit('edit', installableType)"
           class="text-green-600 hover:text-green-800 transition-colors"
-          title="Edit">
-          <i class="pi pi-pencil"></i>
+          title="Edit"
+          @click="$emit('edit', installableType)"
+        >
+          <i class="pi pi-pencil" />
         </button>
         <button
-          @click="$emit('delete', installableType)"
           class="text-red-600 hover:text-red-800 transition-colors"
-          title="Delete">
-          <i class="pi pi-trash"></i>
+          title="Delete"
+          @click="$emit('delete', installableType)"
+        >
+          <i class="pi pi-trash" />
         </button>
       </div>
     </td>

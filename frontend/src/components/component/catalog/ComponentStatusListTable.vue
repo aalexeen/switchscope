@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps } from 'vue';
 
-const props = defineProps({
+defineProps({
   status: {
     type: Object,
     required: true
@@ -43,7 +43,7 @@ const getLifecycleBadgeClass = (phase) => {
         <i
           :class="[getIconClass(status.iconClass), status.colorClass]"
           class="text-xl"
-        ></i>
+        />
         <span class="font-medium text-gray-900">{{ status.name }}</span>
       </div>
     </td>
@@ -79,7 +79,10 @@ const getLifecycleBadgeClass = (phase) => {
       >
         {{ status.lifecyclePhase }}
       </span>
-      <span v-else class="text-gray-400 text-sm">-</span>
+      <span
+        v-else
+        class="text-gray-400 text-sm"
+      >-</span>
     </td>
 
     <!-- Available -->
@@ -87,7 +90,7 @@ const getLifecycleBadgeClass = (phase) => {
       <i
         :class="status.available ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Operational -->
@@ -95,7 +98,7 @@ const getLifecycleBadgeClass = (phase) => {
       <i
         :class="status.operational ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Physically Present -->
@@ -103,7 +106,7 @@ const getLifecycleBadgeClass = (phase) => {
       <i
         :class="status.physicallyPresent ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- In Inventory -->
@@ -111,7 +114,7 @@ const getLifecycleBadgeClass = (phase) => {
       <i
         :class="status.inInventory ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Can Accept Installations -->
@@ -119,7 +122,7 @@ const getLifecycleBadgeClass = (phase) => {
       <i
         :class="status.canAcceptInstallations ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Requires Attention -->
@@ -128,7 +131,7 @@ const getLifecycleBadgeClass = (phase) => {
         :class="status.requiresAttention ? 'pi pi-exclamation-triangle text-orange-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
         :title="status.requiresAttention ? 'Requires attention' : 'No attention required'"
-      ></i>
+      />
     </td>
 
     <!-- In Transition -->
@@ -136,7 +139,7 @@ const getLifecycleBadgeClass = (phase) => {
       <i
         :class="status.inTransition ? 'pi pi-sync text-blue-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Description -->
@@ -148,22 +151,25 @@ const getLifecycleBadgeClass = (phase) => {
     <td class="px-4 py-3">
       <div class="flex space-x-2">
         <button
-          @click="$emit('view', status)"
           class="text-blue-600 hover:text-blue-800 transition-colors"
-          title="View Details">
-          <i class="pi pi-eye"></i>
+          title="View Details"
+          @click="$emit('view', status)"
+        >
+          <i class="pi pi-eye" />
         </button>
         <button
-          @click="$emit('edit', status)"
           class="text-green-600 hover:text-green-800 transition-colors"
-          title="Edit">
-          <i class="pi pi-pencil"></i>
+          title="Edit"
+          @click="$emit('edit', status)"
+        >
+          <i class="pi pi-pencil" />
         </button>
         <button
-          @click="$emit('delete', status)"
           class="text-red-600 hover:text-red-800 transition-colors"
-          title="Delete">
-          <i class="pi pi-trash"></i>
+          title="Delete"
+          @click="$emit('delete', status)"
+        >
+          <i class="pi pi-trash" />
         </button>
       </div>
     </td>

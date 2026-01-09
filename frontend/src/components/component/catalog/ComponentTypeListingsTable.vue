@@ -57,37 +57,55 @@ onMounted(async () => {
             <span class="font-medium">
               Displaying: {{ displayedTypes.length }} types
             </span>
-            <span v-if="props.limit" class="ml-4">
+            <span
+              v-if="props.limit"
+              class="ml-4"
+            >
               (Limit: {{ Math.min(props.limit, displayedTypes.length) }} of {{ totalComponentTypes }})
             </span>
           </div>
           <button
-            @click="fetchComponentTypes(true)"
             :disabled="isLoading"
-            class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded text-sm">
+            class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded text-sm"
+            @click="fetchComponentTypes(true)"
+          >
             {{ isLoading ? 'Refreshing...' : 'Refresh' }}
           </button>
         </div>
       </div>
 
       <!-- Show error message if there's an error -->
-      <div v-if="error" class="bg-white rounded-lg shadow p-6 text-center text-red-500">
-        <p class="mb-4">Error loading component types. Please try again.</p>
+      <div
+        v-if="error"
+        class="bg-white rounded-lg shadow p-6 text-center text-red-500"
+      >
+        <p class="mb-4">
+          Error loading component types. Please try again.
+        </p>
         <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded"
           @click="fetchComponentTypes(true)"
-          class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded">
+        >
           Retry
         </button>
       </div>
 
       <!-- Show loading spinner while loading -->
-      <div v-else-if="isLoading" class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div
+        v-else-if="isLoading"
+        class="bg-white rounded-lg shadow p-8 text-center text-gray-500"
+      >
         <PulseLoader />
-        <p class="mt-4">Loading component types...</p>
+        <p class="mt-4">
+          Loading component types...
+        </p>
       </div>
 
       <!-- Show component type listing table when done loading -->
-      <div v-else-if="displayedTypes.length > 0" class="bg-white rounded-lg shadow overflow-hidden">
+      <div
+        v-else-if="displayedTypes.length > 0"
+        class="bg-white rounded-lg shadow overflow-hidden"
+      >
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -110,19 +128,34 @@ onMounted(async () => {
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Type
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="System Type">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="System Type"
+                >
                   System
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Requires Management">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Requires Management"
+                >
                   Mgmt
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Can Have IP Address">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Can Have IP Address"
+                >
                   IP
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Supports SNMP">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Supports SNMP"
+                >
                   SNMP
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Requires Rack Space">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Requires Rack Space"
+                >
                   Rack
                 </th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -148,16 +181,23 @@ onMounted(async () => {
       </div>
 
       <!-- Show message when no types are available -->
-      <div v-else class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div
+        v-else
+        class="bg-white rounded-lg shadow p-8 text-center text-gray-500"
+      >
         <p>No component types found.</p>
       </div>
     </div>
   </section>
 
-  <section v-if="showButton" class="m-auto max-w-lg my-10 px-6">
+  <section
+    v-if="showButton"
+    class="m-auto max-w-lg my-10 px-6"
+  >
     <RouterLink
       to="/catalog/component-types"
-      class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700">
+      class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
+    >
       View All Component Types
     </RouterLink>
   </section>

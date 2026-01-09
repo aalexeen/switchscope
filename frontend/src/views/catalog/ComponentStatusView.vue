@@ -1,5 +1,5 @@
 <script setup>
-import ComponentStatusSearchBar from '@/components/component/catalog/ComponentStatusSearchBar.vue';
+import GenericSearchBar from '@/components/common/GenericSearchBar.vue';
 import ComponentStatusListingsTable from '@/components/component/catalog/ComponentStatusListingsTable.vue';
 import { ref, computed } from 'vue';
 import { useComponentStatuses } from '@/composables/useComponentStatuses';
@@ -8,7 +8,7 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 
 // Get search functionality from composable
-const { searchComponentStatuses, componentStatuses, totalComponentStatuses } = useComponentStatuses();
+const { searchComponentStatuses, totalComponentStatuses } = useComponentStatuses();
 
 // Reactive state for search
 const searchQuery = ref('');
@@ -45,10 +45,15 @@ const handleDelete = (status) => {
 
 <template>
   <!-- Search Bar Component -->
-  <ComponentStatusSearchBar
-    v-model:search-query="searchQuery"
+  <GenericSearchBar
+    entity-name="Component Statuses"
+    :search-query="searchQuery"
     :found-count="filteredStatuses.length"
     :total-count="totalComponentStatuses"
+    theme="purple"
+    intensity="600"
+    :search-fields="['name', 'code', 'display name', 'lifecycle', 'description']"
+    @update:search-query="searchQuery = $event"
     @clear="clearSearch"
   />
 

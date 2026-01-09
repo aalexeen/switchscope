@@ -1,5 +1,5 @@
 <script setup>
-import InstallationStatusSearchBar from '@/components/installation/catalog/InstallationStatusSearchBar.vue';
+import GenericSearchBar from '@/components/common/GenericSearchBar.vue';
 import InstallationStatusListingsTable from '@/components/installation/catalog/InstallationStatusListingsTable.vue';
 import { ref, computed } from 'vue';
 import { useInstallationStatuses } from '@/composables/useInstallationStatuses';
@@ -8,7 +8,7 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 
 // Get search functionality from composable
-const { searchInstallationStatuses, installationStatuses, totalInstallationStatuses } = useInstallationStatuses();
+const { searchInstallationStatuses, totalInstallationStatuses } = useInstallationStatuses();
 
 // Reactive state for search
 const searchQuery = ref('');
@@ -45,10 +45,14 @@ const handleDelete = (installationStatus) => {
 
 <template>
   <!-- Search Bar Component -->
-  <InstallationStatusSearchBar
+  <GenericSearchBar
+    entity-name="Installation Statuses"
     :search-query="searchQuery"
     :found-count="filteredStatuses.length"
     :total-count="totalInstallationStatuses"
+    theme="amber"
+    intensity="600"
+    :search-fields="['name', 'code', 'display name', 'status category', 'color category', 'description']"
     @update:search-query="searchQuery = $event"
     @clear="clearSearch"
   />

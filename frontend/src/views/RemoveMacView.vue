@@ -9,7 +9,7 @@ const route = useRoute();
 const router = useRouter();
 
 // Get search functionality from composable
-const { searchMacs, macAddresses, totalMacs } = useMacAddresses();
+const { searchMacs, totalMacs } = useMacAddresses();
 
 // Reactive state for current view type and search
 const viewType = ref('card'); // 'card' or 'table'
@@ -72,25 +72,27 @@ onMounted(() => {
         </h1>
         <div class="flex space-x-2">
           <button
-            @click="switchToTable"
             :class="[
               isTableView 
                 ? 'bg-green-700 text-white' 
                 : 'bg-white text-green-500 hover:bg-gray-100',
               'px-4 py-2 rounded transition-colors'
-            ]">
-            <i class="pi pi-list mr-2"></i>
+            ]"
+            @click="switchToTable"
+          >
+            <i class="pi pi-list mr-2" />
             Table View
           </button>
           <button
-            @click="switchToCard"
             :class="[
               isCardView 
                 ? 'bg-green-700 text-white' 
                 : 'bg-white text-green-500 hover:bg-gray-100',
               'px-4 py-2 rounded transition-colors'
-            ]">
-            <i class="pi pi-th-large mr-2"></i>
+            ]"
+            @click="switchToCard"
+          >
+            <i class="pi pi-th-large mr-2" />
             Card View
           </button>
         </div>
@@ -104,8 +106,9 @@ onMounted(() => {
               v-model="searchQuery"
               type="text"
               placeholder="Search by MAC address or reason..."
-              class="w-full px-4 py-2 pl-10 text-gray-900 rounded-lg border-0 focus:ring-2 focus:ring-green-300 focus:outline-none">
-            <i class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              class="w-full px-4 py-2 pl-10 text-gray-900 rounded-lg border-0 focus:ring-2 focus:ring-green-300 focus:outline-none"
+            >
+            <i class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
         </div>
         
@@ -118,9 +121,10 @@ onMounted(() => {
           
           <button
             v-if="searchQuery"
+            class="bg-white text-green-500 px-3 py-1 rounded text-sm hover:bg-gray-100 transition-colors"
             @click="clearSearch"
-            class="bg-white text-green-500 px-3 py-1 rounded text-sm hover:bg-gray-100 transition-colors">
-            <i class="pi pi-times mr-1"></i>
+          >
+            <i class="pi pi-times mr-1" />
             Clear
           </button>
         </div>

@@ -67,14 +67,8 @@ const authService = {
 
   // Register user
   async register(userData) {
-    try {
-      // Call the registration endpoint using API
-      const response = await api.authentication.signUp(userData);
-      return response;
-    } catch (error) {
-      // Registration failed
-      throw error;
-    }
+    // Call the registration endpoint using API
+    return await api.authentication.signUp(userData);
   },
 
   // Login user with Basic Auth
@@ -177,9 +171,9 @@ const authService = {
           return false;
         }
         return true;
-      } catch (error) {
+      } catch {
         // Network error or server unavailable, keep local state but don't set headers
-        console.warn('Could not verify authentication with server:', error);
+        console.warn('Could not verify authentication with server');
         return this.isAuthenticated();
       }
     }
@@ -197,9 +191,9 @@ const authService = {
         // Call server logout endpoint
         await api.authentication.logOut();
       }
-    } catch (error) {
+    } catch {
       // Logout can fail but we still want to clear local data
-      console.warn('Server logout failed:', error);
+      console.warn('Server logout failed');
     } finally {
       // Always clear local storage and headers
       localStorage.removeItem("isAuthenticated");
