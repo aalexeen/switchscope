@@ -15,8 +15,13 @@ const {
   totalComponentTypes
 } = useComponentTypes();
 
+defineEmits(['view', 'edit', 'delete']);
+
 const props = defineProps({
-  limit: Number,
+  limit: {
+    type: Number,
+    default: null
+  },
   showButton: {
     type: Boolean,
     default: false

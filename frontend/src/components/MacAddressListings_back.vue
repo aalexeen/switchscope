@@ -13,7 +13,10 @@ const state = reactive({
 });
 
 defineProps({
-    limit: Number,
+    limit: {
+        type: Number,
+        default: null
+    },
     showButton: {
         type: Boolean,
         default: false

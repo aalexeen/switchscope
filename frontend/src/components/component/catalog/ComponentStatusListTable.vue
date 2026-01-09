@@ -1,6 +1,8 @@
 <script setup>
 import { defineProps } from 'vue';
 
+defineEmits(['view', 'edit', 'delete']);
+
 defineProps({
   status: {
     type: Object,

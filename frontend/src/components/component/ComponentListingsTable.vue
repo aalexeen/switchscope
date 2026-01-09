@@ -16,15 +16,18 @@ const {
 } = useComponents();
 
 const props = defineProps({
-    limit: Number,
-    showButton: {
-        type: Boolean,
-        default: false
-    },
-    filteredComponents: {
-        type: Array,
-        default: null
-    }
+  limit: {
+    type: Number,
+    default: null
+  },
+  showButton: {
+    type: Boolean,
+    default: false
+  },
+  filteredComponents: {
+    type: Array,
+    default: null
+  }
 });
 
 // Use filtered components if provided, otherwise use all components

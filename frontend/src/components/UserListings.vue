@@ -11,11 +11,14 @@ const state = reactive({
 });
 
 const props = defineProps({
-    limit: Number,
-    showButton: {
-        type: Boolean,
-        defaule: false
-    }
+  limit: {
+    type: Number,
+    default: null
+  },
+  showButton: {
+    type: Boolean,
+    default: false
+  }
 });
 
 // const localLimit = ref(props.limit);

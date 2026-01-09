@@ -16,19 +16,22 @@ const {
 } = useMacAddresses();
 
 const props = defineProps({
-    limit: Number,
-    showButton: {
-        type: Boolean,
-        default: false
-    },
-    filteredMacs: {
-        type: Array,
-        default: null
-    },
-    searchQuery: {
-        type: String,
-        default: ''
-    }
+  limit: {
+    type: Number,
+    default: null
+  },
+  showButton: {
+    type: Boolean,
+    default: false
+  },
+  filteredMacs: {
+    type: Array,
+    default: null
+  },
+  searchQuery: {
+    type: String,
+    default: ''
+  }
 });
 
 // Use filtered MACs if provided, otherwise use all MACs
