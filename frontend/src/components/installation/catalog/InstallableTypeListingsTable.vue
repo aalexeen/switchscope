@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 import InstallableTypeListTable from './InstallableTypeListTable.vue';
-import { defineProps, onMounted, computed } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useInstallableTypes } from '@/composables/useInstallableTypes';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
@@ -57,37 +57,55 @@ onMounted(async () => {
             <span class="font-medium">
               Displaying: {{ displayedTypes.length }} types
             </span>
-            <span v-if="props.limit" class="ml-4">
+            <span
+              v-if="props.limit"
+              class="ml-4"
+            >
               (Limit: {{ Math.min(props.limit, displayedTypes.length) }} of {{ totalInstallableTypes }})
             </span>
           </div>
           <button
-            @click="fetchInstallableTypes(true)"
             :disabled="isLoading"
-            class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded text-sm">
+            class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded text-sm"
+            @click="fetchInstallableTypes(true)"
+          >
             {{ isLoading ? 'Refreshing...' : 'Refresh' }}
           </button>
         </div>
       </div>
 
       <!-- Show error message if there's an error -->
-      <div v-if="error" class="bg-white rounded-lg shadow p-6 text-center text-red-500">
-        <p class="mb-4">Error loading installable types. Please try again.</p>
+      <div
+        v-if="error"
+        class="bg-white rounded-lg shadow p-6 text-center text-red-500"
+      >
+        <p class="mb-4">
+          Error loading installable types. Please try again.
+        </p>
         <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded"
           @click="fetchInstallableTypes(true)"
-          class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded">
+        >
           Retry
         </button>
       </div>
 
       <!-- Show loading spinner while loading -->
-      <div v-else-if="isLoading" class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div
+        v-else-if="isLoading"
+        class="bg-white rounded-lg shadow p-8 text-center text-gray-500"
+      >
         <PulseLoader />
-        <p class="mt-4">Loading installable types...</p>
+        <p class="mt-4">
+          Loading installable types...
+        </p>
       </div>
 
       <!-- Show installable type listing table when done loading -->
-      <div v-else-if="displayedTypes.length > 0" class="bg-white rounded-lg shadow overflow-hidden">
+      <div
+        v-else-if="displayedTypes.length > 0"
+        class="bg-white rounded-lg shadow overflow-hidden"
+      >
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -110,16 +128,28 @@ onMounted(async () => {
                 <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Priority
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Requires Rack Position">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Requires Rack Position"
+                >
                   Rack
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Hot Swappable">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Hot Swappable"
+                >
                   Hot Swap
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Supports Power Management">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Supports Power Management"
+                >
                   Power
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Requires Environmental Control">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Requires Environmental Control"
+                >
                   Env
                 </th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -145,16 +175,23 @@ onMounted(async () => {
       </div>
 
       <!-- Show message when no types are available -->
-      <div v-else class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div
+        v-else
+        class="bg-white rounded-lg shadow p-8 text-center text-gray-500"
+      >
         <p>No installable types found.</p>
       </div>
     </div>
   </section>
 
-  <section v-if="showButton" class="m-auto max-w-lg my-10 px-6">
+  <section
+    v-if="showButton"
+    class="m-auto max-w-lg my-10 px-6"
+  >
     <RouterLink
       to="/catalog/installable-types"
-      class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700">
+      class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
+    >
       View All Installable Types
     </RouterLink>
   </section>

@@ -1,7 +1,6 @@
 <script setup>
 import Hero from '@/components/Hero.vue';
 import HomeCards from '@/components/HomeCards.vue';
-import MacAddressListingsTable from '@/components/MacAddressListingsTable.vue';
 
 
 </script>

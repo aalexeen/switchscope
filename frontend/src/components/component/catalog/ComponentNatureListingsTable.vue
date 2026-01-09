@@ -57,37 +57,55 @@ onMounted(async () => {
             <span class="font-medium">
               Displaying: {{ displayedNatures.length }} natures
             </span>
-            <span v-if="props.limit" class="ml-4">
+            <span
+              v-if="props.limit"
+              class="ml-4"
+            >
               (Limit: {{ Math.min(props.limit, displayedNatures.length) }} of {{ totalComponentNatures }})
             </span>
           </div>
           <button
-            @click="fetchComponentNatures(true)"
             :disabled="isLoading"
-            class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded text-sm">
+            class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded text-sm"
+            @click="fetchComponentNatures(true)"
+          >
             {{ isLoading ? 'Refreshing...' : 'Refresh' }}
           </button>
         </div>
       </div>
 
       <!-- Show error message if there's an error -->
-      <div v-if="error" class="bg-white rounded-lg shadow p-6 text-center text-red-500">
-        <p class="mb-4">Error loading component natures. Please try again.</p>
+      <div
+        v-if="error"
+        class="bg-white rounded-lg shadow p-6 text-center text-red-500"
+      >
+        <p class="mb-4">
+          Error loading component natures. Please try again.
+        </p>
         <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded"
           @click="fetchComponentNatures(true)"
-          class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded">
+        >
           Retry
         </button>
       </div>
 
       <!-- Show loading spinner while loading -->
-      <div v-else-if="isLoading" class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div
+        v-else-if="isLoading"
+        class="bg-white rounded-lg shadow p-8 text-center text-gray-500"
+      >
         <PulseLoader />
-        <p class="mt-4">Loading component natures...</p>
+        <p class="mt-4">
+          Loading component natures...
+        </p>
       </div>
 
       <!-- Show component nature listing table when done loading -->
-      <div v-else-if="displayedNatures.length > 0" class="bg-white rounded-lg shadow overflow-hidden">
+      <div
+        v-else-if="displayedNatures.length > 0"
+        class="bg-white rounded-lg shadow overflow-hidden"
+      >
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -104,19 +122,34 @@ onMounted(async () => {
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Requires Management">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Requires Management"
+                >
                   Mgmt
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Can Have IP Address">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Can Have IP Address"
+                >
                   IP
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Has Firmware">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Has Firmware"
+                >
                   FW
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Processes Network Traffic">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Processes Network Traffic"
+                >
                   Traffic
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Supports SNMP Monitoring">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Supports SNMP Monitoring"
+                >
                   SNMP
                 </th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -145,16 +178,23 @@ onMounted(async () => {
       </div>
 
       <!-- Show message when no natures are available -->
-      <div v-else class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div
+        v-else
+        class="bg-white rounded-lg shadow p-8 text-center text-gray-500"
+      >
         <p>No component natures found.</p>
       </div>
     </div>
   </section>
 
-  <section v-if="showButton" class="m-auto max-w-lg my-10 px-6">
+  <section
+    v-if="showButton"
+    class="m-auto max-w-lg my-10 px-6"
+  >
     <RouterLink
       to="/catalog/component-natures"
-      class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700">
+      class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
+    >
       View All Component Natures
     </RouterLink>
   </section>

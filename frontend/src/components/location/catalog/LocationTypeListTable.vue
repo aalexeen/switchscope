@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps } from 'vue';
 
-const props = defineProps({
+defineProps({
   locationType: {
     type: Object,
     required: true
@@ -55,7 +55,7 @@ const getCategoryLabel = (locationType) => {
         <i
           :class="getIconClass(locationType.iconClass)"
           class="text-xl text-blue-600"
-        ></i>
+        />
         <span class="font-medium text-gray-900">{{ locationType.name }}</span>
       </div>
     </td>
@@ -91,7 +91,10 @@ const getCategoryLabel = (locationType) => {
       >
         Level {{ locationType.hierarchyLevel }}
       </span>
-      <span v-else class="text-gray-400 text-sm">-</span>
+      <span
+        v-else
+        class="text-gray-400 text-sm"
+      >-</span>
     </td>
 
     <!-- Category -->
@@ -109,7 +112,7 @@ const getCategoryLabel = (locationType) => {
       <i
         :class="locationType.canHaveChildren ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Can Hold Equipment -->
@@ -117,7 +120,7 @@ const getCategoryLabel = (locationType) => {
       <i
         :class="locationType.canHoldEquipment ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Physical Location -->
@@ -125,7 +128,7 @@ const getCategoryLabel = (locationType) => {
       <i
         :class="locationType.physicalLocation ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Requires Address -->
@@ -133,7 +136,7 @@ const getCategoryLabel = (locationType) => {
       <i
         :class="locationType.requiresAddress ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Secure Location -->
@@ -142,15 +145,21 @@ const getCategoryLabel = (locationType) => {
         :class="locationType.secureLocation ? 'pi pi-lock text-yellow-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
         :title="locationType.secureLocation ? 'Secure location' : 'Not secure'"
-      ></i>
+      />
     </td>
 
     <!-- Rack Units -->
     <td class="px-4 py-3 text-center">
-      <span v-if="locationType.defaultRackUnits" class="text-sm text-gray-700">
+      <span
+        v-if="locationType.defaultRackUnits"
+        class="text-sm text-gray-700"
+      >
         {{ locationType.defaultRackUnits }}U
       </span>
-      <span v-else class="text-gray-400 text-sm">-</span>
+      <span
+        v-else
+        class="text-gray-400 text-sm"
+      >-</span>
     </td>
 
     <!-- Description -->
@@ -162,22 +171,25 @@ const getCategoryLabel = (locationType) => {
     <td class="px-4 py-3">
       <div class="flex space-x-2">
         <button
-          @click="$emit('view', locationType)"
           class="text-blue-600 hover:text-blue-800 transition-colors"
-          title="View Details">
-          <i class="pi pi-eye"></i>
+          title="View Details"
+          @click="$emit('view', locationType)"
+        >
+          <i class="pi pi-eye" />
         </button>
         <button
-          @click="$emit('edit', locationType)"
           class="text-green-600 hover:text-green-800 transition-colors"
-          title="Edit">
-          <i class="pi pi-pencil"></i>
+          title="Edit"
+          @click="$emit('edit', locationType)"
+        >
+          <i class="pi pi-pencil" />
         </button>
         <button
-          @click="$emit('delete', locationType)"
           class="text-red-600 hover:text-red-800 transition-colors"
-          title="Delete">
-          <i class="pi pi-trash"></i>
+          title="Delete"
+          @click="$emit('delete', locationType)"
+        >
+          <i class="pi pi-trash" />
         </button>
       </div>
     </td>

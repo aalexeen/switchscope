@@ -2,7 +2,7 @@
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import BackButtonMacs from '../components/BackButtonMacs.vue';
 import { reactive, onMounted, computed, ref } from 'vue';
-import { useRoute, RouterLink, useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { useMacAddresses } from '@/composables/useMacAddresses';
 
@@ -68,14 +68,22 @@ onMounted(async () => {
 
 <template>
   <BackButtonMacs />
-  <section v-if="!state.isLoading" class="bg-green-50">
+  <section
+    v-if="!state.isLoading"
+    class="bg-green-50"
+  >
     <div class="container m-auto py-10 px-6">
       <div class="grid grid-cols-1 md:grid-cols-70/30 w-full gap-6">
         <main>
           <div
-            class="bg-white p-6 rounded-lg shadow-md text-center md:text-left">
-            <div class="text-gray-500 mb-4">Full Mac address</div>
-            <h1 class="text-3xl font-bold mb-4">{{ state.mac.clientMac }}</h1>
+            class="bg-white p-6 rounded-lg shadow-md text-center md:text-left"
+          >
+            <div class="text-gray-500 mb-4">
+              Full Mac address
+            </div>
+            <h1 class="text-3xl font-bold mb-4">
+              {{ state.mac.clientMac }}
+            </h1>
             <!-- <div
               class="text-gray-500 mb-4 flex align-middle justify-center md:justify-start">
               <i
@@ -93,12 +101,20 @@ onMounted(async () => {
               {{ state.mac.reason }}
             </p>
 
-            <h3 class="text-green-800 text-lg font-bold mb-2">Block Time</h3>
+            <h3 class="text-green-800 text-lg font-bold mb-2">
+              Block Time
+            </h3>
 
-            <p class="mb-4">{{ state.mac.blockTime }}</p>
+            <p class="mb-4">
+              {{ state.mac.blockTime }}
+            </p>
 
-            <h3 class="text-green-800 text-lg font-bold mb-2">Remaining Time</h3>
-            <p class="mb-4">{{ state.mac.remainingTime }}</p>
+            <h3 class="text-green-800 text-lg font-bold mb-2">
+              Remaining Time
+            </h3>
+            <p class="mb-4">
+              {{ state.mac.remainingTime }}
+            </p>
           </div>
         </main>
 
@@ -133,7 +149,9 @@ onMounted(async () => {
 
           <!-- Manage -->
           <div class="bg-white p-6 rounded-lg shadow-md mt-6">
-            <h3 class="text-xl font-bold mb-6">Manage MAC</h3>
+            <h3 class="text-xl font-bold mb-6">
+              Manage MAC
+            </h3>
             <!--
             <RouterLink
               :to="`/macs/edit/${state.mac.id}`"
@@ -141,9 +159,10 @@ onMounted(async () => {
             </RouterLink>
             -->
             <button 
-              @click="deleteMac"
               :disabled="isDeleting"
-              class="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block">
+              class="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
+              @click="deleteMac"
+            >
               {{ isDeleting ? 'Deleting...' : 'Delete MAC' }}
             </button>
           </div>
@@ -153,8 +172,10 @@ onMounted(async () => {
   </section>
 
   <!-- Show loading spinner while loading is true -->
-  <div v-else class="text-center text-gray-500 py-6">
+  <div
+    v-else
+    class="text-center text-gray-500 py-6"
+  >
     <PulseLoader />
   </div>
-
 </template>

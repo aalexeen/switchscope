@@ -44,22 +44,29 @@ const goToLogin = () => {
 const handleRetry = () => {
   emit('retry');
 };
-
-// Handle reset (go back to form)
-const handleReset = () => {
-  emit('reset');
-};
 </script>
 
 <template>
   <div class="bg-white px-6 py-8 mb-4 shadow-md rounded-md border m-4 md:m-0">
-    
     <!-- Success State -->
-    <div v-if="isSuccess" class="text-center">
+    <div
+      v-if="isSuccess"
+      class="text-center"
+    >
       <!-- Success Icon -->
       <div class="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-        <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        <svg
+          class="w-8 h-8 text-green-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
         </svg>
       </div>
 
@@ -74,22 +81,36 @@ const handleReset = () => {
       </p>
       
       <!-- Additional login prompt -->
-      <div v-if="result.showLoginPrompt" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div
+        v-if="result.showLoginPrompt"
+        class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6"
+      >
         <p class="text-sm text-blue-700">
           <strong>Next Step:</strong> Please log in with your new credentials to access your account.
-          <span v-if="result.redirectAfterLogin && result.redirectAfterLogin !== '/'" class="block mt-1">
+          <span
+            v-if="result.redirectAfterLogin && result.redirectAfterLogin !== '/'"
+            class="block mt-1"
+          >
             After logging in, you'll be redirected to your requested page.
           </span>
         </p>
       </div>
 
       <!-- User Info (if available) -->
-      <div v-if="result.user" class="bg-gray-50 rounded-lg p-4 mb-6">
-        <p class="text-sm text-gray-600 mb-2">Account Details:</p>
+      <div
+        v-if="result.user"
+        class="bg-gray-50 rounded-lg p-4 mb-6"
+      >
+        <p class="text-sm text-gray-600 mb-2">
+          Account Details:
+        </p>
         <div class="text-left">
           <p><strong>Name:</strong> {{ result.user.name }}</p>
           <p><strong>Email:</strong> {{ result.user.email }}</p>
-          <p v-if="result.user.id" class="text-xs text-gray-500 mt-2">
+          <p
+            v-if="result.user.id"
+            class="text-xs text-gray-500 mt-2"
+          >
             User ID: {{ result.user.id }}
           </p>
         </div>
@@ -98,19 +119,33 @@ const handleReset = () => {
       <!-- Action Buttons -->
       <div class="space-y-3">
         <button
+          class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full w-full focus:outline-none focus:shadow-outline transition-colors"
           @click="goToLogin"
-          class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full w-full focus:outline-none focus:shadow-outline transition-colors">
+        >
           Continue to Login
         </button>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-if="isError" class="text-center">
+    <div
+      v-if="isError"
+      class="text-center"
+    >
       <!-- Error Icon -->
       <div class="mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        <svg
+          class="w-8 h-8 text-red-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       </div>
 
@@ -125,17 +160,26 @@ const handleReset = () => {
       </p>
 
       <!-- Error Details -->
-      <div v-if="result.details" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+      <div
+        v-if="result.details"
+        class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6"
+      >
         <p class="text-sm text-red-700">
           {{ result.details }}
         </p>
       </div>
 
       <!-- Login suggestion for certain errors -->
-      <div v-if="result.canSwitchToLogin && result.isEmailAlreadyExists" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div
+        v-if="result.canSwitchToLogin && result.isEmailAlreadyExists"
+        class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6"
+      >
         <p class="text-sm text-blue-700">
           <strong>Suggestion:</strong> If you already have an account with this email, you can log in instead.
-          <span v-if="result.preserveRedirect" class="block mt-1">
+          <span
+            v-if="result.preserveRedirect"
+            class="block mt-1"
+          >
             Your original destination will be preserved after login.
           </span>
         </p>
@@ -146,14 +190,16 @@ const handleReset = () => {
         <!-- For email already exists error - prioritize login -->
         <template v-if="result.isEmailAlreadyExists">
           <button
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full w-full focus:outline-none focus:shadow-outline transition-colors"
             @click="goToLogin"
-            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full w-full focus:outline-none focus:shadow-outline transition-colors">
+          >
             Go to Login
           </button>
           
           <button
+            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full w-full focus:outline-none focus:shadow-outline transition-colors"
             @click="handleRetry"
-            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full w-full focus:outline-none focus:shadow-outline transition-colors">
+          >
             Try Different Email
           </button>
         </template>
@@ -162,14 +208,16 @@ const handleReset = () => {
         <template v-else>
           <button
             v-if="result.canRetry !== false"
+            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full w-full focus:outline-none focus:shadow-outline transition-colors"
             @click="handleRetry"
-            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full w-full focus:outline-none focus:shadow-outline transition-colors">
+          >
             Try Again
           </button>
           
           <button
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full w-full focus:outline-none focus:shadow-outline transition-colors"
             @click="goToLogin"
-            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full w-full focus:outline-none focus:shadow-outline transition-colors">
+          >
             Go to Login
           </button>
         </template>

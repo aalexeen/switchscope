@@ -10,10 +10,8 @@ defineProps({
 </script>
 
 <template>
-    <!-- v-bind -->
-    <div :class="`${bg} p-6 rounded-lg shadow-md`">
-        <slot>
-
-        </slot>
-    </div>
+  <!-- v-bind -->
+  <div :class="`${bg} p-6 rounded-lg shadow-md`">
+    <slot />
+  </div>
 </template>

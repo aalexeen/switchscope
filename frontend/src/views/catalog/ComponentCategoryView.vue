@@ -1,5 +1,5 @@
 <script setup>
-import ComponentCategorySearchBar from '@/components/component/catalog/ComponentCategorySearchBar.vue';
+import GenericSearchBar from '@/components/common/GenericSearchBar.vue';
 import ComponentCategoryListingsTable from '@/components/component/catalog/ComponentCategoryListingsTable.vue';
 import { ref, computed } from 'vue';
 import { useComponentCategories } from '@/composables/useComponentCategories';
@@ -8,7 +8,7 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 
 // Get search functionality from composable
-const { searchComponentCategories, componentCategories, totalComponentCategories } = useComponentCategories();
+const { searchComponentCategories, totalComponentCategories } = useComponentCategories();
 
 // Reactive state for search
 const searchQuery = ref('');
@@ -49,10 +49,15 @@ const handleDelete = (category) => {
 
 <template>
   <!-- Search Bar Component -->
-  <ComponentCategorySearchBar
-    v-model:search-query="searchQuery"
+  <GenericSearchBar
+    entity-name="Component Categories"
+    :search-query="searchQuery"
     :found-count="filteredCategories.length"
     :total-count="totalComponentCategories"
+    theme="green"
+    intensity="600"
+    :search-fields="['name', 'code', 'display name', 'description']"
+    @update:search-query="searchQuery = $event"
     @clear="clearSearch"
   />
 

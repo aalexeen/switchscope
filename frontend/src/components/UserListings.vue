@@ -1,6 +1,5 @@
 <script setup>
-import { RouterLink } from 'vue-router';
-import { reactive, defineProps, onMounted, ref, watchEffect, computed } from 'vue';
+import { reactive, defineProps, onMounted, ref, computed } from 'vue';
 import UserList from './UserList.vue';
 import axios from 'axios';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
@@ -57,36 +56,49 @@ onMounted(async () => {
 </script>
 
 <template>
-    <section class="bg-blue-50 px-4 py-10">
-        <div class="container-xl lg:container m-auto">
-            <h2 class="text-3xl font-bold text-green-500 mb-6 text-center">
-                Browse Users
-            </h2>
-            <!-- Show loading spinner while loading is true -->
-            <div v-if="state.isLoading" class="text-center text-gray-500 py-6">
-                <PulseLoader />
-            </div>
+  <section class="bg-blue-50 px-4 py-10">
+    <div class="container-xl lg:container m-auto">
+      <h2 class="text-3xl font-bold text-green-500 mb-6 text-center">
+        Browse Users
+      </h2>
+      <!-- Show loading spinner while loading is true -->
+      <div
+        v-if="state.isLoading"
+        class="text-center text-gray-500 py-6"
+      >
+        <PulseLoader />
+      </div>
 
-            <!-- Show mac listing when done loading   ############# || state.users.length -->
-            <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <UserList v-for="user in state.users.slice(0, trunkatedUserList)" :key="user.id" :user="user" />
-            </div>
-        </div>
+      <!-- Show mac listing when done loading   ############# || state.users.length -->
+      <div
+        v-else
+        class="grid grid-cols-1 md:grid-cols-3 gap-6"
+      >
+        <UserList
+          v-for="user in state.users.slice(0, trunkatedUserList)"
+          :key="user.id"
+          :user="user"
+        />
+      </div>
+    </div>
+  </section>
 
-    </section>
+  <!-- to do, send the limit like props to AllUserView for UserListings-->
+  <section
+    v-if="showButton"
+    class="m-auto max-w-lg my-10 px-6"
+  >
+    <div class="flex justify-center items-center v-screen">
+      <button
+        class="block bg-black text-white text-center py-4 px-8 rounded-xl hover:bg-gray-700"
+        @click="toggleFullUserList"
+      >
+        {{ showFullUserList ? 'View Less Users' : 'View All Users' }}
+      </button>
+    </div>
+  </section>
 
-    <!-- to do, send the limit like props to AllUserView for UserListings-->
-    <section v-if="showButton" class="m-auto max-w-lg my-10 px-6">
-        <div class="flex justify-center items-center v-screen">
-            <button
-                @click="toggleFullUserList"
-                class="block bg-black text-white text-center py-4 px-8 rounded-xl hover:bg-gray-700">
-                {{ showFullUserList ? 'View Less Users' : 'View All Users' }}
-            </button>
-        </div>
-    </section>
-
-    <!-- <RouterLink
+  <!-- <RouterLink
         to="/users/allusers"
         class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
         >View All Users</RouterLink> -->

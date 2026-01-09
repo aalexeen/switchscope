@@ -1,7 +1,7 @@
 <script setup>
 import logo from '@/assets/img/logo.png';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useAuth } from '@/composables/useAuth';
 import { useToast } from 'vue-toastification';
 
@@ -16,9 +16,7 @@ const {
   logout, 
   initializeAuth, 
   isAdmin, 
-  isUser, 
-  hasRole,
-  userRoles 
+  hasRole 
 } = useAuth();
 
 onMounted(async () => {
@@ -51,11 +49,6 @@ const canAccessAdminRoutes = () => {
   return isAdmin.value;
 };
 
-// Function to check if user can access user management
-const canAccessUserManagement = () => {
-  return hasRole('ADMIN');
-};
-
 </script>
 
 <template>
@@ -64,21 +57,32 @@ const canAccessUserManagement = () => {
       <div class="flex h-20 items-center justify-between">
         <div class="flex flex-1 items-center justify-center md:items-stretch md:justify-start">
           <!-- Logo -->
-          <RouterLink class="flex flex-shrink-0 items-center mr-4" to="/">
-            <img class="h-10 w-auto" :src="logo" alt="SwitchScope" />
+          <RouterLink
+            class="flex flex-shrink-0 items-center mr-4"
+            to="/"
+          >
+            <img
+              class="h-10 w-auto"
+              :src="logo"
+              alt="SwitchScope"
+            >
             <span class="hidden md:block text-white text-2xl font-bold ml-2">SwitchScope</span>
           </RouterLink>
 
           <!-- Only show navigation when logged in -->
-          <div v-if="isLoggedIn" class="md:ml-auto">
+          <div
+            v-if="isLoggedIn"
+            class="md:ml-auto"
+          >
             <div class="flex space-x-2">
               <!-- Home - Available to all authenticated users -->
               <RouterLink
                 to="/"
                 :class="[isActiveLink('/')
-                  ? 'bg-green-900'
-                  : 'hover:bg-gray-900 hover:text-white',
-                  'text-white', 'px-3', 'py-2', 'rounded-md']">
+                           ? 'bg-green-900'
+                           : 'hover:bg-gray-900 hover:text-white',
+                         'text-white', 'px-3', 'py-2', 'rounded-md']"
+              >
                 Home
               </RouterLink>
 
@@ -87,9 +91,10 @@ const canAccessUserManagement = () => {
                 v-if="hasRole('USER') || hasRole('ADMIN')"
                 to="/dashboard"
                 :class="[isRemoveMacActive()
-                  ? 'bg-green-900'
-                  : 'hover:bg-gray-900 hover:text-white',
-                  'text-white', 'px-3', 'py-2', 'rounded-md']">
+                           ? 'bg-green-900'
+                           : 'hover:bg-gray-900 hover:text-white',
+                         'text-white', 'px-3', 'py-2', 'rounded-md']"
+              >
                 Dashboard
               </RouterLink>
 
@@ -98,18 +103,20 @@ const canAccessUserManagement = () => {
                 <RouterLink
                   to="/users/allusers"
                   :class="[isActiveLink('/users/allusers')
-                    ? 'bg-green-900'
-                    : 'hover:bg-gray-900 hover:text-white',
-                    'text-white', 'px-3', 'py-2', 'rounded-md']">
+                             ? 'bg-green-900'
+                             : 'hover:bg-gray-900 hover:text-white',
+                           'text-white', 'px-3', 'py-2', 'rounded-md']"
+                >
                   All Users
                 </RouterLink>
                 
                 <RouterLink
                   to="/users/add"
                   :class="[isActiveLink('/users/add')
-                    ? 'bg-green-900'
-                    : 'hover:bg-gray-900 hover:text-white',
-                    'text-white', 'px-3', 'py-2', 'rounded-md']">
+                             ? 'bg-green-900'
+                             : 'hover:bg-gray-900 hover:text-white',
+                           'text-white', 'px-3', 'py-2', 'rounded-md']"
+                >
                   Add User
                 </RouterLink>
               </template>
@@ -118,16 +125,18 @@ const canAccessUserManagement = () => {
               <RouterLink
                 to="/user"
                 :class="[isActiveLink('/user')
-                  ? 'bg-green-900'
-                  : 'hover:bg-gray-900 hover:text-white',
-                  'text-white', 'px-3', 'py-2', 'rounded-md']">
+                           ? 'bg-green-900'
+                           : 'hover:bg-gray-900 hover:text-white',
+                         'text-white', 'px-3', 'py-2', 'rounded-md']"
+              >
                 My Account
               </RouterLink>
 
               <!-- Logout Button -->
               <button
+                class="text-white px-3 py-2 rounded-md hover:bg-red-700"
                 @click="handleLogout"
-                class="text-white px-3 py-2 rounded-md hover:bg-red-700">
+              >
                 Logout
               </button>
 

@@ -1,5 +1,5 @@
 <script setup>
-import ComponentNatureSearchBar from '@/components/component/catalog/ComponentNatureSearchBar.vue';
+import GenericSearchBar from '@/components/common/GenericSearchBar.vue';
 import ComponentNatureListingsTable from '@/components/component/catalog/ComponentNatureListingsTable.vue';
 import { ref, computed } from 'vue';
 import { useComponentNatures } from '@/composables/useComponentNatures';
@@ -8,7 +8,7 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 
 // Get search functionality from composable
-const { searchComponentNatures, componentNatures, totalComponentNatures } = useComponentNatures();
+const { searchComponentNatures, totalComponentNatures } = useComponentNatures();
 
 // Reactive state for search
 const searchQuery = ref('');
@@ -45,10 +45,15 @@ const handleDelete = (nature) => {
 
 <template>
   <!-- Search Bar Component -->
-  <ComponentNatureSearchBar
-    v-model:search-query="searchQuery"
+  <GenericSearchBar
+    entity-name="Component Natures"
+    :search-query="searchQuery"
     :found-count="filteredNatures.length"
     :total-count="totalComponentNatures"
+    theme="indigo"
+    intensity="500"
+    :search-fields="['name', 'code', 'display name', 'description']"
+    @update:search-query="searchQuery = $event"
     @clear="clearSearch"
   />
 

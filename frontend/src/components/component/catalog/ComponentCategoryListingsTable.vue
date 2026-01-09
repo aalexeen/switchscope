@@ -57,37 +57,55 @@ onMounted(async () => {
             <span class="font-medium">
               Displaying: {{ displayedCategories.length }} categories
             </span>
-            <span v-if="props.limit" class="ml-4">
+            <span
+              v-if="props.limit"
+              class="ml-4"
+            >
               (Limit: {{ Math.min(props.limit, displayedCategories.length) }} of {{ totalComponentCategories }})
             </span>
           </div>
           <button
-            @click="fetchComponentCategories(true)"
             :disabled="isLoading"
-            class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded text-sm">
+            class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded text-sm"
+            @click="fetchComponentCategories(true)"
+          >
             {{ isLoading ? 'Refreshing...' : 'Refresh' }}
           </button>
         </div>
       </div>
 
       <!-- Show error message if there's an error -->
-      <div v-if="error" class="bg-white rounded-lg shadow p-6 text-center text-red-500">
-        <p class="mb-4">Error loading component categories. Please try again.</p>
+      <div
+        v-if="error"
+        class="bg-white rounded-lg shadow p-6 text-center text-red-500"
+      >
+        <p class="mb-4">
+          Error loading component categories. Please try again.
+        </p>
         <button
+          class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded"
           @click="fetchComponentCategories(true)"
-          class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded">
+        >
           Retry
         </button>
       </div>
 
       <!-- Show loading spinner while loading -->
-      <div v-else-if="isLoading" class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div
+        v-else-if="isLoading"
+        class="bg-white rounded-lg shadow p-8 text-center text-gray-500"
+      >
         <PulseLoader />
-        <p class="mt-4">Loading component categories...</p>
+        <p class="mt-4">
+          Loading component categories...
+        </p>
       </div>
 
       <!-- Show component category listing table when done loading -->
-      <div v-else-if="displayedCategories.length > 0" class="bg-white rounded-lg shadow overflow-hidden">
+      <div
+        v-else-if="displayedCategories.length > 0"
+        class="bg-white rounded-lg shadow overflow-hidden"
+      >
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -107,13 +125,22 @@ onMounted(async () => {
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Type
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="System Category">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="System Category"
+                >
                   System
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Infrastructure">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Infrastructure"
+                >
                   Infra
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" title="Component Types Count">
+                <th
+                  class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  title="Component Types Count"
+                >
                   Types
                 </th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -139,16 +166,23 @@ onMounted(async () => {
       </div>
 
       <!-- Show message when no categories are available -->
-      <div v-else class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div
+        v-else
+        class="bg-white rounded-lg shadow p-8 text-center text-gray-500"
+      >
         <p>No component categories found.</p>
       </div>
     </div>
   </section>
 
-  <section v-if="showButton" class="m-auto max-w-lg my-10 px-6">
+  <section
+    v-if="showButton"
+    class="m-auto max-w-lg my-10 px-6"
+  >
     <RouterLink
       to="/catalog/component-categories"
-      class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700">
+      class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
+    >
       View All Component Categories
     </RouterLink>
   </section>

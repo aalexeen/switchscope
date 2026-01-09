@@ -35,7 +35,7 @@ onMounted(async () => {
   try {
     const response = await axios.get(`/api/users/${userId}`);
     state.user = response.data;
-  } catch (error) {
+  } catch {
     console.error('Fetching user data error');
   } finally {
     state.isLoading = false;
@@ -45,14 +45,22 @@ onMounted(async () => {
 
 <template>
   <BackButtonUsers />
-  <section v-if="!state.isLoading" class="bg-green-50">
+  <section
+    v-if="!state.isLoading"
+    class="bg-green-50"
+  >
     <div class="container m-auto py-10 px-6">
       <div class="grid grid-cols-1 md:grid-cols-70/30 w-full gap-6">
         <main>
           <div
-            class="bg-white p-6 rounded-lg shadow-md text-center md:text-left">
-            <div class="text-gray-500 mb-4">{{ state.user.nickname }}</div>
-            <h1 class="text-3xl font-bold mb-4">{{ state.user.first_name }}</h1>
+            class="bg-white p-6 rounded-lg shadow-md text-center md:text-left"
+          >
+            <div class="text-gray-500 mb-4">
+              {{ state.user.nickname }}
+            </div>
+            <h1 class="text-3xl font-bold mb-4">
+              {{ state.user.first_name }}
+            </h1>
             <!-- <div
               class="text-gray-500 mb-4 flex align-middle justify-center md:justify-start">
               <i
@@ -70,12 +78,20 @@ onMounted(async () => {
               {{ state.user.last_name }}
             </p>
 
-            <h3 class="text-green-800 text-lg font-bold mb-2">Subdivision</h3>
+            <h3 class="text-green-800 text-lg font-bold mb-2">
+              Subdivision
+            </h3>
 
-            <p class="mb-4">{{ state.user.subdivision }}</p>
+            <p class="mb-4">
+              {{ state.user.subdivision }}
+            </p>
 
-            <h3 class="text-green-800 text-lg font-bold mb-2">Team</h3>
-            <p class="mb-4">{{ state.user.team }}</p>
+            <h3 class="text-green-800 text-lg font-bold mb-2">
+              Team
+            </h3>
+            <p class="mb-4">
+              {{ state.user.team }}
+            </p>
           </div>
         </main>
 
@@ -83,9 +99,13 @@ onMounted(async () => {
         <aside>
           <!-- Company Info -->
           <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-bold mb-6">User Details</h3>
+            <h3 class="text-xl font-bold mb-6">
+              User Details
+            </h3>
 
-            <h2 class="text-2xl">{{ state.user.description }}</h2>
+            <h2 class="text-2xl">
+              {{ state.user.description }}
+            </h2>
 
             <!-- <p class="my-2">
               NewTek Solutions is a leading technology company specializing in
@@ -94,27 +114,40 @@ onMounted(async () => {
               while fostering a collaborative and innovative work environment.
             </p> -->
 
-            <hr class="my-4" />
+            <hr class="my-4">
 
-            <h3 class="text-xl">Contact Email:</h3>
+            <h3 class="text-xl">
+              Contact Email:
+            </h3>
 
             <p class="my-2 bg-green-100 p-2 font-bold">
               {{ state.user.contactEmail }}
             </p>
 
-            <h3 class="text-xl">Contact Phone:</h3>
+            <h3 class="text-xl">
+              Contact Phone:
+            </h3>
 
-            <p class="my-2 bg-green-100 p-2 font-bold">{{ state.user.contactPhone }}</p>
+            <p class="my-2 bg-green-100 p-2 font-bold">
+              {{ state.user.contactPhone }}
+            </p>
           </div>
 
           <!-- Manage -->
           <div class="bg-white p-6 rounded-lg shadow-md mt-6">
-            <h3 class="text-xl font-bold mb-6">Manage User</h3>
+            <h3 class="text-xl font-bold mb-6">
+              Manage User
+            </h3>
             <RouterLink
               :to="`/users/edit/${state.user.id}`"
-              class="bg-green-500 hover:bg-green-600 text-white text-center font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block">Edit User</RouterLink>
-            <button @click="deleteUser"
-              class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block">
+              class="bg-green-500 hover:bg-green-600 text-white text-center font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
+            >
+              Edit User
+            </RouterLink>
+            <button
+              class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
+              @click="deleteUser"
+            >
               Delete User
             </button>
           </div>
@@ -124,8 +157,10 @@ onMounted(async () => {
   </section>
 
   <!-- Show loading spinner while loading is true -->
-  <div v-else class="text-center text-gray-500 py-6">
+  <div
+    v-else
+    class="text-center text-gray-500 py-6"
+  >
     <PulseLoader />
   </div>
-
 </template>

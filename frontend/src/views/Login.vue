@@ -26,7 +26,7 @@ const handleSubmit = async () => {
       remember: form.remember
     };
 
-    const response = await login(credentials);
+    await login(credentials);
 
     toast.success('Login Successful');
 
@@ -53,44 +53,52 @@ const handleSubmit = async () => {
   <section class="bg-green-50">
     <div class="container m-auto max-w-md py-24">
       <div
-        class="bg-white px-6 py-8 mb-4 shadow-md rounded-md border m-4 md:m-0">
+        class="bg-white px-6 py-8 mb-4 shadow-md rounded-md border m-4 md:m-0"
+      >
         <form @submit.prevent="handleSubmit">
-          <h2 class="text-3xl text-center font-semibold mb-6">Login</h2>
+          <h2 class="text-3xl text-center font-semibold mb-6">
+            Login
+          </h2>
 
           <div class="mb-4">
             <label
               for="email"
-              class="block text-gray-700 font-bold mb-2">Email Address</label>
+              class="block text-gray-700 font-bold mb-2"
+            >Email Address</label>
             <input
-              type="email"
-              v-model="form.email"
               id="email"
+              v-model="form.email"
+              type="email"
               name="email"
               class="border rounded w-full py-2 px-3"
               placeholder="Enter your email"
-              required />
+              required
+            >
           </div>
 
           <div class="mb-6">
             <label
               for="password"
-              class="block text-gray-700 font-bold mb-2">Password</label>
+              class="block text-gray-700 font-bold mb-2"
+            >Password</label>
             <input
-              type="password"
-              v-model="form.password"
               id="password"
+              v-model="form.password"
+              type="password"
               name="password"
               class="border rounded w-full py-2 px-3"
               placeholder="Enter your password"
-              required />
+              required
+            >
           </div>
 
           <div class="mb-6">
             <label class="flex items-center">
               <input
-                type="checkbox"
                 v-model="form.remember"
-                class="mr-2" />
+                type="checkbox"
+                class="mr-2"
+              >
               <span class="text-gray-700">Remember me</span>
             </label>
           </div>
@@ -98,7 +106,8 @@ const handleSubmit = async () => {
           <div>
             <button
               class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
-              type="submit">
+              type="submit"
+            >
               Sign In
             </button>
           </div>
@@ -106,7 +115,12 @@ const handleSubmit = async () => {
           <div class="mt-4 text-center">
             <p class="text-gray-600">
               Don't have an account?
-              <router-link to="/register" class="text-green-500 hover:text-green-600">Create Account</router-link>
+              <router-link
+                to="/register"
+                class="text-green-500 hover:text-green-600"
+              >
+                Create Account
+              </router-link>
             </p>
           </div>
         </form>

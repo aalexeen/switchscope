@@ -82,7 +82,6 @@ const handleReset = () => {
 <template>
   <section class="bg-green-50 min-h-screen">
     <div class="container m-auto max-w-md py-24">
-      
       <!-- Registration Form -->
       <RegistrationForm
         v-if="currentView === 'form'"
@@ -101,7 +100,6 @@ const handleReset = () => {
         @retry="handleRetry"
         @reset="handleReset"
       />
-
     </div>
   </section>
 </template>

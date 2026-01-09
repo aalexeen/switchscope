@@ -1,5 +1,5 @@
 <script setup>
-import LocationTypeSearchBar from '@/components/location/catalog/LocationTypeSearchBar.vue';
+import GenericSearchBar from '@/components/common/GenericSearchBar.vue';
 import LocationTypeListingsTable from '@/components/location/catalog/LocationTypeListingsTable.vue';
 import { ref, computed } from 'vue';
 import { useLocationTypes } from '@/composables/useLocationTypes';
@@ -8,7 +8,7 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 
 // Get search functionality from composable
-const { searchLocationTypes, locationTypes, totalLocationTypes } = useLocationTypes();
+const { searchLocationTypes, totalLocationTypes } = useLocationTypes();
 
 // Reactive state for search
 const searchQuery = ref('');
@@ -45,10 +45,15 @@ const handleDelete = (locationType) => {
 
 <template>
   <!-- Search Bar Component -->
-  <LocationTypeSearchBar
-    v-model:search-query="searchQuery"
+  <GenericSearchBar
+    entity-name="Location Types"
+    :search-query="searchQuery"
     :found-count="filteredTypes.length"
     :total-count="totalLocationTypes"
+    theme="teal"
+    intensity="600"
+    :search-fields="['name', 'code', 'display name', 'category', 'description']"
+    @update:search-query="searchQuery = $event"
     @clear="clearSearch"
   />
 

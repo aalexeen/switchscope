@@ -6,7 +6,7 @@ import router from "@/router";
 import axios from "axios";
 import authService from "@/services/auth"; // Adjust path as needed
 
-import { createApp, isProxy } from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 
 import ApiPlugin from "@/plugins/api";

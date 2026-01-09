@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps } from 'vue';
 
-const props = defineProps({
+defineProps({
   category: {
     type: Object,
     required: true
@@ -47,7 +47,7 @@ const getCategoryTypeLabel = (category) => {
         <i
           :class="[getIconClass(category.iconClass), category.colorClass]"
           class="text-xl"
-        ></i>
+        />
         <span class="font-medium text-gray-900">{{ category.name }}</span>
       </div>
     </td>
@@ -90,7 +90,7 @@ const getCategoryTypeLabel = (category) => {
         :class="category.systemCategory ? 'pi pi-lock text-yellow-600' : 'pi pi-unlock text-gray-400'"
         class="text-lg"
         :title="category.systemCategory ? 'System category (protected)' : 'User category'"
-      ></i>
+      />
     </td>
 
     <!-- Infrastructure -->
@@ -98,7 +98,7 @@ const getCategoryTypeLabel = (category) => {
       <i
         :class="category.infrastructure ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Component Types Count -->
@@ -117,24 +117,27 @@ const getCategoryTypeLabel = (category) => {
     <td class="px-4 py-3">
       <div class="flex space-x-2">
         <button
-          @click="$emit('view', category)"
           class="text-blue-600 hover:text-blue-800 transition-colors"
-          title="View Details">
-          <i class="pi pi-eye"></i>
+          title="View Details"
+          @click="$emit('view', category)"
+        >
+          <i class="pi pi-eye" />
         </button>
         <button
-          @click="$emit('edit', category)"
           class="text-green-600 hover:text-green-800 transition-colors"
-          title="Edit">
-          <i class="pi pi-pencil"></i>
+          title="Edit"
+          @click="$emit('edit', category)"
+        >
+          <i class="pi pi-pencil" />
         </button>
         <button
-          @click="$emit('delete', category)"
           class="text-red-600 hover:text-red-800 transition-colors"
           title="Delete"
           :disabled="!category.canBeDeleted"
-          :class="{ 'opacity-50 cursor-not-allowed': !category.canBeDeleted }">
-          <i class="pi pi-trash"></i>
+          :class="{ 'opacity-50 cursor-not-allowed': !category.canBeDeleted }"
+          @click="$emit('delete', category)"
+        >
+          <i class="pi pi-trash" />
         </button>
       </div>
     </td>

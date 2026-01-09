@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps } from 'vue';
 
-const props = defineProps({
+defineProps({
   type: {
     type: Object,
     required: true
@@ -47,7 +47,7 @@ const getTypeCategoryLabel = (type) => {
         <i
           :class="[getIconClass(type.iconClass), type.colorClass]"
           class="text-xl"
-        ></i>
+        />
         <span class="font-medium text-gray-900">{{ type.name }}</span>
       </div>
     </td>
@@ -67,7 +67,9 @@ const getTypeCategoryLabel = (type) => {
     <!-- Category -->
     <td class="px-4 py-3">
       <div class="text-sm">
-        <div class="font-medium text-gray-900">{{ type.categoryDisplayName || type.categoryCode || '-' }}</div>
+        <div class="font-medium text-gray-900">
+          {{ type.categoryDisplayName || type.categoryCode || '-' }}
+        </div>
         <code class="text-xs text-gray-500">{{ type.categoryCode }}</code>
       </div>
     </td>
@@ -98,7 +100,7 @@ const getTypeCategoryLabel = (type) => {
         :class="type.systemType ? 'pi pi-lock text-yellow-600' : 'pi pi-unlock text-gray-400'"
         class="text-lg"
         :title="type.systemType ? 'System type (protected)' : 'User type'"
-      ></i>
+      />
     </td>
 
     <!-- Requires Management -->
@@ -106,7 +108,7 @@ const getTypeCategoryLabel = (type) => {
       <i
         :class="type.requiresManagement ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Has IP Address -->
@@ -114,7 +116,7 @@ const getTypeCategoryLabel = (type) => {
       <i
         :class="type.canHaveIpAddress ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- SNMP -->
@@ -122,18 +124,27 @@ const getTypeCategoryLabel = (type) => {
       <i
         :class="type.supportsSnmp ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
         class="text-lg"
-      ></i>
+      />
     </td>
 
     <!-- Rack Space -->
     <td class="px-4 py-3 text-center">
-      <div v-if="type.requiresRackSpace" class="text-sm">
-        <i class="pi pi-check text-green-600 text-lg"></i>
-        <div v-if="type.typicalRackUnits" class="text-xs text-gray-600">
+      <div
+        v-if="type.requiresRackSpace"
+        class="text-sm"
+      >
+        <i class="pi pi-check text-green-600 text-lg" />
+        <div
+          v-if="type.typicalRackUnits"
+          class="text-xs text-gray-600"
+        >
           {{ type.typicalRackUnits }}U
         </div>
       </div>
-      <i v-else class="pi pi-times text-gray-400 text-lg"></i>
+      <i
+        v-else
+        class="pi pi-times text-gray-400 text-lg"
+      />
     </td>
 
     <!-- Description -->
@@ -145,24 +156,27 @@ const getTypeCategoryLabel = (type) => {
     <td class="px-4 py-3">
       <div class="flex space-x-2">
         <button
-          @click="$emit('view', type)"
           class="text-blue-600 hover:text-blue-800 transition-colors"
-          title="View Details">
-          <i class="pi pi-eye"></i>
+          title="View Details"
+          @click="$emit('view', type)"
+        >
+          <i class="pi pi-eye" />
         </button>
         <button
-          @click="$emit('edit', type)"
           class="text-green-600 hover:text-green-800 transition-colors"
-          title="Edit">
-          <i class="pi pi-pencil"></i>
+          title="Edit"
+          @click="$emit('edit', type)"
+        >
+          <i class="pi pi-pencil" />
         </button>
         <button
-          @click="$emit('delete', type)"
           class="text-red-600 hover:text-red-800 transition-colors"
           title="Delete"
           :disabled="!type.canBeDeleted"
-          :class="{ 'opacity-50 cursor-not-allowed': !type.canBeDeleted }">
-          <i class="pi pi-trash"></i>
+          :class="{ 'opacity-50 cursor-not-allowed': !type.canBeDeleted }"
+          @click="$emit('delete', type)"
+        >
+          <i class="pi pi-trash" />
         </button>
       </div>
     </td>

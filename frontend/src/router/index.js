@@ -217,7 +217,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   // Import the composable inside the guard to avoid circular dependencies
   const { useAuth } = await import("@/composables/useAuth");
-  const { isLoggedIn, verifyAuth, hasAnyRole } = useAuth();
+  const { isLoggedIn, hasAnyRole } = useAuth();
 
   // Check if the route requires authentication
   if (to.meta.requiresAuth) {

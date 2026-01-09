@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps } from 'vue';
 
-const props = defineProps({
+defineProps({
   model: {
     type: Object,
     required: true
@@ -54,7 +54,10 @@ const formatDate = (dateString) => {
         <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono text-gray-700">
           {{ model.modelNumber }}
         </code>
-        <span v-if="model.name && model.name !== model.modelDesignation" class="text-xs text-gray-500 mt-1">
+        <span
+          v-if="model.name && model.name !== model.modelDesignation"
+          class="text-xs text-gray-500 mt-1"
+        >
           {{ model.name }}
         </span>
       </div>
@@ -66,7 +69,10 @@ const formatDate = (dateString) => {
         <span class="text-sm text-gray-900">
           {{ model.componentTypeDisplayName || model.componentTypeCode || '-' }}
         </span>
-        <span v-if="model.categoryName" class="text-xs text-gray-500">
+        <span
+          v-if="model.categoryName"
+          class="text-xs text-gray-500"
+        >
           {{ model.categoryName }}
         </span>
       </div>
@@ -103,7 +109,7 @@ const formatDate = (dateString) => {
         :class="model.verified ? 'pi pi-check-circle text-green-600' : 'pi pi-circle text-gray-400'"
         class="text-lg"
         :title="model.verified ? 'Verified' : 'Not Verified'"
-      ></i>
+      />
     </td>
 
     <!-- Description (truncated) -->
@@ -115,22 +121,25 @@ const formatDate = (dateString) => {
     <td class="px-4 py-3">
       <div class="flex space-x-2">
         <button
-          @click="$emit('view', model)"
           class="text-blue-600 hover:text-blue-800 transition-colors"
-          title="View Details">
-          <i class="pi pi-eye"></i>
+          title="View Details"
+          @click="$emit('view', model)"
+        >
+          <i class="pi pi-eye" />
         </button>
         <button
-          @click="$emit('edit', model)"
           class="text-green-600 hover:text-green-800 transition-colors"
-          title="Edit">
-          <i class="pi pi-pencil"></i>
+          title="Edit"
+          @click="$emit('edit', model)"
+        >
+          <i class="pi pi-pencil" />
         </button>
         <button
-          @click="$emit('delete', model)"
           class="text-red-600 hover:text-red-800 transition-colors"
-          title="Delete">
-          <i class="pi pi-trash"></i>
+          title="Delete"
+          @click="$emit('delete', model)"
+        >
+          <i class="pi pi-trash" />
         </button>
       </div>
     </td>

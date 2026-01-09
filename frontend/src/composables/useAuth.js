@@ -27,26 +27,16 @@ export const useAuth = () => {
 
   // Register wrapper that calls the registration API
   const register = async (userData) => {
-    try {
-      // Use authService register method (which calls the API internally)
-      const result = await authService.register(userData);
-
-      // Note: We don't automatically log the user in after registration
-      // They need to log in separately after registration
-
-      return result;
-    } catch (error) {
-      // Registration failed
-      throw error;
-    }
+    // Use authService register method (which calls the API internally)
+    return await authService.register(userData);
   };
 
   // Logout wrapper that updates reactive state
   const logout = async () => {
     try {
       await authService.logout();
-    } catch (error) {
-      console.warn("Server logout failed:", error);
+    } catch {
+      console.warn("Server logout failed");
     } finally {
       // Always update reactive state
       isLoggedIn.value = false;
@@ -64,7 +54,7 @@ export const useAuth = () => {
       user.value = status.user;
 
       return status;
-    } catch (error) {
+    } catch {
       // Auth check failed, clear state
       isLoggedIn.value = false;
       user.value = null;
@@ -82,7 +72,7 @@ export const useAuth = () => {
       user.value = result ? authService.getUser() : null;
 
       return result;
-    } catch (error) {
+    } catch {
       isLoggedIn.value = false;
       user.value = null;
       return false;
@@ -116,7 +106,7 @@ export const useAuth = () => {
       }
 
       return result;
-    } catch (error) {
+    } catch {
       isLoggedIn.value = false;
       user.value = null;
       return false;
@@ -140,14 +130,6 @@ export const useAuth = () => {
 
   const hasAllRoles = (roleArray) => {
     return authService.hasAllRoles(roleArray);
-  };
-
-  const isAdmin = () => {
-    return authService.isAdmin();
-  };
-
-  const isUser = () => {
-    return authService.isUser();
   };
 
   return {
