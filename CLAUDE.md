@@ -37,6 +37,7 @@ switchscope/
 │   │   ├── api/                       # API client modules (axios)
 │   │   ├── components/                # Reusable Vue components
 │   │   │   └── component/             # Component-specific components
+│   │   │       └── catalog/           # Catalog UI components (Natures, Models)
 │   │   ├── composables/               # Vue 3 Composition API composables
 │   │   ├── plugins/                   # Vue plugins configuration
 │   │   ├── router/                    # Vue Router configuration
@@ -231,9 +232,11 @@ net.switchscope/
    - `BaseMapper<E, T>` - MapStruct entity ↔ DTO conversion
 
 4. **Catalog Pattern**:
-   - `ComponentModel` catalog for manufacturer specifications
+   - `ComponentModel` catalog for manufacturer specifications (abstract base with Single Table Inheritance)
+   - `ComponentNatureEntity` catalog for component nature classifications (active, passive, hybrid, etc.)
    - Separates product catalog from component instances
-   - Concrete models: `SwitchModel`, `RouterModel`, `RackModelEntity`
+   - Concrete models: `SwitchModel`, `RouterModel`, `RackModelEntity`, `AccessPointModel`, `PatchPanelModel`, `CableRunModel`
+   - **Important**: Discriminator values in entity classes must match CSV data exactly
 
 ### Database Management
 
@@ -524,14 +527,19 @@ frontend/src/
 │   ├── index.js            # API exports barrel
 │   ├── authentication.js   # Auth API endpoints
 │   ├── components.js       # Components API endpoints
+│   ├── componentNatures.js # Component Natures catalog API
+│   ├── componentModels.js  # Component Models catalog API
 │   └── blockedmacs.js      # Legacy API (to be migrated)
 ├── components/             # Reusable UI components
 │   ├── component/          # Component management UI components
+│   │   └── catalog/        # Catalog-specific UI (Natures, Models)
 │   ├── Navbar.vue          # Main navigation
 │   ├── Hero.vue            # Hero section
 │   ├── HomeCards.vue       # Dashboard cards
 │   └── [other components]  # Various UI components
 ├── composables/            # Vue 3 Composition API composables
+│   ├── useComponentNatures.js  # Component Natures state management
+│   ├── useComponentModels.js   # Component Models state management
 │   └── [reusable logic]    # Shared reactive state and logic
 ├── views/                  # Page-level components (routed)
 │   ├── DashboardView.vue   # Main dashboard
