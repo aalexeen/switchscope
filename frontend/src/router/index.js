@@ -17,6 +17,7 @@ import ComponentTypeView from "@/views/catalog/ComponentTypeView.vue";
 import ComponentStatusView from "@/views/catalog/ComponentStatusView.vue";
 import ComponentModelView from "@/views/catalog/ComponentModelView.vue";
 import LocationTypeView from "@/views/catalog/LocationTypeView.vue";
+import InstallationStatusView from "@/views/catalog/InstallationStatusView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -109,6 +110,15 @@ const router = createRouter({
       path: "/catalog/location-types",
       name: "location-types",
       component: LocationTypeView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'] // Both users and admins can access
+      },
+    },
+    {
+      path: "/catalog/installation-statuses",
+      name: "installation-statuses",
+      component: InstallationStatusView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'] // Both users and admins can access
