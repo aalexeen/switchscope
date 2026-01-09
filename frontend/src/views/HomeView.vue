@@ -9,5 +9,5 @@ import MacAddressListingsTable from '@/components/MacAddressListingsTable.vue';
 <template>
   <Hero />
   <HomeCards />
-  <MacAddressListingsTable :limit="3" :showButton="true" />
+  <!-- <MacAddressListingsTable :limit="3" :showButton="true" /> -->
 </template>

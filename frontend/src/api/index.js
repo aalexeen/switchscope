@@ -5,6 +5,7 @@ import blockedmacsModule from "./blockedmacs";
 import authModule from "./authentication";
 import componentsModule from "./components/components";
 import componentNaturesModule from "./components/componentNatures";
+import componentCategoriesModule from "./components/componentCategories";
 import componentModelsModule from "./components/catalog/componentModels";
 
 export default {
@@ -12,5 +13,6 @@ export default {
     authentication: authModule(instance),
     components: componentsModule(instance),
     componentNatures: componentNaturesModule(instance),
+    componentCategories: componentCategoriesModule(instance),
     componentModels: componentModelsModule(instance)
 }
