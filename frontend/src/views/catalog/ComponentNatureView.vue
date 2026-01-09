@@ -1,6 +1,6 @@
 <script setup>
-import ComponentNatureSearchBar from '@/components/component/ComponentNatureSearchBar.vue';
-import ComponentNatureListingsTable from '@/components/component/ComponentNatureListingsTable.vue';
+import ComponentNatureSearchBar from '@/components/component/catalog/ComponentNatureSearchBar.vue';
+import ComponentNatureListingsTable from '@/components/component/catalog/ComponentNatureListingsTable.vue';
 import { ref, computed } from 'vue';
 import { useComponentNatures } from '@/composables/useComponentNatures';
 import { useToast } from 'vue-toastification';
