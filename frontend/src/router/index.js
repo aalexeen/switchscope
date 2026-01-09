@@ -13,6 +13,7 @@ import Registration from "@/views/Registration.vue";
 import ComponentView from "@/views/component/ComponentView.vue";
 import ComponentNatureView from "@/views/catalog/ComponentNatureView.vue";
 import ComponentCategoryView from "@/views/catalog/ComponentCategoryView.vue";
+import ComponentTypeView from "@/views/catalog/ComponentTypeView.vue";
 import ComponentModelView from "@/views/catalog/ComponentModelView.vue";
 
 const router = createRouter({
@@ -70,6 +71,15 @@ const router = createRouter({
       path: "/catalog/component-categories",
       name: "component-categories",
       component: ComponentCategoryView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'] // Both users and admins can access
+      },
+    },
+    {
+      path: "/catalog/component-types",
+      name: "component-types",
+      component: ComponentTypeView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'] // Both users and admins can access
