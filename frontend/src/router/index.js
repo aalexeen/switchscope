@@ -10,9 +10,8 @@ import UserView from "@/views/UserView.vue";
 import EditUserView from "@/views/EditUserView.vue";
 import Login from "@/views/Login.vue";
 import Registration from "@/views/Registration.vue";
-import ComponentView from "@/views/component/ComponentView.vue";
-// Generic Catalog View - handles all catalog pages dynamically
-import GenericCatalogView from "@/views/catalog/GenericCatalogView.vue";
+// Universal Generic Table View - handles ALL table pages (catalogs + entities)
+import GenericTableView from "@/views/GenericTableView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,91 +49,92 @@ const router = createRouter({
     {
       path: "/components",
       name: "components",
-      component: ComponentView,
-      meta: {
-        requiresAuth: true,
-        roles: ['USER', 'ADMIN'] // Both users and admins can access
-      },
-    },
-    // Catalog routes - all use GenericCatalogView with entityKey metadata
-    {
-      path: "/catalog/component-natures",
-      name: "component-natures",
-      component: GenericCatalogView,
+      component: GenericTableView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
-        entityKey: 'componentNatures' // Tells GenericCatalogView which entity config to use
+        tableKey: 'components' // Tells GenericTableView which table config to use
+      },
+    },
+    // Catalog routes - all use GenericTableView with tableKey metadata
+    {
+      path: "/catalog/component-natures",
+      name: "component-natures",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'componentNatures' // Tells GenericTableView which table config to use
       },
     },
     {
       path: "/catalog/component-categories",
       name: "component-categories",
-      component: GenericCatalogView,
+      component: GenericTableView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
-        entityKey: 'componentCategories'
+        tableKey: 'componentCategories'
       },
     },
     {
       path: "/catalog/component-types",
       name: "component-types",
-      component: GenericCatalogView,
+      component: GenericTableView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
-        entityKey: 'componentTypes'
+        tableKey: 'componentTypes'
       },
     },
     {
       path: "/catalog/component-statuses",
       name: "component-statuses",
-      component: GenericCatalogView,
+      component: GenericTableView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
-        entityKey: 'componentStatuses'
+        tableKey: 'componentStatuses'
       },
     },
     {
       path: "/catalog/component-models",
       name: "component-models",
-      component: GenericCatalogView,
+      component: GenericTableView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
-        entityKey: 'componentModels'
+        tableKey: 'componentModels'
       },
     },
     {
       path: "/catalog/location-types",
       name: "location-types",
-      component: GenericCatalogView,
+      component: GenericTableView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
-        entityKey: 'locationTypes'
+        tableKey: 'locationTypes'
       },
     },
     {
       path: "/catalog/installation-statuses",
       name: "installation-statuses",
-      component: GenericCatalogView,
+      component: GenericTableView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
-        entityKey: 'installationStatuses'
+        tableKey: 'installationStatuses'
       },
     },
     {
       path: "/catalog/installable-types",
       name: "installable-types",
-      component: GenericCatalogView,
+      component: GenericTableView,
       meta: {
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
-        entityKey: 'installableTypes'
+        tableKey: 'installableTypes'
       },
     },
     {
