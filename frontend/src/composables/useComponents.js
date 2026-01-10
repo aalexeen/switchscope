@@ -1,6 +1,7 @@
 // @/composables/useComponents.js
 import { ref, computed } from "vue";
 import api from '@/api/index';
+import { useToast } from 'vue-toastification';
 
 // Global reactive state - shared across all components
 const components = ref([]);
@@ -12,6 +13,7 @@ const error = ref(null);
 const CACHE_DURATION = 5 * 60 * 1000;
 
 export const useComponents = () => {
+  const toast = useToast();
 
   // Check if cache is still valid
   const isCacheValid = () => {
@@ -36,7 +38,6 @@ export const useComponents = () => {
       return response.data;
     } catch (err) {
       error.value = err;
-      console.error('Error fetching components:', err);
       throw err;
     } finally {
       isLoading.value = false;
@@ -66,7 +67,6 @@ export const useComponents = () => {
       return response.data;
     } catch (err) {
       error.value = err;
-      console.error('Error fetching component:', err);
       throw err;
     }
   };
@@ -82,7 +82,6 @@ export const useComponents = () => {
       return response.data;
     } catch (err) {
       error.value = err;
-      console.error('Error creating component:', err);
       throw err;
     }
   };
@@ -101,7 +100,6 @@ export const useComponents = () => {
       return response.data;
     } catch (err) {
       error.value = err;
-      console.error('Error updating component:', err);
       throw err;
     }
   };
@@ -117,10 +115,11 @@ export const useComponents = () => {
         components.value.splice(index, 1);
       }
 
+      toast.success('Component deleted successfully');
       return true;
     } catch (err) {
       error.value = err;
-      console.error('Error deleting component:', err);
+      toast.error('Failed to delete component');
       throw err;
     }
   };

@@ -1,0 +1,57 @@
+<script setup>
+import { ref } from 'vue';
+import { RouterLink } from 'vue-router';
+import { useComponents } from '@/composables/useComponents';
+
+const props = defineProps({
+  item: {
+    type: Object,
+    required: true
+  },
+  config: {
+    type: Object,
+    required: true
+  }
+});
+
+const { deleteComponent } = useComponents();
+const isDeleting = ref(false);
+
+/**
+ * Handle delete action with confirmation
+ */
+const handleDelete = async () => {
+  if (confirm(`Are you sure you want to delete component ${props.item.name}?`)) {
+    isDeleting.value = true;
+    try {
+      await deleteComponent(props.item.id);
+    } catch (error) {
+      console.error('Error deleting component:', error);
+      alert('Failed to delete component. Please try again.');
+    } finally {
+      isDeleting.value = false;
+    }
+  }
+};
+</script>
+
+<template>
+  <div class="flex space-x-2">
+    <!-- View Details Button -->
+    <RouterLink
+      :to="`/components/${item.id}?from=table`"
+      class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors"
+    >
+      View Details
+    </RouterLink>
+
+    <!-- Delete Button -->
+    <button
+      :disabled="isDeleting"
+      class="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white px-3 py-1 rounded text-xs transition-colors"
+      @click="handleDelete"
+    >
+      {{ isDeleting ? 'Deleting...' : 'Delete' }}
+    </button>
+  </div>
+</template>

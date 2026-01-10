@@ -1,11 +1,20 @@
 <script setup>
 import GenericSearchBar from '@/components/common/GenericSearchBar.vue';
-import ComponentListingsTable from '@/components/component/ComponentListingsTable.vue';
+import GenericListingsTable from '@/components/table/GenericListingsTable.vue';
+import componentsConfig from '@/configs/tables/components.config.js';
 import { ref, computed } from 'vue';
 import { useComponents } from '@/composables/useComponents';
 
-// Get search functionality from composable
-const { searchComponents, totalComponents } = useComponents();
+// Get composable data
+const composable = useComponents();
+const {
+  components,
+  searchComponents,
+  totalComponents,
+  isLoading,
+  error,
+  fetchComponents
+} = composable;
 
 // Reactive state for search
 const searchQuery = ref('');
@@ -36,10 +45,18 @@ const clearSearch = () => {
     @clear="clearSearch"
   />
 
-  <!-- Component Listings Table -->
+  <!-- Generic Listings Table -->
   <div>
-    <ComponentListingsTable
-      :filtered-components="filteredComponents"
+    <GenericListingsTable
+      :config="componentsConfig"
+      :filtered-data="filteredComponents"
+      :composable-data="{
+        data: components,
+        isLoading: isLoading,
+        error: error,
+        fetchData: fetchComponents,
+        total: totalComponents
+      }"
     />
   </div>
 </template>

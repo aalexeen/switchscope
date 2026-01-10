@@ -15,15 +15,21 @@ import { useLocationTypes } from '@/composables/useLocationTypes';
 import { useInstallationStatuses } from '@/composables/useInstallationStatuses';
 import { useInstallableTypes } from '@/composables/useInstallableTypes';
 
-// Import all ListingsTable components (from their respective domain directories)
-import ComponentNatureListingsTable from '@/components/component/catalog/ComponentNatureListingsTable.vue';
-import ComponentCategoryListingsTable from '@/components/component/catalog/ComponentCategoryListingsTable.vue';
-import ComponentTypeListingsTable from '@/components/component/catalog/ComponentTypeListingsTable.vue';
-import ComponentStatusListingsTable from '@/components/component/catalog/ComponentStatusListingsTable.vue';
-import ComponentModelListingsTable from '@/components/component/catalog/ComponentModelListingsTable.vue';
-import LocationTypeListingsTable from '@/components/location/catalog/LocationTypeListingsTable.vue';
-import InstallationStatusListingsTable from '@/components/installation/catalog/InstallationStatusListingsTable.vue';
-import InstallableTypeListingsTable from '@/components/installation/catalog/InstallableTypeListingsTable.vue';
+// Import Generic Table Components (NEW!)
+import GenericListingsTable from '@/components/table/GenericListingsTable.vue';
+
+// Import table configurations
+import componentNaturesConfig from '@/configs/tables/componentNatures.config.js';
+import componentCategoriesConfig from '@/configs/tables/componentCategories.config.js';
+import componentTypesConfig from '@/configs/tables/componentTypes.config.js';
+import componentStatusesConfig from '@/configs/tables/componentStatuses.config.js';
+import componentModelsConfig from '@/configs/tables/componentModels.config.js';
+import locationTypesConfig from '@/configs/tables/locationTypes.config.js';
+import installationStatusesConfig from '@/configs/tables/installationStatuses.config.js';
+import installableTypesConfig from '@/configs/tables/installableTypes.config.js';
+
+// Old ListingsTable components - NO LONGER NEEDED!
+// All entities have been migrated to GenericListingsTable + config files
 
 /**
  * Helper function to capitalize first letter
@@ -56,17 +62,21 @@ const composableLookup = {
   installableTypes: useInstallableTypes
 };
 
-// Component lookup object
-const componentLookup = {
-  componentNatures: ComponentNatureListingsTable,
-  componentCategories: ComponentCategoryListingsTable,
-  componentTypes: ComponentTypeListingsTable,
-  componentStatuses: ComponentStatusListingsTable,
-  componentModels: ComponentModelListingsTable,
-  locationTypes: LocationTypeListingsTable,
-  installationStatuses: InstallationStatusListingsTable,
-  installableTypes: InstallableTypeListingsTable
+// Table configuration lookup (NEW!)
+const tableConfigLookup = {
+  componentNatures: componentNaturesConfig,
+  componentCategories: componentCategoriesConfig,
+  componentTypes: componentTypesConfig,
+  componentStatuses: componentStatusesConfig,
+  componentModels: componentModelsConfig,
+  locationTypes: locationTypesConfig,
+  installationStatuses: installationStatusesConfig,
+  installableTypes: installableTypesConfig
 };
+
+// Component lookup object - NO LONGER NEEDED!
+// All entities now use GenericListingsTable with config files
+// const componentLookup = { ... };
 
 // Get entity configuration from route meta
 const route = useRoute();
@@ -121,17 +131,21 @@ const handleDelete = (item) => {
   console.log('Delete item:', item);
 };
 
-// Dynamic component for ListingsTable
-const ListingsTable = computed(() => {
-  return componentLookup[entityKey];
-});
+// All entities use Generic Table now!
+const ListingsTable = GenericListingsTable;
 
-// Dynamic props for ListingsTable
-// Each ListingsTable expects different prop names (e.g., filteredNatures, filteredTypes)
+// Dynamic props for GenericListingsTable
 const listingsProps = computed(() => {
-  const propName = `filtered${capitalize(config.entityName)}`;
   return {
-    [propName]: filteredItems.value
+    config: tableConfigLookup[entityKey],
+    filteredData: filteredItems.value,
+    composableData: {
+      data: composable[config.entityName],
+      isLoading: composable.isLoading,
+      error: composable.error,
+      fetchData: composable[`fetch${capitalize(config.entityName)}`],
+      total: composable[totalCountName]
+    }
   };
 });
 
