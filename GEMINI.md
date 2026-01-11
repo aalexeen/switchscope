@@ -36,16 +36,28 @@ switchscope/
 │   ├── src/
 │   │   ├── api/                       # API client modules (axios)
 │   │   ├── components/                # Reusable Vue components
-│   │   │   └── component/             # Component-specific components
-│   │   │       └── catalog/           # Catalog UI components (Natures, Models)
+│   │   │   ├── table/                 # Generic table system components
+│   │   │   │   ├── cells/             # Cell renderer components
+│   │   │   │   ├── GenericListingsTable.vue  # Table wrapper component
+│   │   │   │   └── GenericListTable.vue      # Table row component
+│   │   │   └── common/                # Common UI components
 │   │   ├── composables/               # Vue 3 Composition API composables
+│   │   │   ├── composableFactory.js   # Factory for creating catalog composables
+│   │   │   ├── entityRegistry.js      # Catalog entity configurations
+│   │   │   └── use*.js                # Entity-specific composables
+│   │   ├── configs/                   # Configuration files
+│   │   │   └── tables/                # Table configuration system
+│   │   │       ├── tableRegistry.js   # Central table registry
+│   │   │       └── *.config.js        # Per-table configurations
 │   │   ├── plugins/                   # Vue plugins configuration
 │   │   ├── router/                    # Vue Router configuration
 │   │   ├── services/                  # Business logic services
 │   │   ├── utils/                     # Utility functions
 │   │   ├── views/                     # Page-level components (routed views)
-│   │   │   ├── catalog/               # Catalog management views
-│   │   │   ├── component/             # Component management views
+│   │   │   ├── GenericTableView.vue   # Universal table view for ALL tables
+│   │   │   ├── DashboardView.vue      # Main dashboard
+│   │   │   ├── catalog/               # Catalog views (deprecated, moved to _deprecated)
+│   │   │   ├── component/             # Component views (deprecated, moved to _deprecated)
 │   │   │   ├── installation/          # Installation tracking views
 │   │   │   ├── location/              # Location management views
 │   │   │   └── port/                  # Port management views
@@ -335,18 +347,100 @@ export default {
 }
 ```
 
-#### Component Architecture Pattern
+#### Configuration-Driven Table System
 
-**Container/Presentational Pattern** (recommended for all pages):
-1.  **PageView.vue (Container)**: Manages state, calls composables, handles events.
-2.  **ListingsTable.vue (Presentational)**: Props for data, emits events (view, edit, delete).
-3.  **ListTable.vue (Row)**: Renders single row.
+**CRITICAL**: The frontend uses a **unified, configuration-driven system** for ALL tables (catalogs and entities). This eliminates ~72% code duplication and provides consistent UI/UX.
+
+**Single Universal View**:
+- **`GenericTableView.vue`** (`frontend/src/views/`) - ONE view for ALL tables
+  - Loads configuration dynamically via `route.meta.tableKey`
+  - Handles CRUD operations uniformly
+  - Search, filtering, column visibility toggle
+  - Delete confirmation dialogs with system item protection
+
+**Configuration Structure**:
+```
+frontend/src/configs/tables/
+├── tableRegistry.js              # Central registry (tableKey → config & composable)
+├── componentNatures.config.js    # Component Natures catalog
+├── componentTypes.config.js      # Component Types catalog
+├── componentStatuses.config.js   # Component Statuses catalog
+├── componentModels.config.js     # Component Models catalog
+├── componentCategories.config.js # Component Categories catalog
+├── locationTypes.config.js       # Location Types catalog
+├── installationStatuses.config.js # Installation Statuses catalog
+├── installableTypes.config.js    # Installable Types catalog
+└── components.config.js          # Components entity
+```
+
+**Generic Components**:
+```
+frontend/src/components/table/
+├── GenericListingsTable.vue   # Wrapper (stats, refresh, column toggle)
+├── GenericListTable.vue       # Row renderer with dynamic cells
+└── cells/                     # Cell renderer components (8 types)
+    ├── CellText.vue           # Plain text
+    ├── CellCode.vue           # Monospace code
+    ├── CellIconText.vue       # Icon + text (catalogs)
+    ├── CellStatusBadge.vue    # Active/Inactive badge
+    ├── CellBooleanIcon.vue    # Boolean check/times icons
+    ├── CellBadge.vue          # Colored badges
+    └── CellActions.vue        # View/Edit/Delete icons
+```
+
+**Table Configuration Example**:
+```javascript
+// configs/tables/componentNatures.config.js
+export default {
+  entityName: 'Component Nature',
+  entityNamePlural: 'Component Natures',
+  icon: 'pi-box',
+  iconColor: 'text-blue-600',
+  composable: 'useComponentNatures',
+  searchFields: ['name', 'code', 'displayName'],
+  theme: 'indigo',
+  themeIntensity: '500',
+  columns: [
+    { key: 'name', label: 'Name', type: 'icon-text', visible: true },
+    { key: 'code', label: 'Code', type: 'code', visible: true },
+    { key: 'active', label: 'Status', type: 'status-badge', visible: true },
+    { key: 'requiresManagement', label: 'Mgmt', type: 'boolean-icon', visible: false },
+    { key: 'actions', label: 'Actions', type: 'actions', visible: true, actions: ['view', 'edit', 'delete'] }
+  ]
+};
+```
+
+**Cell Renderer Types**:
+| Type | Component | Use Case |
+|------|-----------|----------|
+| `text` | CellText | Names, descriptions |
+| `code` | CellCode | Codes, serial numbers |
+| `icon-text` | CellIconText | Catalog items with icons |
+| `status-badge` | CellStatusBadge | Active/Inactive status |
+| `boolean-icon` | CellBooleanIcon | Boolean flags |
+| `badge` | CellBadge | Categories, tags |
+| `text-truncate` | CellText | Long text with tooltip |
+| `actions` | CellActions | CRUD action buttons |
+
+**Router Integration**:
+```javascript
+{
+  path: "/catalog/component-natures",
+  component: GenericTableView,
+  meta: {
+    requiresAuth: true,
+    roles: ['USER', 'ADMIN'],
+    tableKey: 'componentNatures'  // Lookup key in tableRegistry
+  }
+}
+```
 
 #### Composables Pattern
 
 **Use Singleton Pattern** for shared data (like catalogs):
 
 ```javascript
+// Shared state OUTSIDE the composable function
 const items = ref([]);
 const isInitialized = ref(false);
 
@@ -401,7 +495,7 @@ frontend/src/
 ├── services/               # Business logic services
 ├── utils/                  # Utility functions
 ├── plugins/                # Vue plugins
-├── App.vue                 # Root component
+├── App.vue                 # Root Vue component
 └── main.js                 # Application entry point
 ```
 
@@ -466,6 +560,12 @@ This repository is optimized for use with AI agents. You have access to the foll
 4.  Create composable in `frontend/src/composables/`.
 5.  Use in Vue components.
 
+**Adding a new table to the configuration system**:
+1.  **Create table configuration** in `frontend/src/configs/tables/myEntity.config.js`.
+2.  **Register in tableRegistry** (`frontend/src/configs/tables/tableRegistry.js`).
+3.  **Add route** in `frontend/src/router/index.js` using `GenericTableView`.
+4.  **Ensure composable compatibility**: Must export standard methods (`search*`, `total*`, `delete*` singular).
+
 **Adding encrypted passwords to CSV seed data**:
 1.  Run `java -cp target/classes net.switchscope.util.PasswordEncryptionUtil` (after build) or run `main()` in IDE.
 2.  Copy generated encrypted values to CSV files.
@@ -473,7 +573,11 @@ This repository is optimized for use with AI agents. You have access to the foll
 ## Important Files
 
 - **Backend**: `backend/src/main/resources/application.yaml`, `backend/src/main/resources/db/changelog/db.changelog-master.yaml`, `backend/pom.xml`.
-- **Frontend**: `frontend/vite.config.js`, `frontend/src/api/index.js`, `frontend/src/router/index.js`.
+- **Frontend**:
+  - `frontend/vite.config.js`
+  - `frontend/src/api/index.js`
+  - `frontend/src/router/index.js`
+  - **Table System**: `frontend/src/views/GenericTableView.vue`, `frontend/src/configs/tables/tableRegistry.js`.
 - **Root**: `validate_schema.py`, `.local.props`, `.mcp.json`.
 
 ## Application URLs

@@ -6,6 +6,17 @@ import { createApiModule } from "./apiFactory";
 import blockedmacsModule from "./blockedmacs";
 import authModule from "./authentication";
 import componentsModule from "./components/components";
+import devicesModule from "./devices";
+import networkSwitchesModule from "./networkSwitches";
+import routersModule from "./routers";
+import accessPointsModule from "./accessPoints";
+import cableRunsModule from "./cableRuns";
+import connectorsModule from "./connectors";
+import patchPanelsModule from "./patchPanels";
+import racksModule from "./racks";
+import installationsModule from "./installations";
+import locationsModule from "./locations";
+import portsModule from "./ports";
 
 /**
  * API Modules Registry
@@ -18,6 +29,17 @@ export default {
     blockedmacs: blockedmacsModule(instance),
     authentication: authModule(instance),
     components: componentsModule(instance),
+    devices: devicesModule(instance),
+    networkSwitches: networkSwitchesModule(instance),
+    routers: routersModule(instance),
+    accessPoints: accessPointsModule(instance),
+    cableRuns: cableRunsModule(instance),
+    connectors: connectorsModule(instance),
+    patchPanels: patchPanelsModule(instance),
+    racks: racksModule(instance),
+    installations: installationsModule(instance),
+    locations: locationsModule(instance),
+    ports: portsModule(instance),
 
     // Standard catalog modules using factory pattern
     componentNatures: createApiModule('catalogs/component-natures')(instance),
