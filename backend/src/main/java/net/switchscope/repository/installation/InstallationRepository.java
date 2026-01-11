@@ -16,6 +16,33 @@ import java.util.UUID;
 public interface InstallationRepository extends net.switchscope.repository.BaseRepository<Installation> {
 
     /**
+     * Find all installations with all relationships eagerly loaded
+     *
+     * @return list of all installations with relationships
+     */
+    @Query("SELECT DISTINCT i FROM Installation i " +
+           "LEFT JOIN FETCH i.location " +
+           "LEFT JOIN FETCH i.component " +
+           "LEFT JOIN FETCH i.installedItemType " +
+           "LEFT JOIN FETCH i.status " +
+           "ORDER BY i.installedAt DESC")
+    List<Installation> findAllWithRelationships();
+
+    /**
+     * Find installation by ID with all relationships eagerly loaded
+     *
+     * @param id installation ID
+     * @return optional installation with relationships
+     */
+    @Query("SELECT i FROM Installation i " +
+           "LEFT JOIN FETCH i.location " +
+           "LEFT JOIN FETCH i.component " +
+           "LEFT JOIN FETCH i.installedItemType " +
+           "LEFT JOIN FETCH i.status " +
+           "WHERE i.id = :id")
+    Optional<Installation> findByIdWithRelationships(@Param("id") UUID id);
+
+    /**
      * Find installation by installed item ID
      *
      * @param installedItemId installed item ID (UUID)
