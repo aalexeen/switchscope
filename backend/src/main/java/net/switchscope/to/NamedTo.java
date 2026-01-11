@@ -18,6 +18,10 @@ public class NamedTo extends BaseTo {
     @NoHtml
     protected String name;
 
+    @Size(max = 1024)
+    @NoHtml
+    protected String description;
+
     public NamedTo(UUID id, String name) {
         super(id);
         this.name = name;
