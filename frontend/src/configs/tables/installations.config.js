@@ -21,10 +21,10 @@ export default {
   searchFields: [
     'componentName',
     'locationName',
-    'installableTypeName',
-    'installationStatusName',
+    'installedItemTypeDisplayName',
+    'statusDisplayName',
     'installedBy',
-    'notes'
+    'installationNotes'
   ],
 
   // Theme configuration (Tailwind colors)
@@ -50,7 +50,7 @@ export default {
       fallback: 'N/A'
     },
     {
-      key: 'installableTypeName',
+      key: 'installedItemTypeDisplayName',
       label: 'Installation Type',
       type: 'text',
       visible: true,
@@ -58,7 +58,7 @@ export default {
       fallback: 'N/A'
     },
     {
-      key: 'installationStatusName',
+      key: 'statusDisplayName',
       label: 'Status',
       type: 'text',
       visible: true,
@@ -66,7 +66,7 @@ export default {
       fallback: 'Unknown'
     },
     {
-      key: 'installDate',
+      key: 'installedAt',
       label: 'Install Date',
       type: 'text',
       visible: true,
@@ -77,7 +77,7 @@ export default {
       key: 'installedBy',
       label: 'Installed By',
       type: 'text',
-      visible: false,
+      visible: true,
       sortable: true,
       fallback: 'N/A'
     },
@@ -90,7 +90,7 @@ export default {
       fallback: 'N/A'
     },
     {
-      key: 'heightUnits',
+      key: 'rackUnitHeight',
       label: 'Height (U)',
       type: 'text',
       visible: false,
@@ -98,7 +98,7 @@ export default {
       fallback: 'N/A'
     },
     {
-      key: 'notes',
+      key: 'installationNotes',
       label: 'Notes',
       type: 'text-truncate',
       visible: true,

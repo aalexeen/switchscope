@@ -212,10 +212,10 @@ export const useInstallations = () => {
     return installations.value.filter(installation =>
       installation.componentName?.toLowerCase().includes(lowercaseQuery) ||
       installation.locationName?.toLowerCase().includes(lowercaseQuery) ||
-      installation.installableTypeName?.toLowerCase().includes(lowercaseQuery) ||
-      installation.installationStatusName?.toLowerCase().includes(lowercaseQuery) ||
+      installation.installedItemTypeDisplayName?.toLowerCase().includes(lowercaseQuery) ||
+      installation.statusDisplayName?.toLowerCase().includes(lowercaseQuery) ||
       installation.installedBy?.toLowerCase().includes(lowercaseQuery) ||
-      installation.notes?.toLowerCase().includes(lowercaseQuery)
+      installation.installationNotes?.toLowerCase().includes(lowercaseQuery)
     );
   };
 

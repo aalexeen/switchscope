@@ -20,12 +20,13 @@ public class InstallationService implements CrudService<Installation> {
 
     @Override
     public List<Installation> getAll() {
-        return repository.findAll();
+        return repository.findAllWithRelationships();
     }
 
     @Override
     public Installation getById(UUID id) {
-        return repository.getExisted(id);
+        return repository.findByIdWithRelationships(id)
+                .orElseThrow(() -> new IllegalArgumentException("Installation not found with id: " + id));
     }
 
     @Override
