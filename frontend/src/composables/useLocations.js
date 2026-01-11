@@ -211,12 +211,10 @@ export const useLocations = () => {
 
     return locations.value.filter(location =>
       location.name?.toLowerCase().includes(lowercaseQuery) ||
-      location.code?.toLowerCase().includes(lowercaseQuery) ||
-      location.locationTypeName?.toLowerCase().includes(lowercaseQuery) ||
+      location.typeDisplayName?.toLowerCase().includes(lowercaseQuery) ||
       location.address?.toLowerCase().includes(lowercaseQuery) ||
-      location.city?.toLowerCase().includes(lowercaseQuery) ||
-      location.country?.toLowerCase().includes(lowercaseQuery) ||
       location.parentLocationName?.toLowerCase().includes(lowercaseQuery) ||
+      location.fullPath?.toLowerCase().includes(lowercaseQuery) ||
       location.description?.toLowerCase().includes(lowercaseQuery)
     );
   };

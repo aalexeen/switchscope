@@ -211,12 +211,11 @@ export const usePorts = () => {
 
     return ports.value.filter(port =>
       port.name?.toLowerCase().includes(lowercaseQuery) ||
-      port.portNumber?.toString().toLowerCase().includes(lowercaseQuery) ||
-      port.portType?.toLowerCase().includes(lowercaseQuery) ||
-      port.speed?.toString().toLowerCase().includes(lowercaseQuery) ||
+      port.portLabel?.toLowerCase().includes(lowercaseQuery) ||
       port.deviceName?.toLowerCase().includes(lowercaseQuery) ||
-      port.macAddress?.toLowerCase().includes(lowercaseQuery) ||
+      port.connectorName?.toLowerCase().includes(lowercaseQuery) ||
       port.status?.toLowerCase().includes(lowercaseQuery) ||
+      port.operationalStatus?.toLowerCase().includes(lowercaseQuery) ||
       port.description?.toLowerCase().includes(lowercaseQuery)
     );
   };

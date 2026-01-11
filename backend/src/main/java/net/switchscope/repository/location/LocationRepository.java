@@ -16,6 +16,29 @@ import java.util.UUID;
 public interface LocationRepository extends net.switchscope.repository.BaseRepository<Location> {
 
     /**
+     * Find all locations with all relationships eagerly loaded
+     *
+     * @return list of all locations with relationships
+     */
+    @Query("SELECT DISTINCT l FROM Location l " +
+           "LEFT JOIN FETCH l.type " +
+           "LEFT JOIN FETCH l.parentLocation " +
+           "ORDER BY l.name")
+    List<Location> findAllWithRelationships();
+
+    /**
+     * Find location by ID with all relationships eagerly loaded
+     *
+     * @param id location ID
+     * @return optional location with relationships
+     */
+    @Query("SELECT l FROM Location l " +
+           "LEFT JOIN FETCH l.type " +
+           "LEFT JOIN FETCH l.parentLocation " +
+           "WHERE l.id = :id")
+    Optional<Location> findByIdWithRelationships(@Param("id") UUID id);
+
+    /**
      * Find location by name
      *
      * @param name location name
