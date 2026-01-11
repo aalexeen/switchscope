@@ -56,6 +56,116 @@ const router = createRouter({
         tableKey: 'components' // Tells GenericTableView which table config to use
       },
     },
+    {
+      path: "/devices",
+      name: "devices",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'devices' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/components/devices/switches",
+      name: "network-switches",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'networkSwitches' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/components/devices/routers",
+      name: "routers",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'routers' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/components/devices/access-points",
+      name: "access-points",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'accessPoints' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/components/connectivity/cable-runs",
+      name: "cable-runs",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'cableRuns' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/components/connectivity/connectors",
+      name: "connectors",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'connectors' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/components/connectivity/patch-panels",
+      name: "patch-panels",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'patchPanels' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/components/housing/racks",
+      name: "racks",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'racks' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/installations",
+      name: "installations",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'installations' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/locations",
+      name: "locations",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'locations' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/ports",
+      name: "ports",
+      component: GenericTableView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'ports' // Tells GenericTableView which table config to use
+      },
+    },
     // Catalog routes - all use GenericTableView with tableKey metadata
     {
       path: "/catalog/component-natures",

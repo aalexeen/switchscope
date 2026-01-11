@@ -136,7 +136,7 @@ import { RouterLink } from 'vue-router';
               All Devices
             </h3>
             <RouterLink
-              to="/components/devices"
+              to="/devices"
               class="inline-block bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600"
             >
               Open

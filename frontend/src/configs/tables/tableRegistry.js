@@ -22,6 +22,17 @@ import locationTypesConfig from './locationTypes.config.js';
 import installationStatusesConfig from './installationStatuses.config.js';
 import installableTypesConfig from './installableTypes.config.js';
 import componentsConfig from './components.config.js';
+import devicesConfig from './devices.config.js';
+import networkSwitchesConfig from './networkSwitches.config.js';
+import routersConfig from './routers.config.js';
+import accessPointsConfig from './accessPoints.config.js';
+import cableRunsConfig from './cableRuns.config.js';
+import connectorsConfig from './connectors.config.js';
+import patchPanelsConfig from './patchPanels.config.js';
+import racksConfig from './racks.config.js';
+import installationsConfig from './installations.config.js';
+import locationsConfig from './locations.config.js';
+import portsConfig from './ports.config.js';
 
 // Import all composables
 import { useComponentNatures } from '@/composables/useComponentNatures';
@@ -33,6 +44,17 @@ import { useLocationTypes } from '@/composables/useLocationTypes';
 import { useInstallationStatuses } from '@/composables/useInstallationStatuses';
 import { useInstallableTypes } from '@/composables/useInstallableTypes';
 import { useComponents } from '@/composables/useComponents';
+import { useDevices } from '@/composables/useDevices';
+import { useNetworkSwitches } from '@/composables/useNetworkSwitches';
+import { useRouters } from '@/composables/useRouters';
+import { useAccessPoints } from '@/composables/useAccessPoints';
+import { useCableRuns } from '@/composables/useCableRuns';
+import { useConnectors } from '@/composables/useConnectors';
+import { usePatchPanels } from '@/composables/usePatchPanels';
+import { useRacks } from '@/composables/useRacks';
+import { useInstallations } from '@/composables/useInstallations';
+import { useLocations } from '@/composables/useLocations';
+import { usePorts } from '@/composables/usePorts';
 
 /**
  * Table Registry
@@ -50,7 +72,18 @@ export const tableRegistry = {
   installableTypes: installableTypesConfig,
 
   // Entity tables
-  components: componentsConfig
+  components: componentsConfig,
+  devices: devicesConfig,
+  networkSwitches: networkSwitchesConfig,
+  routers: routersConfig,
+  accessPoints: accessPointsConfig,
+  cableRuns: cableRunsConfig,
+  connectors: connectorsConfig,
+  patchPanels: patchPanelsConfig,
+  racks: racksConfig,
+  installations: installationsConfig,
+  locations: locationsConfig,
+  ports: portsConfig
 };
 
 /**
@@ -69,7 +102,18 @@ export const composableRegistry = {
   installableTypes: useInstallableTypes,
 
   // Entity composables
-  components: useComponents
+  components: useComponents,
+  devices: useDevices,
+  networkSwitches: useNetworkSwitches,
+  routers: useRouters,
+  accessPoints: useAccessPoints,
+  cableRuns: useCableRuns,
+  connectors: useConnectors,
+  patchPanels: usePatchPanels,
+  racks: useRacks,
+  installations: useInstallations,
+  locations: useLocations,
+  ports: usePorts
 };
 
 /**
