@@ -20,12 +20,11 @@ export default {
   // Search configuration
   searchFields: [
     'name',
-    'portNumber',
-    'portType',
-    'speed',
+    'portLabel',
     'deviceName',
-    'macAddress',
+    'connectorName',
     'status',
+    'operationalStatus',
     'description'
   ],
 
@@ -44,15 +43,15 @@ export default {
     },
     {
       key: 'portNumber',
-      label: 'Port Number',
+      label: 'Port #',
       type: 'text',
       visible: true,
       sortable: true,
       fallback: 'N/A'
     },
     {
-      key: 'portType',
-      label: 'Type',
+      key: 'portLabel',
+      label: 'Label',
       type: 'text',
       visible: true,
       sortable: true,
@@ -64,23 +63,15 @@ export default {
       type: 'text',
       visible: true,
       sortable: true,
-      fallback: 'N/A'
+      fallback: 'Unknown'
     },
     {
-      key: 'speed',
-      label: 'Speed (Mbps)',
+      key: 'connectorName',
+      label: 'Connector',
       type: 'text',
       visible: true,
       sortable: true,
-      fallback: 'N/A'
-    },
-    {
-      key: 'enabled',
-      label: 'Enabled',
-      type: 'boolean-icon',
-      visible: true,
-      sortable: true,
-      fallback: false
+      fallback: 'None'
     },
     {
       key: 'status',
@@ -88,26 +79,26 @@ export default {
       type: 'text',
       visible: true,
       sortable: true,
-      fallback: 'Unknown'
+      fallback: 'DOWN'
     },
     {
-      key: 'macAddress',
-      label: 'MAC Address',
-      type: 'code',
-      visible: false,
-      sortable: true,
-      fallback: 'N/A'
-    },
-    {
-      key: 'vlanId',
-      label: 'VLAN ID',
+      key: 'operationalStatus',
+      label: 'Op Status',
       type: 'text',
       visible: false,
       sortable: true,
+      fallback: 'UNKNOWN'
+    },
+    {
+      key: 'speedMbps',
+      label: 'Speed (Mbps)',
+      type: 'text',
+      visible: true,
+      sortable: true,
       fallback: 'N/A'
     },
     {
-      key: 'duplex',
+      key: 'duplexMode',
       label: 'Duplex',
       type: 'text',
       visible: false,
@@ -115,12 +106,19 @@ export default {
       fallback: 'N/A'
     },
     {
-      key: 'mtu',
-      label: 'MTU',
+      key: 'portMode',
+      label: 'Mode',
       type: 'text',
       visible: false,
       sortable: true,
       fallback: 'N/A'
+    },
+    {
+      key: 'poeEnabled',
+      label: 'PoE',
+      type: 'boolean-icon',
+      visible: false,
+      sortable: true
     },
     {
       key: 'description',

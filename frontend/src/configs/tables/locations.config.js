@@ -20,12 +20,10 @@ export default {
   // Search configuration
   searchFields: [
     'name',
-    'code',
-    'locationTypeName',
+    'typeDisplayName',
     'address',
-    'city',
-    'country',
     'parentLocationName',
+    'fullPath',
     'description'
   ],
 
@@ -43,20 +41,12 @@ export default {
       sortable: true
     },
     {
-      key: 'code',
-      label: 'Code',
-      type: 'code',
-      visible: true,
-      sortable: true,
-      fallback: 'N/A'
-    },
-    {
-      key: 'locationTypeName',
+      key: 'typeDisplayName',
       label: 'Type',
       type: 'text',
       visible: true,
       sortable: true,
-      fallback: 'N/A'
+      fallback: 'Unknown'
     },
     {
       key: 'parentLocationName',
@@ -67,52 +57,50 @@ export default {
       fallback: 'None'
     },
     {
+      key: 'fullPath',
+      label: 'Full Path',
+      type: 'text',
+      visible: false,
+      sortable: true,
+      fallback: 'N/A'
+    },
+    {
       key: 'address',
       label: 'Address',
       type: 'text',
-      visible: false,
-      sortable: true,
-      fallback: 'N/A'
-    },
-    {
-      key: 'city',
-      label: 'City',
-      type: 'text',
       visible: true,
       sortable: true,
       fallback: 'N/A'
     },
     {
-      key: 'postalCode',
-      label: 'Postal Code',
+      key: 'floorNumber',
+      label: 'Floor',
       type: 'text',
       visible: false,
       sortable: true,
       fallback: 'N/A'
     },
     {
-      key: 'country',
-      label: 'Country',
-      type: 'text',
-      visible: true,
-      sortable: true,
-      fallback: 'N/A'
-    },
-    {
-      key: 'latitude',
-      label: 'Latitude',
+      key: 'roomNumber',
+      label: 'Room',
       type: 'text',
       visible: false,
       sortable: true,
       fallback: 'N/A'
     },
     {
-      key: 'longitude',
-      label: 'Longitude',
-      type: 'text',
+      key: 'hasUps',
+      label: 'UPS',
+      type: 'boolean-icon',
       visible: false,
-      sortable: true,
-      fallback: 'N/A'
+      sortable: true
+    },
+    {
+      key: 'hasGenerator',
+      label: 'Generator',
+      type: 'boolean-icon',
+      visible: false,
+      sortable: true
     },
     {
       key: 'description',

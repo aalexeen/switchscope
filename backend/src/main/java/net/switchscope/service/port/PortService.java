@@ -20,12 +20,13 @@ public class PortService implements CrudService<Port> {
 
     @Override
     public List<Port> getAll() {
-        return repository.findAll();
+        return repository.findAllWithRelationships();
     }
 
     @Override
     public Port getById(UUID id) {
-        return repository.getExisted(id);
+        return repository.findByIdWithRelationships(id)
+                .orElseThrow(() -> new IllegalArgumentException("Port not found with id: " + id));
     }
 
     @Override

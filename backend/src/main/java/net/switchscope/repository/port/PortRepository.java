@@ -17,6 +17,29 @@ import java.util.UUID;
 public interface PortRepository extends net.switchscope.repository.BaseRepository<Port> {
 
     /**
+     * Find all ports with all relationships eagerly loaded
+     *
+     * @return list of all ports with relationships
+     */
+    @Query("SELECT DISTINCT p FROM Port p " +
+           "LEFT JOIN FETCH p.device " +
+           "LEFT JOIN FETCH p.connector " +
+           "ORDER BY p.device.name, p.portNumber")
+    List<Port> findAllWithRelationships();
+
+    /**
+     * Find port by ID with all relationships eagerly loaded
+     *
+     * @param id port ID
+     * @return optional port with relationships
+     */
+    @Query("SELECT p FROM Port p " +
+           "LEFT JOIN FETCH p.device " +
+           "LEFT JOIN FETCH p.connector " +
+           "WHERE p.id = :id")
+    Optional<Port> findByIdWithRelationships(@Param("id") UUID id);
+
+    /**
      * Find port by equipment and port number
      *
      * @param equipmentId equipment ID

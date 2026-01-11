@@ -20,12 +20,13 @@ public class LocationService implements CrudService<Location> {
 
     @Override
     public List<Location> getAll() {
-        return repository.findAll();
+        return repository.findAllWithRelationships();
     }
 
     @Override
     public Location getById(UUID id) {
-        return repository.getExisted(id);
+        return repository.findByIdWithRelationships(id)
+                .orElseThrow(() -> new IllegalArgumentException("Location not found with id: " + id));
     }
 
     @Override
