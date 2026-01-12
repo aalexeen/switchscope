@@ -117,7 +117,13 @@ databaseChangeLog:
       file: fill/10-fill-component-categories-catalog.yaml
       relativeToChangelogFile: true
   - include:
+      file: fill/10a-fill-component-category-properties.yaml
+      relativeToChangelogFile: true
+  - include:
       file: fill/11-fill-component-natures-catalog.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: fill/11a-fill-component-nature-properties.yaml
       relativeToChangelogFile: true
   - include:
       file: fill/12-fill-component-statuses-catalog.yaml

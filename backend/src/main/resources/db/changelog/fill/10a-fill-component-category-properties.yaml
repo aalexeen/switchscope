@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-component-category-properties
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: false
+            tableName: component_category_properties
+            file: ../csv/10a-component-category-properties.csv
+            commentLineStartsWith: //
+            relativeToChangelogFile: true
+            columns:
+              - column:
+                  header: component_category_id
+                  name: component_category_id
+                  type: uuid
+              - column:
+                  header: property_key
+                  name: property_key
+                  type: varchar
+              - column:
+                  header: property_value
+                  name: property_value
+                  type: varchar
+      rollback:
+        - sql:
+            sql: DELETE FROM component_category_properties;

@@ -50,36 +50,6 @@ export default {
       type: 'status-badge',
       visible: true
     },
-    // Category Type is determined by multiple boolean flags (housingCategory, connectivityCategory, etc.)
-    // For now, we'll hide this column and show it in extended mode via boolean flags
-    {
-      key: 'housingCategory',
-      label: 'Housing',
-      type: 'boolean-icon',
-      visible: false,
-      align: 'center'
-    },
-    {
-      key: 'connectivityCategory',
-      label: 'Connectivity',
-      type: 'boolean-icon',
-      visible: false,
-      align: 'center'
-    },
-    {
-      key: 'supportCategory',
-      label: 'Support',
-      type: 'boolean-icon',
-      visible: false,
-      align: 'center'
-    },
-    {
-      key: 'moduleCategory',
-      label: 'Module',
-      type: 'boolean-icon',
-      visible: false,
-      align: 'center'
-    },
     {
       key: 'systemCategory',
       label: 'System',
@@ -100,6 +70,28 @@ export default {
       type: 'text-truncate',
       visible: true,
       maxWidth: 'max-w-xs'
+    },
+    {
+      key: 'colorClass',
+      label: 'Color Class',
+      type: 'text',
+      visible: false,
+      sortable: false
+    },
+    {
+      key: 'iconClass',
+      label: 'Icon Class',
+      type: 'text',
+      visible: false,
+      sortable: false
+    },
+    {
+      key: 'sortOrder',
+      label: 'Sort Order',
+      type: 'text',
+      visible: false,
+      sortable: true,
+      align: 'center'
     },
     {
       key: 'actions',
