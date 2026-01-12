@@ -125,6 +125,28 @@ export default {
       maxWidth: 'max-w-xs'          // 20rem max width
     },
     {
+      key: 'colorClass',
+      label: 'Color Class',
+      type: 'text',
+      visible: false,
+      sortable: false
+    },
+    {
+      key: 'iconClass',
+      label: 'Icon Class',
+      type: 'text',
+      visible: false,
+      sortable: false
+    },
+    {
+      key: 'sortOrder',
+      label: 'Sort Order',
+      type: 'text',
+      visible: false,
+      sortable: true,
+      align: 'center'
+    },
+    {
       key: 'actions',
       label: 'Actions',
       type: 'actions',              // Action buttons (view/edit/delete)

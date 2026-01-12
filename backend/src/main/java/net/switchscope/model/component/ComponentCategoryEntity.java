@@ -90,19 +90,19 @@ public class ComponentCategoryEntity extends UIStyledEntity {
 
     // Business logic methods
     public boolean isHousingCategory() {
-        return "housing".equals(getCode());
+        return "housing".equalsIgnoreCase(getCode());
     }
 
     public boolean isConnectivityCategory() {
-        return "connectivity".equals(getCode());
+        return "connectivity".equalsIgnoreCase(getCode());
     }
 
     public boolean isSupportCategory() {
-        return "support".equals(getCode());
+        return "support".equalsIgnoreCase(getCode());
     }
 
     public boolean isModuleCategory() {
-        return "module".equals(getCode());
+        return "module".equalsIgnoreCase(getCode());
     }
 
     /**

@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-component-nature-properties
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: false
+            tableName: component_nature_properties
+            file: ../csv/11a-component-nature-properties.csv
+            commentLineStartsWith: //
+            relativeToChangelogFile: true
+            columns:
+              - column:
+                  header: component_nature_id
+                  name: component_nature_id
+                  type: uuid
+              - column:
+                  header: property_key
+                  name: property_key
+                  type: varchar
+              - column:
+                  header: property_value
+                  name: property_value
+                  type: varchar
+      rollback:
+        - sql:
+            sql: DELETE FROM component_nature_properties;
