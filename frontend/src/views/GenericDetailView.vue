@@ -109,6 +109,30 @@
           </div>
         </div>
 
+        <!-- Workflow / Status Transitions Section -->
+        <div v-if="config.sections?.workflow && hasTransitions" class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <i class="pi pi-arrow-right-arrow-left mr-2 text-purple-500"></i>
+            {{ config.sections.workflow.title || 'Workflow Transitions' }}
+          </h2>
+
+          <div class="space-y-4">
+            <!-- Next Possible Statuses -->
+            <div v-if="item.nextPossibleStatusCodes && item.nextPossibleStatusCodes.length > 0">
+              <h3 class="text-sm font-medium text-gray-700 mb-2">Can transition to:</h3>
+              <RelatedItemsBadges
+                :items="item.nextPossibleStatusCodes"
+                icon="pi-arrow-right"
+                theme="purple"
+                empty-message="No transitions available"
+              />
+            </div>
+            <div v-else>
+              <p class="text-sm text-gray-500 italic">No transition rules defined</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Containment Rules Section -->
         <div v-if="config.sections?.containment && hasContainmentRules" class="bg-white rounded-lg shadow p-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">
@@ -238,6 +262,13 @@ const hasProperties = computed(() => {
 const sortedProperties = computed(() => {
   if (!hasProperties.value) return [];
   return Object.entries(item.value.properties).sort(([a], [b]) => a.localeCompare(b));
+});
+
+const hasTransitions = computed(() => {
+  return (
+    item.value?.nextPossibleStatusCodes &&
+    Array.isArray(item.value.nextPossibleStatusCodes)
+  );
 });
 
 const hasContainmentRules = computed(() => {

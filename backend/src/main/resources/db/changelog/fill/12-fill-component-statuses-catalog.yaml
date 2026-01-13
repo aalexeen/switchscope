@@ -90,7 +90,7 @@ databaseChangeLog:
             sql: DELETE FROM component_statuses_catalog;
 
   - changeSet:
-      id: fill-component-status-transitions
+      id: fill-component-status-allowed-transitions
       author: AALEXEEN
       changes:
         - loadData:
@@ -98,20 +98,20 @@ databaseChangeLog:
             separator: ;
             quotchar: ''''
             usePreparedStatements: false
-            tableName: component_status_transitions
+            tableName: component_status_allowed_transitions
             file: ../csv/12-component-status-transitions.csv
             commentLineStartsWith: //
             relativeToChangelogFile: true
             columns:
               - column:
-                  header: from_status_id
-                  name: from_status_id
+                  header: component_status_id
+                  name: component_status_id
                   type: uuid
               - column:
-                  header: to_status_id
-                  name: to_status_id
-                  type: uuid
+                  header: to_status_code
+                  name: to_status_code
+                  type: varchar
       rollback:
         - sql:
-            sql: DELETE FROM component_status_transitions;
+            sql: DELETE FROM component_status_allowed_transitions;
 

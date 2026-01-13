@@ -129,6 +129,9 @@ databaseChangeLog:
       file: fill/12-fill-component-statuses-catalog.yaml
       relativeToChangelogFile: true
   - include:
+      file: fill/12a-fill-component-status-properties.yaml
+      relativeToChangelogFile: true
+  - include:
       file: fill/13-fill-component-types-catalog.yaml
       relativeToChangelogFile: true
   - include:

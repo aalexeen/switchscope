@@ -124,52 +124,39 @@ databaseChangeLog:
                   descending: false
 
   - changeSet:
-      id: create-component-status-transitions
+      id: create-component-status-allowed-transitions
       author: AALEXEEN
       changes:
         - createTable:
-            tableName: component_status_transitions
+            tableName: component_status_allowed_transitions
             columns:
               - column:
-                  name: from_status_id
+                  name: component_status_id
                   type: UUID
                   constraints:
                     nullable: false
               - column:
-                  name: to_status_id
-                  type: UUID
+                  name: to_status_code
+                  type: VARCHAR(64)
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:
-            baseTableName: component_status_transitions
-            baseColumnNames: from_status_id
-            constraintName: fk_component_status_transition_from
-            referencedTableName: component_statuses_catalog
-            referencedColumnNames: id
-            onDelete: CASCADE
-        - addForeignKeyConstraint:
-            baseTableName: component_status_transitions
-            baseColumnNames: to_status_id
-            constraintName: fk_component_status_transition_to
+            baseTableName: component_status_allowed_transitions
+            baseColumnNames: component_status_id
+            constraintName: fk_component_status_allowed_transition
             referencedTableName: component_statuses_catalog
             referencedColumnNames: id
             onDelete: CASCADE
         - addUniqueConstraint:
-            tableName: component_status_transitions
-            columnNames: from_status_id, to_status_id
-            constraintName: uq_component_status_transition_pair
+            tableName: component_status_allowed_transitions
+            columnNames: component_status_id, to_status_code
+            constraintName: uq_component_status_allowed_transition_pair
         - createIndex:
-            tableName: component_status_transitions
-            indexName: idx_component_status_transition_from
+            tableName: component_status_allowed_transitions
+            indexName: idx_component_status_allowed_transition
             columns:
               - column:
-                  name: from_status_id
-        - createIndex:
-            tableName: component_status_transitions
-            indexName: idx_component_status_transition_to
-            columns:
-              - column:
-                  name: to_status_id
+                  name: component_status_id
 
   - changeSet:
       id: create-component-status-properties
