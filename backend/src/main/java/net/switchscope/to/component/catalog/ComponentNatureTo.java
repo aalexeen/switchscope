@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import net.switchscope.validation.NoHtml;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -30,6 +32,9 @@ public class ComponentNatureTo extends UIStyledTo {
     @Size(max = 64)
     @NoHtml
     private String powerConsumptionCategory = "none";
+
+    // Custom properties for extensibility
+    private Map<String, String> properties = new HashMap<>();
 
     public ComponentNatureTo(UUID id, String name, String code, String displayName) {
         super(id, name, code, displayName);

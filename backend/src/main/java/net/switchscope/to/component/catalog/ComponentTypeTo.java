@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -90,6 +92,9 @@ public class ComponentTypeTo extends UIStyledTo {
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Boolean canBeDeleted;
+
+    // Custom properties for extensibility
+    private Map<String, String> properties = new HashMap<>();
 
     public ComponentTypeTo(UUID id, String name, String code, String displayName) {
         super(id, name, code, displayName);

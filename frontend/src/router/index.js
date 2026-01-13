@@ -12,6 +12,8 @@ import Login from "@/views/Login.vue";
 import Registration from "@/views/Registration.vue";
 // Universal Generic Table View - handles ALL table pages (catalogs + entities)
 import GenericTableView from "@/views/GenericTableView.vue";
+// Universal Generic Detail View - handles ALL detail pages
+import GenericDetailView from "@/views/GenericDetailView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -178,6 +180,16 @@ const router = createRouter({
       },
     },
     {
+      path: "/catalog/component-natures/:id",
+      name: "component-nature-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        detailKey: 'componentNature'
+      },
+    },
+    {
       path: "/catalog/component-categories",
       name: "component-categories",
       component: GenericTableView,
@@ -188,6 +200,16 @@ const router = createRouter({
       },
     },
     {
+      path: "/catalog/component-categories/:id",
+      name: "component-category-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        detailKey: 'componentCategory'
+      },
+    },
+    {
       path: "/catalog/component-types",
       name: "component-types",
       component: GenericTableView,
@@ -195,6 +217,16 @@ const router = createRouter({
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
         tableKey: 'componentTypes'
+      },
+    },
+    {
+      path: "/catalog/component-types/:id",
+      name: "component-type-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        detailKey: 'componentType'
       },
     },
     {

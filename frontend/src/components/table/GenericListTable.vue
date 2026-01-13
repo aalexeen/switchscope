@@ -1,7 +1,9 @@
 <script setup>
+import { ref } from 'vue';
 import * as CellComponents from './cells';
+import ExpandedRowContent from './ExpandedRowContent.vue';
 
-defineProps({
+const props = defineProps({
   item: {
     type: Object,
     required: true
@@ -18,6 +20,12 @@ defineProps({
 
 defineEmits(['view', 'edit', 'delete']);
 
+const isExpanded = ref(false);
+
+const toggleExpand = () => {
+  isExpanded.value = !isExpanded.value;
+};
+
 /**
  * Get the appropriate cell component based on column type
  * @param {string} columnType - The type of column (text, code, icon-text, etc.)
@@ -33,6 +41,7 @@ const getCellComponent = (columnType) => {
     'badge': CellComponents.CellBadge,
     'text-badge': CellComponents.CellBadge,
     'text-truncate': CellComponents.CellText,
+    'expand': CellComponents.CellExpand,
     'actions': CellComponents.CellActions
   };
   return componentMap[columnType] || CellComponents.CellText;
@@ -65,10 +74,17 @@ const getColumnValue = (item, key) => {
         :value="getColumnValue(item, col.key)"
         :item="item"
         :config="col"
+        :is-expanded="isExpanded"
+        @toggle="toggleExpand"
         @view="$emit('view', item)"
         @edit="$emit('edit', item)"
         @delete="$emit('delete', item)"
       />
+    </td>
+  </tr>
+  <tr v-if="isExpanded" class="border-t-0">
+    <td :colspan="visibleColumns.length" class="p-0">
+      <ExpandedRowContent :item="item" />
     </td>
   </tr>
 </template>

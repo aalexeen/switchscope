@@ -43,7 +43,7 @@ public class ComponentNatureEntity extends UIStyledEntity {
     @NoHtml
     private String powerConsumptionCategory = "none"; // none, low, medium, high, variable
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "component_nature_properties",
                     joinColumns = @JoinColumn(name = "component_nature_id"))
     @MapKeyColumn(name = "property_key")

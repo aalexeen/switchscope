@@ -1,0 +1,82 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-component-type-properties
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: false
+            tableName: component_type_properties
+            file: ../csv/13a-component-type-properties.csv
+            commentLineStartsWith: //
+            relativeToChangelogFile: true
+            columns:
+              - column:
+                  header: component_type_id
+                  name: component_type_id
+                  type: uuid
+              - column:
+                  header: property_key
+                  name: property_key
+                  type: varchar
+              - column:
+                  header: property_value
+                  name: property_value
+                  type: varchar
+      rollback:
+        - sql:
+            sql: DELETE FROM component_type_properties;
+
+  - changeSet:
+      id: fill-component-type-allowed-child-types
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: false
+            tableName: component_type_allowed_child_types
+            file: ../csv/13b-component-type-allowed-child-types.csv
+            commentLineStartsWith: //
+            relativeToChangelogFile: true
+            columns:
+              - column:
+                  header: parent_type_id
+                  name: parent_type_id
+                  type: uuid
+              - column:
+                  header: child_type_code
+                  name: child_type_code
+                  type: varchar
+      rollback:
+        - sql:
+            sql: DELETE FROM component_type_allowed_child_types;
+
+  - changeSet:
+      id: fill-component-type-allowed-child-categories
+      author: AALEXEEN
+      changes:
+        - loadData:
+            encoding: UTF-8
+            separator: ;
+            quotchar: ''''
+            usePreparedStatements: false
+            tableName: component_type_allowed_child_categories
+            file: ../csv/13c-component-type-allowed-child-categories.csv
+            commentLineStartsWith: //
+            relativeToChangelogFile: true
+            columns:
+              - column:
+                  header: parent_type_id
+                  name: parent_type_id
+                  type: uuid
+              - column:
+                  header: child_category_code
+                  name: child_category_code
+                  type: varchar
+      rollback:
+        - sql:
+            sql: DELETE FROM component_type_allowed_child_categories;

@@ -14,6 +14,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(config = MapStructConfig.class)
 public interface ComponentNatureMapper extends BaseMapper<ComponentNatureEntity, ComponentNatureTo> {
 
+    @Mapping(target = "properties", source = "properties")
     @Override
     ComponentNatureTo toTo(ComponentNatureEntity entity);
 

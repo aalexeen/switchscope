@@ -132,6 +132,9 @@ databaseChangeLog:
       file: fill/13-fill-component-types-catalog.yaml
       relativeToChangelogFile: true
   - include:
+      file: fill/13a-fill-component-type-additional-tables.yaml
+      relativeToChangelogFile: true
+  - include:
       file: fill/20-fill-location-types-catalog.yaml
       relativeToChangelogFile: true
   - include:

@@ -23,6 +23,14 @@ export default {
 
   columns: [
     {
+      key: 'expand',
+      label: '',
+      type: 'expand',
+      visible: true,
+      sortable: false,
+      align: 'center'
+    },
+    {
       key: 'name',
       label: 'Name',
       type: 'icon-text',

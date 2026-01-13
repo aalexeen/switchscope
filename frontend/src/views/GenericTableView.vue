@@ -13,7 +13,7 @@
  */
 
 import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import GenericSearchBar from '@/components/common/GenericSearchBar.vue';
 import GenericListingsTable from '@/components/table/GenericListingsTable.vue';
@@ -45,6 +45,7 @@ const formatFieldName = (field) => {
 
 // Get table configuration from route meta
 const route = useRoute();
+const router = useRouter();
 const tableKey = route.meta.tableKey;
 
 if (!tableKey) {
@@ -106,8 +107,13 @@ const clearSearch = () => {
 const toast = useToast();
 
 const handleView = (item) => {
-  // TODO: Implement view details modal or navigate to details page
-  toast.info(`View details for: ${item.name}`);
+  // Navigate to detail view if route exists
+  if (config.routes?.view) {
+    const viewPath = config.routes.view.replace(':id', item.id);
+    router.push(viewPath);
+  } else {
+    toast.warning('Detail view not available for this table');
+  }
 };
 
 const handleEdit = (item) => {

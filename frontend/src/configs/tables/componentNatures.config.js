@@ -38,6 +38,14 @@ export default {
   // Each column defines how data should be displayed and what features are available
   columns: [
     {
+      key: 'expand',
+      label: '',
+      type: 'expand',              // Expandable row toggle
+      visible: true,
+      sortable: false,
+      align: 'center'
+    },
+    {
       key: 'name',
       label: 'Name',
       type: 'icon-text',           // Display with icon and text
