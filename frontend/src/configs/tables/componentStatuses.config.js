@@ -23,6 +23,14 @@ export default {
 
   columns: [
     {
+      key: 'expand',
+      label: '',
+      type: 'expand',
+      visible: true,
+      sortable: false,
+      align: 'center'
+    },
+    {
       key: 'name',
       label: 'Name',
       type: 'icon-text',
@@ -90,11 +98,54 @@ export default {
       align: 'center'
     },
     {
+      key: 'canAcceptInstallations',
+      label: 'Can Accept Installations',
+      type: 'boolean-icon',
+      visible: false,
+      align: 'center'
+    },
+    {
+      key: 'inTransition',
+      label: 'In Transition',
+      type: 'boolean-icon',
+      visible: false,
+      align: 'center'
+    },
+    {
+      key: 'canBeReserved',
+      label: 'Can Be Reserved',
+      type: 'boolean-icon',
+      visible: false,
+      align: 'center'
+    },
+    {
       key: 'description',
       label: 'Description',
       type: 'text-truncate',
       visible: true,
       maxWidth: 'max-w-xs'
+    },
+    {
+      key: 'colorClass',
+      label: 'Color Class',
+      type: 'text',
+      visible: false,
+      sortable: false
+    },
+    {
+      key: 'iconClass',
+      label: 'Icon Class',
+      type: 'text',
+      visible: false,
+      sortable: false
+    },
+    {
+      key: 'sortOrder',
+      label: 'Sort Order',
+      type: 'text',
+      visible: false,
+      sortable: true,
+      align: 'center'
     },
     {
       key: 'actions',

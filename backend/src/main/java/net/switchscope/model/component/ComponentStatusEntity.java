@@ -50,14 +50,14 @@ public class ComponentStatusEntity extends UIStyledEntity {
     @Column(name = "can_be_reserved", nullable = false)
     private boolean canBeReserved = false;
 
-    // Next possible statuses (many-to-many relationship)
-    @ManyToMany
-    @JoinTable(name = "component_status_transitions",
-               joinColumns = @JoinColumn(name = "from_status_id"),
-               inverseJoinColumns = @JoinColumn(name = "to_status_id"))
-    private Set<ComponentStatusEntity> nextPossibleStatuses = new HashSet<>();
+    // Next possible status codes (stored as codes, not entity references)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "component_status_allowed_transitions",
+                    joinColumns = @JoinColumn(name = "component_status_id"))
+    @Column(name = "to_status_code")
+    private Set<String> nextPossibleStatusCodes = new HashSet<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "component_status_properties",
                     joinColumns = @JoinColumn(name = "component_status_id"))
     @MapKeyColumn(name = "property_key")
@@ -109,35 +109,33 @@ public class ComponentStatusEntity extends UIStyledEntity {
     }
 
     /**
-     * Add next possible status
+     * Add next possible status code
      */
-    public void addNextPossibleStatus(ComponentStatusEntity status) {
-        if (status != null) {
-            nextPossibleStatuses.add(status);
+    public void addNextPossibleStatusCode(String statusCode) {
+        if (statusCode != null && !statusCode.trim().isEmpty()) {
+            nextPossibleStatusCodes.add(statusCode);
         }
     }
 
     /**
-     * Remove next possible status
+     * Remove next possible status code
      */
-    public void removeNextPossibleStatus(ComponentStatusEntity status) {
-        nextPossibleStatuses.remove(status);
+    public void removeNextPossibleStatusCode(String statusCode) {
+        nextPossibleStatusCodes.remove(statusCode);
     }
 
     /**
      * Check if transition to another status is allowed
      */
-    public boolean canTransitionTo(ComponentStatusEntity status) {
-        return nextPossibleStatuses.contains(status);
+    public boolean canTransitionTo(String statusCode) {
+        return nextPossibleStatusCodes.contains(statusCode);
     }
 
     /**
      * Get next possible status codes
      */
     public Set<String> getNextPossibleStatusCodes() {
-        return nextPossibleStatuses.stream()
-                .map(ComponentStatusEntity::getCode)
-                .collect(java.util.stream.Collectors.toSet());
+        return new HashSet<>(nextPossibleStatusCodes);
     }
 
     /**

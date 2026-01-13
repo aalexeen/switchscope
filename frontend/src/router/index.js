@@ -240,6 +240,16 @@ const router = createRouter({
       },
     },
     {
+      path: "/catalog/component-statuses/:id",
+      name: "component-status-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        detailKey: 'componentStatus'
+      },
+    },
+    {
       path: "/catalog/component-models",
       name: "component-models",
       component: GenericTableView,

@@ -7,7 +7,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import net.switchscope.validation.NoHtml;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,8 +42,8 @@ public class ComponentStatusTo extends UIStyledTo {
 
     private Boolean canBeReserved = false;
 
-    // Next possible status IDs for workflow
-    private Set<UUID> nextPossibleStatusIds = new HashSet<>();
+    // Custom properties for extensibility
+    private Map<String, String> properties = new HashMap<>();
 
     // Read-only: next possible status codes
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)

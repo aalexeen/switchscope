@@ -309,12 +309,13 @@ public abstract class Component extends NamedEntity {
 
     // Status transition
     public boolean canTransitionToStatus(ComponentStatusEntity newStatus) {
-        return componentStatus != null && componentStatus.canTransitionTo(newStatus);
+        return newStatus != null && componentStatus != null &&
+               componentStatus.canTransitionTo(newStatus.getCode());
     }
 
-    public List<ComponentStatusEntity> getNextPossibleStatuses() {
+    public List<String> getNextPossibleStatusCodes() {
         if (componentStatus != null) {
-            return new ArrayList<>(componentStatus.getNextPossibleStatuses());
+            return new ArrayList<>(componentStatus.getNextPossibleStatusCodes());
         }
         return new ArrayList<>();
     }
