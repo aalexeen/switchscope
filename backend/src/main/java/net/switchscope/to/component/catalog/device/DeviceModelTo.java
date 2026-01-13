@@ -33,7 +33,6 @@ public abstract class DeviceModelTo extends ComponentModelTo {
     private String series;
 
     // Power specifications
-    @NotNull
     @Min(1)
     private Integer powerConsumptionWatts;
 

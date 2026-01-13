@@ -36,8 +36,7 @@ public abstract class DeviceModel extends ComponentModel {
     private String series;
 
     // Power specifications (device-specific)
-    @Column(name = "power_consumption_watts", nullable = false)
-    @NotNull
+    @Column(name = "power_consumption_watts")
     @Min(1)
     private Integer powerConsumptionWatts;
 
@@ -77,7 +76,7 @@ public abstract class DeviceModel extends ComponentModel {
     private Integer noiseLevelDb;
 
     // Additional device specifications as key-value pairs
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "device_model_specifications",
                     joinColumns = @JoinColumn(name = "device_model_id"))
     @MapKeyColumn(name = "spec_name")
@@ -108,15 +107,30 @@ public abstract class DeviceModel extends ComponentModel {
     }
 
     public String getPowerSummary() {
+        if (powerConsumptionWatts == null && maxPowerConsumptionWatts == null && !redundantPowerSupply) {
+            return null;
+        }
+
         StringBuilder power = new StringBuilder();
-        power.append(powerConsumptionWatts).append("W");
+
+        if (powerConsumptionWatts != null) {
+            power.append(powerConsumptionWatts).append("W");
+        }
 
         if (maxPowerConsumptionWatts != null) {
-            power.append(" (max ").append(maxPowerConsumptionWatts).append("W)");
+            if (power.length() > 0) {
+                power.append(" (max ").append(maxPowerConsumptionWatts).append("W)");
+            } else {
+                power.append("max ").append(maxPowerConsumptionWatts).append("W");
+            }
         }
 
         if (redundantPowerSupply) {
-            power.append(", Redundant PSU");
+            if (power.length() > 0) {
+                power.append(", Redundant PSU");
+            } else {
+                power.append("Redundant PSU");
+            }
         }
 
         return power.toString();
@@ -140,12 +154,13 @@ public abstract class DeviceModel extends ComponentModel {
             return false;
         }
 
-        if (powerConsumptionWatts == null || powerConsumptionWatts <= 0) {
+        // Validate power consumption if provided
+        if (powerConsumptionWatts != null && powerConsumptionWatts <= 0) {
             return false;
         }
 
-        // Validate power consumption
-        if (maxPowerConsumptionWatts != null &&
+        // Validate power consumption range
+        if (powerConsumptionWatts != null && maxPowerConsumptionWatts != null &&
             maxPowerConsumptionWatts < powerConsumptionWatts) {
             return false;
         }

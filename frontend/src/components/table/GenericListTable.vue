@@ -49,11 +49,16 @@ const getCellComponent = (columnType) => {
 
 /**
  * Get the value for a column from the item
+ * Supports nested paths like 'componentType.displayName'
  * @param {Object} item - The data item
- * @param {string} key - The column key
+ * @param {string} key - The column key (supports dot notation)
  * @returns {*} - The value to display
  */
 const getColumnValue = (item, key) => {
+  // Support nested paths like 'componentType.displayName'
+  if (key.includes('.')) {
+    return key.split('.').reduce((obj, prop) => obj?.[prop], item);
+  }
   return item[key];
 };
 </script>

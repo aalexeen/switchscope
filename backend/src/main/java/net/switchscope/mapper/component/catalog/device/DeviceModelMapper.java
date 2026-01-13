@@ -27,6 +27,8 @@ public interface DeviceModelMapper<E extends DeviceModel, T extends DeviceModelT
     @Mapping(target = "managementSummary", expression = "java(entity.getManagementSummary())")
     @Mapping(target = "powerSummary", expression = "java(entity.getPowerSummary())")
     @Mapping(target = "deviceTypeSummary", expression = "java(entity.getDeviceTypeSummary())")
+    // Device specifications map - DO NOT ignore for Entity -> TO
+    @Mapping(target = "deviceSpecs", source = "deviceSpecs")
     @Override
     T toTo(E entity);
 
