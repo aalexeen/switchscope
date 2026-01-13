@@ -14,6 +14,8 @@ import Registration from "@/views/Registration.vue";
 import GenericTableView from "@/views/GenericTableView.vue";
 // Universal Generic Detail View - handles ALL detail pages
 import GenericDetailView from "@/views/GenericDetailView.vue";
+// Specialized Component Model Detail View
+import ComponentModelDetailView from "@/views/ComponentModelDetailView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -257,6 +259,15 @@ const router = createRouter({
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
         tableKey: 'componentModels'
+      },
+    },
+    {
+      path: "/catalog/component-models/:id",
+      name: "component-model-detail",
+      component: ComponentModelDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN']
       },
     },
     {

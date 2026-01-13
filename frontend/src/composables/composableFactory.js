@@ -105,7 +105,19 @@ export function createEntityComposable(config) {
     };
 
     /**
+     * Get nested value from object using dot notation
+     * @param {Object} obj - Source object
+     * @param {string} path - Path like 'componentType.displayName'
+     * @returns {*} Value at path or undefined
+     */
+    const getNestedValue = (obj, path) => {
+      if (!path.includes('.')) return obj[path];
+      return path.split('.').reduce((current, prop) => current?.[prop], obj);
+    };
+
+    /**
      * Search entities by query
+     * Supports nested paths in searchFields like 'componentType.displayName'
      * @param {string} query - Search query
      * @returns {Array} Filtered entities
      */
@@ -118,8 +130,8 @@ export function createEntityComposable(config) {
 
       return entities.value.filter(entity => {
         return searchFields.some(field => {
-          const value = entity[field];
-          return value && value.toLowerCase().includes(searchTerm);
+          const value = getNestedValue(entity, field);
+          return value && String(value).toLowerCase().includes(searchTerm);
         });
       });
     };
