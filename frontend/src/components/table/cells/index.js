@@ -11,4 +11,5 @@ export { default as CellIconText } from './CellIconText.vue';
 export { default as CellStatusBadge } from './CellStatusBadge.vue';
 export { default as CellBooleanIcon } from './CellBooleanIcon.vue';
 export { default as CellBadge } from './CellBadge.vue';
+export { default as CellExpand } from './CellExpand.vue';
 export { default as CellActions } from './CellActions.vue';

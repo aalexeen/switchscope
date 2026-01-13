@@ -6,7 +6,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -20,6 +22,9 @@ public class ComponentCategoryTo extends UIStyledTo {
     private Boolean systemCategory = false;
 
     private Boolean infrastructure = false;
+
+    // Custom properties for extensibility
+    private Map<String, String> properties = new HashMap<>();
 
     // Read-only: list of component type IDs in this category
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)

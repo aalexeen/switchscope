@@ -83,20 +83,20 @@ public class ComponentTypeEntity extends UIStyledEntity {
     private Integer typicalLifespanYears;
 
     // Containment rules (for housing components)
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "component_type_allowed_child_types",
                     joinColumns = @JoinColumn(name = "parent_type_id"))
     @Column(name = "child_type_code")
     private Set<String> allowedChildTypeCodes = new HashSet<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "component_type_allowed_child_categories",
                     joinColumns = @JoinColumn(name = "parent_type_id"))
     @Column(name = "child_category_code")
     private Set<String> allowedChildCategoryCodes = new HashSet<>();
 
     // Custom properties for extensibility
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "component_type_properties",
                     joinColumns = @JoinColumn(name = "component_type_id"))
     @MapKeyColumn(name = "property_key")

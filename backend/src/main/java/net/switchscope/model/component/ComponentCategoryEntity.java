@@ -31,7 +31,7 @@ public class ComponentCategoryEntity extends UIStyledEntity {
     private List<ComponentTypeEntity> componentTypes = new ArrayList<>();
 
     // Custom properties for extensibility
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "component_category_properties",
                     joinColumns = @JoinColumn(name = "component_category_id"))
     @MapKeyColumn(name = "property_key")

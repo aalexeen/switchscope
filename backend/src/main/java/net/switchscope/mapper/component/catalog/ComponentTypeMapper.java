@@ -14,6 +14,9 @@ import org.mapstruct.MappingTarget;
 @Mapper(config = MapStructConfig.class)
 public interface ComponentTypeMapper extends BaseMapper<ComponentTypeEntity, ComponentTypeTo> {
 
+    @Mapping(target = "properties", source = "properties")
+    @Mapping(target = "allowedChildTypeCodes", source = "allowedChildTypeCodes")
+    @Mapping(target = "allowedChildCategoryCodes", source = "allowedChildCategoryCodes")
     @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "categoryCode", source = "category.code")
     @Mapping(target = "categoryDisplayName", source = "category.displayName")

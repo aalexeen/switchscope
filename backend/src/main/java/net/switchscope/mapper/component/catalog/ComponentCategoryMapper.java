@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @Mapper(config = MapStructConfig.class)
 public interface ComponentCategoryMapper extends BaseMapper<ComponentCategoryEntity, ComponentCategoryTo> {
 
+    @Mapping(target = "properties", source = "properties")
     @Mapping(target = "componentTypeIds", source = "componentTypes", qualifiedByName = "componentTypesToIds")
     @Mapping(target = "componentTypeCount", expression = "java(entity.getComponentTypes().size())")
     @Mapping(target = "hasActiveComponentTypes", expression = "java(entity.hasActiveComponentTypes())")
