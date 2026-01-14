@@ -52,7 +52,7 @@ public interface CableRunMapper extends ComponentMapper<CableRun, CableRunTo> {
     @Mapping(target = "pointToPoint", expression = "java(entity.isPointToPoint())")
     @Mapping(target = "multiPoint", expression = "java(entity.isMultiPoint())")
     @Mapping(target = "orderedLocationPath", expression = "java(entity.getOrderedLocationPath())")
-    @Mapping(target = "connectorCount", expression = "java(entity.getConnectors().size())")
+    @Mapping(target = "connectorCount", expression = "java(entity.getConnectors() != null ? entity.getConnectors().size() : 0)")
     @Override
     CableRunTo toTo(CableRun entity);
 
@@ -95,6 +95,7 @@ public interface CableRunMapper extends ComponentMapper<CableRun, CableRunTo> {
     default List<UUID> locationsToIds(List<Location> locations) {
         if (locations == null) return new ArrayList<>();
         return locations.stream()
+                .filter(loc -> loc != null)
                 .map(Location::getId)
                 .collect(Collectors.toList());
     }
@@ -103,6 +104,7 @@ public interface CableRunMapper extends ComponentMapper<CableRun, CableRunTo> {
     default List<UUID> connectorsToIds(List<Connector> connectors) {
         if (connectors == null) return new ArrayList<>();
         return connectors.stream()
+                .filter(conn -> conn != null)
                 .map(Connector::getId)
                 .collect(Collectors.toList());
     }

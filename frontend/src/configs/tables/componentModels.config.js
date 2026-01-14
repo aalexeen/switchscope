@@ -17,7 +17,7 @@ export default {
 
   composable: 'useComponentModels',
 
-  searchFields: ['name', 'manufacturer', 'modelNumber', 'modelDesignation', 'partNumber', 'sku', 'description', 'componentType.code', 'componentType.displayName'],
+  searchFields: ['name', 'manufacturer', 'modelNumber', 'modelDesignation', 'partNumber', 'sku', 'description', 'componentTypeCode', 'componentTypeDisplayName'],
   theme: 'indigo',
   themeIntensity: '500',
 
@@ -41,7 +41,7 @@ export default {
       visible: true
     },
     {
-      key: 'componentType.displayName',
+      key: 'componentTypeDisplayName',
       label: 'Type',
       type: 'text',
       visible: true,

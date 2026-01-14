@@ -19,12 +19,9 @@ public class CableRunService implements CrudService<CableRun> {
     private final ConnectivityRepository repository;
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<CableRun> getAll() {
-        // TODO: filter by type
-        return repository.findAll().stream()
-                .filter(c -> c instanceof CableRun)
-                .map(c -> (CableRun) c)
-                .toList();
+        return (List<CableRun>) (List<?>) repository.findCableRuns();
     }
 
     @Override

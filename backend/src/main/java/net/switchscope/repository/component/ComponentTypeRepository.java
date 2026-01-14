@@ -207,4 +207,15 @@ public interface ComponentTypeRepository extends ComponentCatalogRepository<Comp
      */
     @Query("SELECT COUNT(ct) FROM ComponentTypeEntity ct WHERE ct.category.code = :categoryCode AND ct.active = true")
     long countActiveByCategoryCode(@Param("categoryCode") String categoryCode);
+
+    /**
+     * Find all component types with eager loading of category association
+     *
+     * @return list of all component types with category loaded
+     */
+    @Override
+    @Query("SELECT DISTINCT ct FROM ComponentTypeEntity ct " +
+           "LEFT JOIN FETCH ct.category " +
+           "ORDER BY ct.sortOrder, ct.displayName")
+    List<ComponentTypeEntity> findAllWithAssociations();
 }

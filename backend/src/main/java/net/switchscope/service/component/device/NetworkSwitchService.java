@@ -19,12 +19,9 @@ public class NetworkSwitchService implements CrudService<NetworkSwitch> {
     private final DeviceRepository repository;
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<NetworkSwitch> getAll() {
-        // TODO: filter by type
-        return repository.findAll().stream()
-                .filter(d -> d instanceof NetworkSwitch)
-                .map(d -> (NetworkSwitch) d)
-                .toList();
+        return (List<NetworkSwitch>) (List<?>) repository.findNetworkSwitches();
     }
 
     @Override

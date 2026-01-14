@@ -34,27 +34,45 @@ public interface ConnectivityRepository extends BaseRepository<Component> {
     List<Component> findByManufacturer(String manufacturer);
 
     /**
-     * Find PatchPanel components
+     * Find PatchPanel components with eager loading
      *
      * @return list of patch panels
      */
-    @Query("SELECT c FROM PatchPanel c ORDER BY c.name")
+    @Query("SELECT DISTINCT c FROM PatchPanel c " +
+           "LEFT JOIN FETCH c.componentStatus " +
+           "LEFT JOIN FETCH c.componentType " +
+           "LEFT JOIN FETCH c.componentNature " +
+           "LEFT JOIN FETCH c.installation " +
+           "LEFT JOIN FETCH c.parentComponent " +
+           "ORDER BY c.name")
     List<Component> findPatchPanels();
 
     /**
-     * Find Connector components
+     * Find Connector components with eager loading
      *
      * @return list of connectors
      */
-    @Query("SELECT c FROM Connector c ORDER BY c.name")
+    @Query("SELECT DISTINCT c FROM Connector c " +
+           "LEFT JOIN FETCH c.componentStatus " +
+           "LEFT JOIN FETCH c.componentType " +
+           "LEFT JOIN FETCH c.componentNature " +
+           "LEFT JOIN FETCH c.installation " +
+           "LEFT JOIN FETCH c.parentComponent " +
+           "ORDER BY c.name")
     List<Component> findConnectors();
 
     /**
-     * Find CableRun components
+     * Find CableRun components with eager loading
      *
      * @return list of cable runs
      */
-    @Query("SELECT c FROM CableRun c ORDER BY c.name")
+    @Query("SELECT DISTINCT c FROM CableRun c " +
+           "LEFT JOIN FETCH c.componentStatus " +
+           "LEFT JOIN FETCH c.componentType " +
+           "LEFT JOIN FETCH c.componentNature " +
+           "LEFT JOIN FETCH c.installation " +
+           "LEFT JOIN FETCH c.parentComponent " +
+           "ORDER BY c.name")
     List<Component> findCableRuns();
 
     /**

@@ -34,11 +34,17 @@ public interface HousingRepository extends BaseRepository<Component> {
     List<Component> findByManufacturer(String manufacturer);
 
     /**
-     * Find Rack components
+     * Find Rack components with eager loading
      *
      * @return list of racks
      */
-    @Query("SELECT c FROM Rack c ORDER BY c.name")
+    @Query("SELECT DISTINCT c FROM Rack c " +
+           "LEFT JOIN FETCH c.componentStatus " +
+           "LEFT JOIN FETCH c.componentType " +
+           "LEFT JOIN FETCH c.componentNature " +
+           "LEFT JOIN FETCH c.installation " +
+           "LEFT JOIN FETCH c.parentComponent " +
+           "ORDER BY c.name")
     List<Component> findRacks();
 
     /**

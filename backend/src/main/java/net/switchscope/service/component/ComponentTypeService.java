@@ -19,7 +19,7 @@ public class ComponentTypeService implements CrudService<ComponentTypeEntity> {
 
     @Override
     public List<ComponentTypeEntity> getAll() {
-        return repository.findAll();
+        return repository.findAllWithAssociations();
     }
 
     @Override

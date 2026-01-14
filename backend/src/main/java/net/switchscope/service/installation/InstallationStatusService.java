@@ -19,7 +19,7 @@ public class InstallationStatusService implements CrudService<InstallationStatus
 
     @Override
     public List<InstallationStatusEntity> getAll() {
-        return repository.findAll();
+        return repository.findAllWithAssociations();
     }
 
     @Override

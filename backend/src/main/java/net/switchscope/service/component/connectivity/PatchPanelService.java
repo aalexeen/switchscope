@@ -19,12 +19,9 @@ public class PatchPanelService implements CrudService<PatchPanel> {
     private final ConnectivityRepository repository;
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<PatchPanel> getAll() {
-        // TODO: filter by type
-        return repository.findAll().stream()
-                .filter(c -> c instanceof PatchPanel)
-                .map(c -> (PatchPanel) c)
-                .toList();
+        return (List<PatchPanel>) (List<?>) repository.findPatchPanels();
     }
 
     @Override
