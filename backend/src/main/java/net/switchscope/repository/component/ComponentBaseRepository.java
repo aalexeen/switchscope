@@ -139,4 +139,13 @@ public interface ComponentBaseRepository<T> extends JpaRepository<T, UUID> {
             throw new NotFoundException("Entity with id=" + id + " not found");
         }
     }
+
+    /**
+     * Find all entities with eager loading of associations
+     * Note: Override this in specific repositories if they have associations to fetch
+     *
+     * @return list of all entities
+     */
+    @Query("SELECT DISTINCT e FROM #{#entityName} e ORDER BY e.sortOrder, e.displayName")
+    List<T> findAllWithAssociations();
 }

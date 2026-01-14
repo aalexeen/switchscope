@@ -19,12 +19,9 @@ public class ConnectorService implements CrudService<Connector> {
     private final ConnectivityRepository repository;
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Connector> getAll() {
-        // TODO: filter by type
-        return repository.findAll().stream()
-                .filter(c -> c instanceof Connector)
-                .map(c -> (Connector) c)
-                .toList();
+        return (List<Connector>) (List<?>) repository.findConnectors();
     }
 
     @Override

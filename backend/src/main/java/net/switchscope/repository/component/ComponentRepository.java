@@ -144,5 +144,19 @@ public interface ComponentRepository extends BaseRepository<Component> {
      */
     @Query("SELECT COUNT(c) FROM Component c WHERE c.componentStatus.operational = true")
     long countOperationalComponents();
+
+    /**
+     * Find all components with eager loading of associations
+     *
+     * @return list of all components with associations loaded
+     */
+    @Query("SELECT DISTINCT c FROM Component c " +
+           "LEFT JOIN FETCH c.componentStatus " +
+           "LEFT JOIN FETCH c.componentType " +
+           "LEFT JOIN FETCH c.componentNature " +
+           "LEFT JOIN FETCH c.installation " +
+           "LEFT JOIN FETCH c.parentComponent " +
+           "ORDER BY c.name")
+    List<Component> findAllWithAssociations();
 }
 

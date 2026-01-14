@@ -218,4 +218,14 @@ public interface ComponentModelRepository extends BaseRepository<ComponentModel>
      */
     @Query("SELECT COUNT(cm) FROM ComponentModel cm WHERE TYPE(cm) = :modelType")
     long countByModelType(@Param("modelType") Class<? extends ComponentModel> modelType);
+
+    /**
+     * Find all component models with eager loading of associations
+     *
+     * @return list of all component models with associations loaded
+     */
+    @Query("SELECT DISTINCT cm FROM ComponentModel cm " +
+           "LEFT JOIN FETCH cm.componentType " +
+           "ORDER BY cm.manufacturer, cm.modelNumber")
+    List<ComponentModel> findAllWithAssociations();
 }

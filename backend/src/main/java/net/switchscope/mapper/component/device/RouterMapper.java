@@ -33,7 +33,7 @@ public interface RouterMapper extends DeviceMapper<Router, RouterTo> {
     @Mapping(target = "reachable", expression = "java(entity.isReachable())")
     @Mapping(target = "monitoringStatus", expression = "java(entity.getMonitoringStatus())")
     @Mapping(target = "networkConfiguration", expression = "java(entity.getNetworkConfiguration())")
-    @Mapping(target = "portCount", expression = "java(entity.getPorts().size())")
+    @Mapping(target = "portCount", expression = "java(entity.getPorts() != null ? entity.getPorts().size() : 0)")
     // Router-specific mappings
     @Mapping(target = "enterpriseRouter", expression = "java(entity.isEnterpriseRouter())")
     @Mapping(target = "vpnCapability", expression = "java(entity.hasVpnCapability())")

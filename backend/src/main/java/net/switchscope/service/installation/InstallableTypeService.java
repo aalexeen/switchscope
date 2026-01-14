@@ -19,7 +19,7 @@ public class InstallableTypeService implements CrudService<InstallableTypeEntity
 
     @Override
     public List<InstallableTypeEntity> getAll() {
-        return repository.findAll();
+        return repository.findAllWithAssociations();
     }
 
     @Override

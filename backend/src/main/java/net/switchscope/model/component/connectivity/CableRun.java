@@ -205,15 +205,24 @@ public class CableRun extends Component {
     }
 
     public String getOrderedLocationPath() {
-        if (locations.isEmpty()) {
+        if (locations == null || locations.isEmpty()) {
             return "No locations defined";
         }
 
-        if (locations.size() == 2) {
-            return locations.get(0).getName() + " → " + locations.get(1).getName();
+        // Filter out null locations
+        List<Location> validLocations = locations.stream()
+                .filter(loc -> loc != null)
+                .collect(Collectors.toList());
+
+        if (validLocations.isEmpty()) {
+            return "No locations defined";
         }
 
-        return locations.stream()
+        if (validLocations.size() == 2) {
+            return validLocations.get(0).getName() + " → " + validLocations.get(1).getName();
+        }
+
+        return validLocations.stream()
                 .map(Location::getName)
                 .collect(Collectors.joining(" → "));
     }

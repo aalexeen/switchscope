@@ -19,12 +19,9 @@ public class AccessPointService implements CrudService<AccessPoint> {
     private final DeviceRepository repository;
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<AccessPoint> getAll() {
-        // TODO: filter by type
-        return repository.findAll().stream()
-                .filter(d -> d instanceof AccessPoint)
-                .map(d -> (AccessPoint) d)
-                .toList();
+        return (List<AccessPoint>) (List<?>) repository.findAccessPoints();
     }
 
     @Override

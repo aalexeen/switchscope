@@ -19,12 +19,9 @@ public class RackService implements CrudService<Rack> {
     private final HousingRepository repository;
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Rack> getAll() {
-        // TODO: filter by type
-        return repository.findAll().stream()
-                .filter(h -> h instanceof Rack)
-                .map(h -> (Rack) h)
-                .toList();
+        return (List<Rack>) (List<?>) repository.findRacks();
     }
 
     @Override

@@ -19,12 +19,9 @@ public class RouterService implements CrudService<Router> {
     private final DeviceRepository repository;
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Router> getAll() {
-        // TODO: filter by type
-        return repository.findAll().stream()
-                .filter(d -> d instanceof Router)
-                .map(d -> (Router) d)
-                .toList();
+        return (List<Router>) (List<?>) repository.findRouters();
     }
 
     @Override

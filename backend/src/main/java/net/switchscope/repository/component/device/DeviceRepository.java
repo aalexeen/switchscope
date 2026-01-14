@@ -101,27 +101,45 @@ public interface DeviceRepository extends BaseRepository<Device> {
     List<Device> findBySnmpVersion(@Param("snmpVersion") String snmpVersion);
 
     /**
-     * Find NetworkSwitch devices
+     * Find NetworkSwitch devices with eager loading
      *
      * @return list of network switches
      */
-    @Query("SELECT d FROM NetworkSwitch d ORDER BY d.name")
+    @Query("SELECT DISTINCT d FROM NetworkSwitch d " +
+           "LEFT JOIN FETCH d.componentStatus " +
+           "LEFT JOIN FETCH d.componentType " +
+           "LEFT JOIN FETCH d.componentNature " +
+           "LEFT JOIN FETCH d.installation " +
+           "LEFT JOIN FETCH d.parentComponent " +
+           "ORDER BY d.name")
     List<Device> findNetworkSwitches();
 
     /**
-     * Find Router devices
+     * Find Router devices with eager loading
      *
      * @return list of routers
      */
-    @Query("SELECT d FROM Router d ORDER BY d.name")
+    @Query("SELECT DISTINCT d FROM Router d " +
+           "LEFT JOIN FETCH d.componentStatus " +
+           "LEFT JOIN FETCH d.componentType " +
+           "LEFT JOIN FETCH d.componentNature " +
+           "LEFT JOIN FETCH d.installation " +
+           "LEFT JOIN FETCH d.parentComponent " +
+           "ORDER BY d.name")
     List<Device> findRouters();
 
     /**
-     * Find AccessPoint devices
+     * Find AccessPoint devices with eager loading
      *
      * @return list of access points
      */
-    @Query("SELECT d FROM AccessPoint d ORDER BY d.name")
+    @Query("SELECT DISTINCT d FROM AccessPoint d " +
+           "LEFT JOIN FETCH d.componentStatus " +
+           "LEFT JOIN FETCH d.componentType " +
+           "LEFT JOIN FETCH d.componentNature " +
+           "LEFT JOIN FETCH d.installation " +
+           "LEFT JOIN FETCH d.parentComponent " +
+           "ORDER BY d.name")
     List<Device> findAccessPoints();
 
     /**

@@ -4,12 +4,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import net.switchscope.model.component.device.AccessPoint;
 import net.switchscope.model.component.device.Device;
+import net.switchscope.model.component.device.NetworkSwitch;
+import net.switchscope.model.component.device.Router;
 import net.switchscope.repository.component.device.DeviceRepository;
 import net.switchscope.service.CrudService;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +25,14 @@ public class DeviceService implements CrudService<Device> {
 
     @Override
     public List<Device> getAll() {
-        return repository.findAll();
+        // Only return actual network devices (not PatchPanels which also extend Device)
+        return Stream.concat(
+                Stream.concat(
+                    repository.findNetworkSwitches().stream(),
+                    repository.findRouters().stream()
+                ),
+                repository.findAccessPoints().stream()
+        ).collect(Collectors.toList());
     }
 
     @Override

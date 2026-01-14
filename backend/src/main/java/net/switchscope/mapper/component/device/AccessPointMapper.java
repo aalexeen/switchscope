@@ -33,11 +33,11 @@ public interface AccessPointMapper extends DeviceMapper<AccessPoint, AccessPoint
     @Mapping(target = "reachable", expression = "java(entity.isReachable())")
     @Mapping(target = "monitoringStatus", expression = "java(entity.getMonitoringStatus())")
     @Mapping(target = "networkConfiguration", expression = "java(entity.getNetworkConfiguration())")
-    @Mapping(target = "portCount", expression = "java(entity.getPorts().size())")
+    @Mapping(target = "portCount", expression = "java(entity.getPorts() != null ? entity.getPorts().size() : 0)")
     // AccessPoint-specific mappings
     @Mapping(target = "wifi6", expression = "java(entity.isWiFi6())")
     @Mapping(target = "modernSecurity", expression = "java(entity.hasModernSecurity())")
-    @Mapping(target = "ssidCount", expression = "java(entity.getSsids().size())")
+    @Mapping(target = "ssidCount", expression = "java(entity.getSsids() != null ? entity.getSsids().size() : 0)")
     @Override
     AccessPointTo toTo(AccessPoint entity);
 

@@ -19,7 +19,7 @@ public class ComponentNatureService implements CrudService<ComponentNatureEntity
 
     @Override
     public List<ComponentNatureEntity> getAll() {
-        return repository.findAll();
+        return repository.findAllWithAssociations();
     }
 
     @Override

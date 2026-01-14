@@ -19,7 +19,7 @@ public class ComponentStatusService implements CrudService<ComponentStatusEntity
 
     @Override
     public List<ComponentStatusEntity> getAll() {
-        return repository.findAll();
+        return repository.findAllWithAssociations();
     }
 
     @Override

@@ -33,7 +33,7 @@ public interface NetworkSwitchMapper extends DeviceMapper<NetworkSwitch, Network
     @Mapping(target = "reachable", expression = "java(entity.isReachable())")
     @Mapping(target = "monitoringStatus", expression = "java(entity.getMonitoringStatus())")
     @Mapping(target = "networkConfiguration", expression = "java(entity.getNetworkConfiguration())")
-    @Mapping(target = "portCount", expression = "java(entity.getPorts().size())")
+    @Mapping(target = "portCount", expression = "java(entity.getPorts() != null ? entity.getPorts().size() : 0)")
     // Switch-specific mappings
     @Mapping(target = "switchModelId", source = "switchModel.id")
     @Mapping(target = "switchModelName", source = "switchModel.name")

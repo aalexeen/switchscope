@@ -19,7 +19,7 @@ public class ComponentModelService implements CrudService<ComponentModel> {
 
     @Override
     public List<ComponentModel> getAll() {
-        return repository.findAll();
+        return repository.findAllWithAssociations();
     }
 
     @Override

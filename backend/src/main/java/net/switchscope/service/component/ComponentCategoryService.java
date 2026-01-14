@@ -19,7 +19,7 @@ public class ComponentCategoryService implements CrudService<ComponentCategoryEn
 
     @Override
     public List<ComponentCategoryEntity> getAll() {
-        return repository.findAll();
+        return repository.findAllWithAssociations();
     }
 
     @Override

@@ -19,7 +19,7 @@ public class LocationTypeService implements CrudService<LocationTypeEntity> {
 
     @Override
     public List<LocationTypeEntity> getAll() {
-        return repository.findAll();
+        return repository.findAllWithAssociations();
     }
 
     @Override
