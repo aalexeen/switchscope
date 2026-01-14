@@ -42,20 +42,21 @@ Each configuration organizes fields into **priority tiers**:
 - Management capabilities
 - **Total: 30-50 fields in collapsible sections**
 
-#### **Tier 3: Business & Metadata (Priority 10-16)**
+#### **Tier 3: Business & Metadata (Priority 10-17)**
+- Additional specifications (deviceSpecs map - conditional)
 - Product information
 - Lifecycle & dates
 - Documentation
 - Certifications
 - Pricing
 - Internal notes
-- **Total: 25-30 fields in collapsible sections**
+- **Total: 26-31 fields in collapsible sections**
 
 ## 📊 Configuration Breakdown
 
 ### Switch Model (`switchModel.detail.js`)
 
-**Total Fields:** 81 fields in 15 sections
+**Total Fields:** 82 fields in 16 sections
 
 **Sections:**
 1. Overview (12 fields) - Always visible
@@ -67,15 +68,17 @@ Each configuration organizes fields into **priority tiers**:
 7. Performance Metrics (5 fields) - Collapsible
 8. Network Features (8 fields) - Collapsible
 9. Management & Monitoring (6 fields) - Collapsible
-10. Product Information (5 fields) - Collapsible
-11. Lifecycle & Dates (5 fields) - Collapsible
-12. Documentation & Support (3 fields) - Collapsible
-13. Certifications & Compliance (2 fields) - Collapsible
-14. Pricing (3 fields) - Collapsible
-15. Internal Notes & Metadata (7 fields) - Collapsible
+10. Additional Specifications (1 field - map) - Conditional, collapsible
+11. Product Information (5 fields) - Collapsible
+12. Lifecycle & Dates (5 fields) - Collapsible
+13. Documentation & Support (3 fields) - Collapsible
+14. Certifications & Compliance (2 fields) - Collapsible
+15. Pricing (3 fields) - Collapsible
+16. Internal Notes & Metadata (7 fields) - Collapsible
 
 **Unique Features:**
 - Conditional PoE section (shown only if `supportsPoe === true`)
+- Conditional Additional Specifications section (shown only if `deviceSpecs` has data)
 - Port summary with breakdown by speed
 - Network features (VLANs, QoS, ACLs, etc.)
 
@@ -83,7 +86,7 @@ Each configuration organizes fields into **priority tiers**:
 
 ### Router Model (`routerModel.detail.js`)
 
-**Total Fields:** 73 fields in 16 sections
+**Total Fields:** 74 fields in 17 sections
 
 **Sections:**
 1. Overview (12 fields) - Always visible
@@ -95,25 +98,27 @@ Each configuration organizes fields into **priority tiers**:
 7. Physical Specifications (4 fields) - Collapsible
 8. Performance Metrics (4 fields) - Collapsible
 9. Power & Environmental (13 fields) - Collapsible
-10. Management & Monitoring (6 fields) - Collapsible
-11. Product Information (5 fields) - Collapsible
-12. Lifecycle & Dates (5 fields) - Collapsible
-13. Documentation & Support (3 fields) - Collapsible
-14. Certifications & Compliance (2 fields) - Collapsible
-15. Pricing (3 fields) - Collapsible
-16. Internal Notes & Metadata (7 fields) - Collapsible
+10. Additional Specifications (1 field - map) - Conditional, collapsible
+11. Management & Monitoring (6 fields) - Collapsible
+12. Product Information (5 fields) - Collapsible
+13. Lifecycle & Dates (5 fields) - Collapsible
+14. Documentation & Support (3 fields) - Collapsible
+15. Certifications & Compliance (2 fields) - Collapsible
+16. Pricing (3 fields) - Collapsible
+17. Internal Notes & Metadata (7 fields) - Collapsible
 
 **Unique Features:**
 - Routing protocol support (BGP, OSPF)
 - VPN capabilities and tunnel limits
 - Firewall throughput metrics
 - WAN interface types array
+- Conditional Additional Specifications section (shown only if `deviceSpecs` has data)
 
 ---
 
 ### Access Point Model (`accessPointModel.detail.js`)
 
-**Total Fields:** 76 fields in 16 sections
+**Total Fields:** 77 fields in 17 sections
 
 **Sections:**
 1. Overview (12 fields) - Always visible
@@ -125,13 +130,14 @@ Each configuration organizes fields into **priority tiers**:
 7. Management Capabilities (6 fields) - Collapsible
 8. PoE Specifications (2 fields) - Conditional, collapsible
 9. Physical Specifications (5 fields) - Collapsible
-10. Power & Environmental (11 fields) - Collapsible
-11. Product Information (5 fields) - Collapsible
-12. Lifecycle & Dates (5 fields) - Collapsible
-13. Documentation & Support (3 fields) - Collapsible
-14. Certifications & Compliance (2 fields) - Collapsible
-15. Pricing (3 fields) - Collapsible
-16. Internal Notes & Metadata (7 fields) - Collapsible
+10. Additional Specifications (1 field - map) - Conditional, collapsible
+11. Power & Environmental (11 fields) - Collapsible
+12. Product Information (5 fields) - Collapsible
+13. Lifecycle & Dates (5 fields) - Collapsible
+14. Documentation & Support (3 fields) - Collapsible
+15. Certifications & Compliance (2 fields) - Collapsible
+16. Pricing (3 fields) - Collapsible
+17. Internal Notes & Metadata (7 fields) - Collapsible
 
 **Unique Features:**
 - WiFi standard and generation detection
@@ -140,6 +146,7 @@ Each configuration organizes fields into **priority tiers**:
 - WiFi 6/6E/7 indicators
 - Mesh, MU-MIMO, Beamforming support
 - Controller vs. cloud management
+- Conditional Additional Specifications section (shown only if `deviceSpecs` has data)
 
 ---
 
@@ -243,6 +250,7 @@ All configurations support these field types:
 | `datetime` | Formatted date+time | Created at, updated at |
 | `textarea` | Multi-line text | Internal notes |
 | `array` | Array of values | WAN interface types |
+| `map` | Key-value pairs display | Device specifications (deviceSpecs) |
 
 ## 🎨 Section Properties
 
@@ -313,9 +321,9 @@ sortedSections.forEach(([key, section]) => {
 
 | Model Type | Total Fields | Visible by Default | Sections | Conditional Sections |
 |------------|--------------|-------------------|----------|---------------------|
-| Switch | 81 | 28 | 15 | 1 (PoE) |
-| Router | 73 | 22 | 16 | 0 |
-| Access Point | 76 | 21 | 16 | 1 (PoE) |
+| Switch | 82 | 28 | 16 | 2 (PoE, Additional Specs) |
+| Router | 74 | 22 | 17 | 1 (Additional Specs) |
+| Access Point | 77 | 21 | 17 | 2 (PoE, Additional Specs) |
 | Rack | 66 | 24 | 15 | 0 |
 
 ## 🎯 Benefits
@@ -362,10 +370,18 @@ export default {
 };
 ```
 
-## 📚 Next Steps
+## 📚 Implementation Status
 
-1. Create detail view component to render these configurations
-2. Add to detail view registry
-3. Configure routing
-4. Add navigation from table view
-5. Implement field type renderers (badge, currency, url, etc.)
+All steps completed! ✅
+
+1. ✅ **Detail view component created** - `ComponentModelDetailView.vue` handles all model types with discriminator-based config selection
+2. ✅ **Added to detail view registry** - All 4 model configs registered in `detailViewRegistry.js`
+3. ✅ **Routing configured** - Route `/catalog/component-models/:id` maps to ComponentModelDetailView
+4. ✅ **Navigation from table view** - View action in table routes to detail page
+5. ✅ **Field type renderers implemented** - `FieldRenderer.vue` supports all 11 field types including new `map` type for deviceSpecs
+
+### Components
+
+- **`ComponentModelDetailView.vue`** - Main detail view component with type detection, section sorting, collapsible sections, and conditional rendering
+- **`FieldRenderer.vue`** - Renders 11 field types: heading, badge, boolean, summary, url, currency, date, datetime, textarea, array, map
+- **`GenericDetailView.vue`** - Generic detail view for other catalog entities (componentCategory, componentNature, etc.)

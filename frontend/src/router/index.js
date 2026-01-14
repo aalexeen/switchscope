@@ -301,6 +301,17 @@ const router = createRouter({
       },
     },
     {
+      path: "/catalog/installable-types/:id",
+      name: "installable-type-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'installableTypes',
+        detailKey: 'installableType'
+      },
+    },
+    {
       path: "/removemac",
       name: "removemac",
       component: RemoveMacView,
