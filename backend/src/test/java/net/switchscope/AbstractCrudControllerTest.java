@@ -51,6 +51,22 @@ class AbstractCrudControllerTest {
     @MockBean
     private net.switchscope.service.component.ComponentService service;
 
+    // Mock mappers required by ComponentController constructor
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.device.NetworkSwitchMapper networkSwitchMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.device.RouterMapper routerMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.device.AccessPointMapper accessPointMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.connectivity.CableRunMapper cableRunMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.connectivity.ConnectorMapper connectorMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.connectivity.PatchPanelMapper patchPanelMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.housing.RackMapper rackMapper;
+
     @Test
     @DisplayName("Should require authentication for GET all (401 when unauthenticated)")
     void shouldRequireAuthForGetAllWhenUnauthenticated() throws Exception {

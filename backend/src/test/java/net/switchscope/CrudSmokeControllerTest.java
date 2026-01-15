@@ -40,6 +40,22 @@ class CrudSmokeControllerTest {
     @MockBean
     private ComponentService componentService;
 
+    // Mock mappers required by ComponentController constructor
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.device.NetworkSwitchMapper networkSwitchMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.device.RouterMapper routerMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.device.AccessPointMapper accessPointMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.connectivity.CableRunMapper cableRunMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.connectivity.ConnectorMapper connectorMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.connectivity.PatchPanelMapper patchPanelMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.mapper.component.housing.RackMapper rackMapper;
+
     @Test
     @DisplayName("GET /api/components requires authentication (401 when unauthenticated)")
     void componentsGetAllRequiresAuth() throws Exception {
