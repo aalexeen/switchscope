@@ -21,6 +21,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.InstallableCategory;
+import net.switchscope.model.component.InstallableComponent;
 import net.switchscope.model.component.catalog.connectiviy.PatchPanelModel;
 import net.switchscope.model.component.device.HasPortsImpl;
 import net.switchscope.validation.NoHtml;
@@ -30,6 +32,7 @@ import net.switchscope.validation.NoHtml;
  */
 @Entity
 @DiscriminatorValue("PATCH_PANEL")
+@InstallableComponent(code = "PATCH_PANEL", category = InstallableCategory.CONNECTIVITY)
 @Getter
 @Setter
 @NoArgsConstructor

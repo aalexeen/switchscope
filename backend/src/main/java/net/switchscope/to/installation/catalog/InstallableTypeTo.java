@@ -5,12 +5,10 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import net.switchscope.to.component.catalog.BaseCodedTo;
-import net.switchscope.validation.NoHtml;
 
 import java.util.UUID;
 
@@ -46,11 +44,6 @@ public class InstallableTypeTo extends BaseCodedTo {
     @DecimalMin("0.1") @DecimalMax("500.0")
     private Double maxWeightKg;
 
-    // Associated entity class
-    @Size(max = 128)
-    @NoHtml
-    private String entityClass;
-
     // Installation priority
     @Min(1) @Max(10)
     private Integer installationPriority;
@@ -63,7 +56,16 @@ public class InstallableTypeTo extends BaseCodedTo {
     private Boolean connectivityType;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-    private Boolean supportType;
+    private String category;
+
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private Boolean housingType;
+
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private Boolean powerType;
+
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private Boolean implemented;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Boolean requiresSpecialHandling;
@@ -88,4 +90,3 @@ public class InstallableTypeTo extends BaseCodedTo {
         super(id, name);
     }
 }
-

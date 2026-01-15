@@ -18,7 +18,10 @@ public interface InstallableTypeMapper extends BaseMapper<InstallableTypeEntity,
     // Entity -> TO mappings
     @Mapping(target = "deviceType", expression = "java(entity.isDeviceType())")
     @Mapping(target = "connectivityType", expression = "java(entity.isConnectivityType())")
-    @Mapping(target = "supportType", expression = "java(entity.isSupportType())")
+    @Mapping(target = "category", expression = "java(entity.getCategory() != null ? entity.getCategory().name() : null)")
+    @Mapping(target = "housingType", expression = "java(entity.isHousingType())")
+    @Mapping(target = "powerType", expression = "java(entity.isPowerType())")
+    @Mapping(target = "implemented", expression = "java(entity.isImplemented())")
     @Mapping(target = "requiresSpecialHandling", expression = "java(entity.requiresSpecialHandling())")
     @Mapping(target = "highPriority", expression = "java(entity.isHighPriority())")
     @Mapping(target = "lowPriority", expression = "java(entity.isLowPriority())")
@@ -40,4 +43,3 @@ public interface InstallableTypeMapper extends BaseMapper<InstallableTypeEntity,
     @Override
     InstallableTypeEntity updateFromTo(@MappingTarget InstallableTypeEntity entity, InstallableTypeTo to);
 }
-

@@ -16,7 +16,7 @@ import { entities } from '@/composables/entityRegistry';
  * - Methods: fetchInstallableTypes, initialize, searchInstallableTypes,
  *           getInstallableTypeById, createInstallableType, updateInstallableType, deleteInstallableType
  * - Computed: totalInstallableTypes, activeTypes,
- *            deviceTypes, connectivityTypes, supportTypes, rackMountable, hotSwappableTypes,
+ *            deviceTypes, connectivityTypes, housingTypes, powerTypes, rackMountable, hotSwappableTypes,
  *            powerManagedTypes, environmentalControlTypes, highPriorityTypes, lowPriorityTypes, specialHandlingTypes
  */
 export const useInstallableTypes = createEntityComposable(entities.installableTypes);
