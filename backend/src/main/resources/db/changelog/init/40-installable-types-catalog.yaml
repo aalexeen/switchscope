@@ -126,13 +126,6 @@ databaseChangeLog:
                   constraints:
                     nullable: true
 
-              # Associated entity class for polymorphism
-              - column:
-                  name: entity_class
-                  type: VARCHAR(128)
-                  constraints:
-                    nullable: true
-
               # Installation priority
               - column:
                   name: installation_priority
@@ -157,11 +150,3 @@ databaseChangeLog:
               - column:
                   name: sort_order
                   descending: false
-
-        - createIndex:
-            tableName: installable_types_catalog
-            indexName: idx_installable_type_entity_class
-            columns:
-              - column:
-                  name: entity_class
-

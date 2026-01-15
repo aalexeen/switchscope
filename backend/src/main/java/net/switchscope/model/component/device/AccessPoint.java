@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.InstallableCategory;
+import net.switchscope.model.component.InstallableComponent;
 import net.switchscope.validation.NoHtml;
 
 import java.util.*;
@@ -16,6 +18,7 @@ import java.util.*;
  */
 @Entity
 @DiscriminatorValue("ACCESS_POINT")
+@InstallableComponent(code = "ACCESS_POINT", category = InstallableCategory.DEVICE)
 @Getter
 @Setter
 @NoArgsConstructor
