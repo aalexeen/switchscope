@@ -14,6 +14,13 @@ export default {
   icon: 'pi-sitemap',
   iconColor: 'text-cyan-600',
 
+  routes: {
+    list: '/installations',
+    view: '/installations/:id',
+    create: '/installations/create',
+    edit: '/installations/edit/:id'
+  },
+
   // Composable reference
   composable: 'useInstallations',
 

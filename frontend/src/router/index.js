@@ -250,6 +250,17 @@ const router = createRouter({
       },
     },
     {
+      path: "/installations/:id",
+      name: "installation-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'installations',
+        detailKey: 'installation'
+      },
+    },
+    {
       path: "/locations",
       name: "locations",
       component: GenericTableView,
