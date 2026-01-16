@@ -2,13 +2,16 @@
 package net.switchscope.model.installation.catalog;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.AccessLevel;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.BaseCodedEntity;
-import net.switchscope.validation.NoHtml;
+import net.switchscope.model.component.InstallableCategory;
+import net.switchscope.service.component.InstallableComponentRegistry;
 
 /**
  * Dynamic catalog entity for installable component types
@@ -54,11 +57,8 @@ public class InstallableTypeEntity extends BaseCodedEntity {
     @DecimalMin("0.1") @DecimalMax("500.0")
     private Double maxWeightKg;
 
-    // Associated entity class for polymorphism
-    @Column(name = "entity_class")
-    @Size(max = 128)
-    @NoHtml
-    private String entityClass;
+    @Transient
+    private transient InstallableComponentRegistry registry;
 
     // Installation priority (for ordering installations)
     @Column(name = "installation_priority")
@@ -77,18 +77,27 @@ public class InstallableTypeEntity extends BaseCodedEntity {
 
     // Business methods
     public boolean isDeviceType() {
-        return "Device".equals(entityClass) || 
-               (entityClass != null && entityClass.endsWith("Device"));
+        return requireRegistry().isDeviceType(getCode());
     }
 
     public boolean isConnectivityType() {
-        return "ConnectivityComponent".equals(entityClass) ||
-               (entityClass != null && entityClass.contains("Connectivity"));
+        return requireRegistry().isConnectivityType(getCode());
     }
 
-    public boolean isSupportType() {
-        return "SupportComponent".equals(entityClass) ||
-               (entityClass != null && entityClass.contains("Support"));
+    public boolean isHousingType() {
+        return requireRegistry().isHousingType(getCode());
+    }
+
+    public boolean isPowerType() {
+        return requireRegistry().isPowerType(getCode());
+    }
+
+    public boolean isImplemented() {
+        return requireRegistry().isImplemented(getCode());
+    }
+
+    public InstallableCategory getCategory() {
+        return requireRegistry().getCategoryByCode(getCode()).orElse(null);
     }
 
     public boolean requiresSpecialHandling() {
@@ -129,10 +138,20 @@ public class InstallableTypeEntity extends BaseCodedEntity {
         }
     }
 
+    public void setRegistry(InstallableComponentRegistry registry) {
+        this.registry = registry;
+    }
+
+    private InstallableComponentRegistry requireRegistry() {
+        if (registry == null) {
+            throw new IllegalStateException("InstallableComponentRegistry is not set for code: " + getCode());
+        }
+        return registry;
+    }
+
     @Override
     public String toString() {
         return "InstallableTypeEntity:" + getId() + "[" + getCode() + 
-               ", " + getDisplayName() + 
-               (entityClass != null ? ", " + entityClass : "") + "]";
+               ", " + getDisplayName() + "]";
     }
 }

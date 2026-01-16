@@ -30,6 +30,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.Component;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.InstallableCategory;
+import net.switchscope.model.component.InstallableComponent;
 import net.switchscope.model.component.catalog.connectiviy.CableRunModel;
 import net.switchscope.model.location.Location;
 import net.switchscope.validation.NoHtml;
@@ -39,6 +41,7 @@ import net.switchscope.validation.NoHtml;
  */
 @Entity
 @DiscriminatorValue("CABLE_RUN")
+@InstallableComponent(code = "CABLE_RUN", category = InstallableCategory.CONNECTIVITY)
 @Getter
 @Setter
 @NoArgsConstructor

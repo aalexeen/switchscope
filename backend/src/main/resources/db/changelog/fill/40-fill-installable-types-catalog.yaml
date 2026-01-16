@@ -31,10 +31,8 @@ databaseChangeLog:
               - column: { header: hot_swappable, name: hot_swappable, type: BOOLEAN }
               - column: { header: default_rack_units, name: default_rack_units, type: INTEGER }
               - column: { header: max_weight_kg, name: max_weight_kg, type: DOUBLE }
-              - column: { header: entity_class, name: entity_class, type: VARCHAR }
               - column: { header: installation_priority, name: installation_priority, type: INTEGER }
       rollback:
         - delete:
             tableName: installable_types_catalog
-
 
