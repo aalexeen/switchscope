@@ -11,6 +11,7 @@ import componentStatusDetail from './componentStatus.detail';
 import componentTypeDetail from './componentType.detail';
 import installableTypeDetail from './installableType.detail';
 import installationStatusDetail from './installationStatus.detail';
+import locationTypeDetail from './locationType.detail';
 // Component Model detail configs (type-specific)
 import switchModelDetail from './componentModels/switchModel.detail';
 import routerModelDetail from './componentModels/routerModel.detail';
@@ -24,6 +25,7 @@ export const detailViewRegistry = {
   componentType: componentTypeDetail,
   installableType: installableTypeDetail,
   installationStatus: installationStatusDetail,
+  locationType: locationTypeDetail,
   // Component Models (by discriminator type)
   switchModel: switchModelDetail,
   routerModel: routerModelDetail,
