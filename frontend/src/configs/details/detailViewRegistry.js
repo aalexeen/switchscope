@@ -10,6 +10,7 @@ import componentNatureDetail from './componentNature.detail';
 import componentStatusDetail from './componentStatus.detail';
 import componentTypeDetail from './componentType.detail';
 import componentDetail from './component.detail';
+import deviceDetail from './device.detail';
 import installableTypeDetail from './installableType.detail';
 import installationStatusDetail from './installationStatus.detail';
 import locationTypeDetail from './locationType.detail';
@@ -25,6 +26,7 @@ export const detailViewRegistry = {
   componentStatus: componentStatusDetail,
   componentType: componentTypeDetail,
   component: componentDetail,
+  device: deviceDetail,
   installableType: installableTypeDetail,
   installationStatus: installationStatusDetail,
   locationType: locationTypeDetail,
