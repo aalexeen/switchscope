@@ -271,6 +271,17 @@ const router = createRouter({
       },
     },
     {
+      path: "/locations/:id",
+      name: "location-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'locations',
+        detailKey: 'location'
+      },
+    },
+    {
       path: "/ports",
       name: "ports",
       component: GenericTableView,
