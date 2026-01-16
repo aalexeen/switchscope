@@ -17,6 +17,7 @@ import routerDetail from './router.detail';
 import accessPointDetail from './accessPoint.detail';
 import cableRunDetail from './cableRun.detail';
 import connectorDetail from './connector.detail';
+import patchPanelDetail from './patchPanel.detail';
 import installationStatusDetail from './installationStatus.detail';
 import locationTypeDetail from './locationType.detail';
 // Component Model detail configs (type-specific)
@@ -38,6 +39,7 @@ export const detailViewRegistry = {
   accessPoint: accessPointDetail,
   cableRun: cableRunDetail,
   connector: connectorDetail,
+  patchPanel: patchPanelDetail,
   installationStatus: installationStatusDetail,
   locationType: locationTypeDetail,
   // Component Models (by discriminator type)
