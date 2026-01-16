@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import net.switchscope.model.installation.catalog.InstallableTypeEntity;
 import net.switchscope.repository.installation.InstallableTypeRepository;
 import net.switchscope.service.CrudService;
+import net.switchscope.service.component.InstallableComponentRegistry;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,22 +17,29 @@ import java.util.UUID;
 public class InstallableTypeService implements CrudService<InstallableTypeEntity> {
 
     private final InstallableTypeRepository repository;
+    private final InstallableComponentRegistry registry;
 
     @Override
     public List<InstallableTypeEntity> getAll() {
-        return repository.findAllWithAssociations();
+        List<InstallableTypeEntity> entities = repository.findAllWithAssociations();
+        entities.forEach(entity -> entity.setRegistry(registry));
+        return entities;
     }
 
     @Override
     public InstallableTypeEntity getById(UUID id) {
-        return repository.getExisted(id);
+        InstallableTypeEntity entity = repository.getExisted(id);
+        entity.setRegistry(registry);
+        return entity;
     }
 
     @Override
     @Transactional
     public InstallableTypeEntity create(InstallableTypeEntity entity) {
         // TODO: implement validation
-        return repository.save(entity);
+        InstallableTypeEntity saved = repository.save(entity);
+        saved.setRegistry(registry);
+        return saved;
     }
 
     @Override
@@ -39,7 +47,9 @@ public class InstallableTypeService implements CrudService<InstallableTypeEntity
     public InstallableTypeEntity update(UUID id, InstallableTypeEntity entity) {
         repository.getExisted(id);
         entity.setId(id);
-        return repository.save(entity);
+        InstallableTypeEntity saved = repository.save(entity);
+        saved.setRegistry(registry);
+        return saved;
     }
 
     @Override

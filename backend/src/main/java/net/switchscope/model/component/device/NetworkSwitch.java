@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.InstallableCategory;
+import net.switchscope.model.component.InstallableComponent;
 import net.switchscope.model.component.catalog.device.SwitchModel;
 import net.switchscope.model.location.Location;
 import net.switchscope.model.port.Port;
@@ -23,6 +25,7 @@ import java.util.UUID;
  */
 @Entity
 @DiscriminatorValue("NETWORK_SWITCH")
+@InstallableComponent(code = "NETWORK_SWITCH", category = InstallableCategory.DEVICE)
 @Getter
 @Setter
 @NoArgsConstructor

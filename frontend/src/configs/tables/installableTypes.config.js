@@ -17,7 +17,7 @@ export default {
 
   composable: 'useInstallableTypes',
 
-  searchFields: ['name', 'code', 'displayName', 'description', 'entityClass'],
+  searchFields: ['name', 'code', 'displayName', 'description', 'category'],
   theme: 'indigo',
   themeIntensity: '600',
 
@@ -48,9 +48,10 @@ export default {
       visible: true
     },
     {
-      key: 'entityClass',
-      label: 'Entity Class',
-      type: 'code',
+      key: 'category',
+      label: 'Category',
+      type: 'badge',
+      transform: 'uppercase',
       visible: true
     },
     {
@@ -68,8 +69,22 @@ export default {
       align: 'center'
     },
     {
-      key: 'supportType',
-      label: 'Support',
+      key: 'housingType',
+      label: 'Housing',
+      type: 'boolean-icon',
+      visible: false,
+      align: 'center'
+    },
+    {
+      key: 'powerType',
+      label: 'Power',
+      type: 'boolean-icon',
+      visible: false,
+      align: 'center'
+    },
+    {
+      key: 'implemented',
+      label: 'Implemented',
       type: 'boolean-icon',
       visible: false,
       align: 'center'

@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.Component;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.InstallableCategory;
+import net.switchscope.model.component.InstallableComponent;
 import net.switchscope.model.component.catalog.housing.RackModelEntity;
 import net.switchscope.model.installation.Installation;
 import net.switchscope.validation.NoHtml;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @DiscriminatorValue("RACK")
+@InstallableComponent(code = "RACK", category = InstallableCategory.HOUSING)
 @Getter
 @Setter
 @NoArgsConstructor

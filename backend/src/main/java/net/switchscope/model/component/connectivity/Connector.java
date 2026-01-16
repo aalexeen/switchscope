@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.Component;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.InstallableCategory;
+import net.switchscope.model.component.InstallableComponent;
 import net.switchscope.model.component.catalog.connectiviy.ConnectorModel;
 import net.switchscope.model.port.Port;
 import net.switchscope.validation.NoHtml;
@@ -26,6 +28,7 @@ import net.switchscope.validation.NoHtml;
  */
 @Entity
 @DiscriminatorValue("CONNECTOR")
+@InstallableComponent(code = "CONNECTOR", category = InstallableCategory.CONNECTIVITY)
 @Getter
 @Setter
 @NoArgsConstructor

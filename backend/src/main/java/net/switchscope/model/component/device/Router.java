@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.switchscope.model.component.ComponentTypeEntity;
+import net.switchscope.model.component.InstallableCategory;
+import net.switchscope.model.component.InstallableComponent;
 
 import java.util.*;
 
@@ -15,6 +17,7 @@ import java.util.*;
  */
 @Entity
 @DiscriminatorValue("ROUTER")
+@InstallableComponent(code = "ROUTER", category = InstallableCategory.DEVICE)
 @Getter
 @Setter
 @NoArgsConstructor

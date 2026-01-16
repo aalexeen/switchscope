@@ -2,7 +2,6 @@ package net.switchscope.repository.installation;
 
 import net.switchscope.model.installation.catalog.InstallableTypeEntity;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -54,12 +53,10 @@ public interface InstallableTypeRepository extends net.switchscope.repository.co
     List<InstallableTypeEntity> findEnvironmentalControlTypes();
 
     /**
-     * Find types by entity class
+     * Fetch all installable type codes.
      *
-     * @param entityClass entity class name
-     * @return list of types
+     * @return list of codes
      */
-    @Query("SELECT ite FROM InstallableTypeEntity ite WHERE ite.entityClass = :entityClass AND ite.active = true ORDER BY ite.sortOrder, ite.displayName")
-    List<InstallableTypeEntity> findByEntityClass(@Param("entityClass") String entityClass);
+    @Query("SELECT ite.code FROM InstallableTypeEntity ite")
+    List<String> findAllCodes();
 }
-

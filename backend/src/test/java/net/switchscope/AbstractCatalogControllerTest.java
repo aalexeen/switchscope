@@ -1,6 +1,7 @@
 package net.switchscope;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.switchscope.mapper.BaseMapper;
 import net.switchscope.service.CrudService;
 import net.switchscope.web.AbstractCatalogController;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,7 +39,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = TestEntityController.class)
-@Import(AbstractCatalogControllerTest.TestSecurityConfig.class)
+@Import({AbstractCatalogControllerTest.TestSecurityConfig.class, AbstractCatalogControllerTest.TestMapperConfig.class})
 @org.springframework.test.context.ActiveProfiles("mvc-test")
 @org.springframework.test.context.TestPropertySource(properties = "spring.web.resources.add-mappings=false")
 class AbstractCatalogControllerTest {
@@ -52,6 +54,45 @@ class AbstractCatalogControllerTest {
 
     @MockBean
     private CrudService<TestEntity> service;
+
+    @TestConfiguration
+    static class TestMapperConfig {
+        @Bean
+        @Primary
+        BaseMapper<TestEntity, TestEntityTo> testEntityMapper() {
+            return new BaseMapper<>() {
+                @Override
+                public TestEntity toEntity(TestEntityTo to) {
+                    if (to == null) return null;
+                    return new TestEntity(to.getId(), to.getName());
+                }
+
+                @Override
+                public java.util.List<TestEntity> toEntityList(java.util.Collection<TestEntityTo> tos) {
+                    return tos == null ? java.util.List.of() : tos.stream().map(this::toEntity).toList();
+                }
+
+                @Override
+                public TestEntity updateFromTo(TestEntity entity, TestEntityTo to) {
+                    if (entity == null || to == null) return entity;
+                    entity.setName(to.getName());
+                    return entity;
+                }
+
+                @Override
+                public TestEntityTo toTo(TestEntity entity) {
+                    if (entity == null) return null;
+                    return new TestEntityTo(entity.getId(), entity.getName());
+                    
+                }
+
+                @Override
+                public java.util.List<TestEntityTo> toToList(java.util.Collection<TestEntity> entities) {
+                    return entities == null ? java.util.List.of() : entities.stream().map(this::toTo).toList();
+                }
+            };
+        }
+    }
 
     
 
