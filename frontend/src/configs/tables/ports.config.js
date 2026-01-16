@@ -14,6 +14,13 @@ export default {
   icon: 'pi-bolt',
   iconColor: 'text-cyan-600',
 
+  routes: {
+    list: '/ports',
+    view: '/ports/:id',
+    create: '/ports/create',
+    edit: '/ports/edit/:id'
+  },
+
   // Composable reference
   composable: 'usePorts',
 
