@@ -208,6 +208,17 @@ const router = createRouter({
       },
     },
     {
+      path: "/components/connectivity/patch-panels/:id",
+      name: "patch-panel-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'patchPanels',
+        detailKey: 'patchPanel'
+      },
+    },
+    {
       path: "/components/housing/racks",
       name: "racks",
       component: GenericTableView,

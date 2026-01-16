@@ -14,6 +14,13 @@ export default {
   icon: 'pi-table',
   iconColor: 'text-emerald-600',
 
+  routes: {
+    list: '/components/connectivity/patch-panels',
+    view: '/components/connectivity/patch-panels/:id',
+    create: '/components/connectivity/patch-panels/create',
+    edit: '/components/connectivity/patch-panels/edit/:id'
+  },
+
   // Composable reference
   composable: 'usePatchPanels',
 
