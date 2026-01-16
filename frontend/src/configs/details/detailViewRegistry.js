@@ -19,6 +19,7 @@ import cableRunDetail from './cableRun.detail';
 import connectorDetail from './connector.detail';
 import patchPanelDetail from './patchPanel.detail';
 import rackDetail from './rack.detail';
+import installationDetail from './installation.detail';
 import installationStatusDetail from './installationStatus.detail';
 import locationTypeDetail from './locationType.detail';
 // Component Model detail configs (type-specific)
@@ -42,6 +43,7 @@ export const detailViewRegistry = {
   connector: connectorDetail,
   patchPanel: patchPanelDetail,
   rack: rackDetail,
+  installation: installationDetail,
   installationStatus: installationStatusDetail,
   locationType: locationTypeDetail,
   // Component Models (by discriminator type)
