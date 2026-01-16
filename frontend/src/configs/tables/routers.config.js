@@ -14,6 +14,13 @@ export default {
   icon: 'pi-share-alt',
   iconColor: 'text-orange-600',
 
+  routes: {
+    list: '/components/devices/routers',
+    view: '/components/devices/routers/:id',
+    create: '/components/devices/routers/create',
+    edit: '/components/devices/routers/edit/:id'
+  },
+
   // Composable reference
   composable: 'useRouters',
 

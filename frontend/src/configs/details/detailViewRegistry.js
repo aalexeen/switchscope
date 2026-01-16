@@ -12,6 +12,10 @@ import componentTypeDetail from './componentType.detail';
 import componentDetail from './component.detail';
 import deviceDetail from './device.detail';
 import installableTypeDetail from './installableType.detail';
+import networkSwitchDetail from './networkSwitch.detail';
+import routerDetail from './router.detail';
+import accessPointDetail from './accessPoint.detail';
+import cableRunDetail from './cableRun.detail';
 import installationStatusDetail from './installationStatus.detail';
 import locationTypeDetail from './locationType.detail';
 // Component Model detail configs (type-specific)
@@ -28,6 +32,10 @@ export const detailViewRegistry = {
   component: componentDetail,
   device: deviceDetail,
   installableType: installableTypeDetail,
+  networkSwitch: networkSwitchDetail,
+  router: routerDetail,
+  accessPoint: accessPointDetail,
+  cableRun: cableRunDetail,
   installationStatus: installationStatusDetail,
   locationType: locationTypeDetail,
   // Component Models (by discriminator type)

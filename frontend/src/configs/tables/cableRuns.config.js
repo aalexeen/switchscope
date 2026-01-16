@@ -14,6 +14,13 @@ export default {
   icon: 'pi-link',
   iconColor: 'text-teal-600',
 
+  routes: {
+    list: '/components/connectivity/cable-runs',
+    view: '/components/connectivity/cable-runs/:id',
+    create: '/components/connectivity/cable-runs/create',
+    edit: '/components/connectivity/cable-runs/edit/:id'
+  },
+
   // Composable reference
   composable: 'useCableRuns',
 

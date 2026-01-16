@@ -14,6 +14,13 @@ export default {
   icon: 'pi-wifi',
   iconColor: 'text-purple-600',
 
+  routes: {
+    list: '/components/devices/access-points',
+    view: '/components/devices/access-points/:id',
+    create: '/components/devices/access-points/create',
+    edit: '/components/devices/access-points/edit/:id'
+  },
+
   // Composable reference
   composable: 'useAccessPoints',
 

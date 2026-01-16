@@ -14,6 +14,13 @@ export default {
   icon: 'pi-sitemap',
   iconColor: 'text-cyan-600',
 
+  routes: {
+    list: '/components/devices/switches',
+    view: '/components/devices/switches/:id',
+    create: '/components/devices/switches/create',
+    edit: '/components/devices/switches/edit/:id'
+  },
+
   // Composable reference
   composable: 'useNetworkSwitches',
 
