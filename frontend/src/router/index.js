@@ -229,6 +229,17 @@ const router = createRouter({
       },
     },
     {
+      path: "/components/housing/racks/:id",
+      name: "rack-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'racks',
+        detailKey: 'rack'
+      },
+    },
+    {
       path: "/installations",
       name: "installations",
       component: GenericTableView,

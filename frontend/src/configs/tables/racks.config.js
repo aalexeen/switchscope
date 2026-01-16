@@ -14,6 +14,13 @@ export default {
   icon: 'pi-box',
   iconColor: 'text-slate-600',
 
+  routes: {
+    list: '/components/housing/racks',
+    view: '/components/housing/racks/:id',
+    create: '/components/housing/racks/create',
+    edit: '/components/housing/racks/edit/:id'
+  },
+
   // Composable reference
   composable: 'useRacks',
 
