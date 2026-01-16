@@ -291,6 +291,17 @@ const router = createRouter({
         tableKey: 'ports' // Tells GenericTableView which table config to use
       },
     },
+    {
+      path: "/ports/:id",
+      name: "port-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'ports',
+        detailKey: 'port'
+      },
+    },
     // Catalog routes - all use GenericTableView with tableKey metadata
     {
       path: "/catalog/component-natures",
