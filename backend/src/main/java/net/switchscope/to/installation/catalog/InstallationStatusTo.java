@@ -11,8 +11,8 @@ import net.switchscope.to.component.catalog.BaseCodedTo;
 import net.switchscope.validation.NoHtml;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
+import java.util.Set;
 
 /**
  * DTO for InstallationStatusEntity - catalog of installation statuses
@@ -58,12 +58,9 @@ public class InstallationStatusTo extends BaseCodedTo {
 
     private Boolean notifiesStakeholders = false;
 
-    // Possible next statuses (IDs)
-    @Schema(description = "IDs of possible next statuses")
-    private Set<UUID> nextPossibleStatusIds = new HashSet<>();
-
-    @Schema(accessMode = Schema.AccessMode.READ_ONLY, description = "IDs of previous statuses")
-    private Set<UUID> previousStatusIds = new HashSet<>();
+    // Possible next statuses (codes)
+    @Schema(description = "Codes of possible next statuses")
+    private Set<String> nextPossibleStatusCodes = new HashSet<>();
 
     // Computed read-only fields
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
@@ -98,4 +95,3 @@ public class InstallationStatusTo extends BaseCodedTo {
         super(id, name);
     }
 }
-

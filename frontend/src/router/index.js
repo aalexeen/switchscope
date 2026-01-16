@@ -291,6 +291,17 @@ const router = createRouter({
       },
     },
     {
+      path: "/catalog/installation-statuses/:id",
+      name: "installation-status-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'installationStatuses',
+        detailKey: 'installationStatus'
+      },
+    },
+    {
       path: "/catalog/installable-types",
       name: "installable-types",
       component: GenericTableView,

@@ -218,7 +218,8 @@ public class Installation extends BaseEntity {
 
     // Status management
     public void changeStatus(InstallationStatusEntity newStatus, String changedBy) {
-        if (newStatus != null && (status == null || status.canTransitionTo(newStatus))) {
+        if (newStatus != null &&
+                (status == null || status.canTransitionTo(newStatus.getCode()))) {
             this.status = newStatus;
             this.lastStatusChange = LocalDateTime.now();
             this.statusChangedBy = changedBy;
@@ -234,7 +235,7 @@ public class Installation extends BaseEntity {
     }
 
     public boolean canChangeStatusTo(InstallationStatusEntity targetStatus) {
-        return status == null || status.canTransitionTo(targetStatus);
+        return status == null || status.canTransitionTo(targetStatus.getCode());
     }
 
     public void markAsRemoved(String removedBy) {
