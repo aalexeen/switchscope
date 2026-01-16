@@ -14,6 +14,13 @@ export default {
   icon: 'pi-map-marker',
   iconColor: 'text-orange-600',
 
+  routes: {
+    list: '/locations',
+    view: '/locations/:id',
+    create: '/locations/create',
+    edit: '/locations/edit/:id'
+  },
+
   // Composable reference
   composable: 'useLocations',
 
