@@ -40,7 +40,7 @@ databaseChangeLog:
             tableName: installation_statuses_catalog
 
   - changeSet:
-      id: fill-installation-status-transitions
+      id: fill-installation-status-allowed-transitions
       author: AALEXEEN
       changes:
         - loadData:
@@ -48,15 +48,13 @@ databaseChangeLog:
             separator: ;
             quotchar: ''''
             usePreparedStatements: false
-            tableName: installation_status_transitions
+            tableName: installation_status_allowed_transitions
             file: ../csv/41-installation-status-transitions.csv
             commentLineStartsWith: //
             relativeToChangelogFile: true
             columns:
-              - column: { header: from_status_id, name: from_status_id, type: UUID }
-              - column: { header: to_status_id, name: to_status_id, type: UUID }
+              - column: { header: installation_status_id, name: installation_status_id, type: UUID }
+              - column: { header: to_status_code, name: to_status_code, type: VARCHAR }
       rollback:
         - delete:
-            tableName: installation_status_transitions
-
-
+            tableName: installation_status_allowed_transitions

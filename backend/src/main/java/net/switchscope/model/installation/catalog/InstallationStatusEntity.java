@@ -71,18 +71,14 @@ public class InstallationStatusEntity extends BaseCodedEntity {
     @Column(name = "notifies_stakeholders", nullable = false)
     private boolean notifiesStakeholders = false;
 
-    // Possible next statuses (many-to-many self-reference)
-    @ManyToMany
-    @JoinTable(
-        name = "installation_status_transitions",
-        joinColumns = @JoinColumn(name = "from_status_id"),
-        inverseJoinColumns = @JoinColumn(name = "to_status_id")
+    // Next possible status codes (stored as codes, not entity references)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "installation_status_allowed_transitions",
+        joinColumns = @JoinColumn(name = "installation_status_id")
     )
-    private Set<InstallationStatusEntity> nextPossibleStatuses = new HashSet<>();
-
-    // Reverse relationship for transitions
-    @ManyToMany(mappedBy = "nextPossibleStatuses")
-    private Set<InstallationStatusEntity> previousStatuses = new HashSet<>();
+    @Column(name = "to_status_code", length = 64)
+    private Set<String> nextPossibleStatusCodes = new HashSet<>();
 
     // Constructor
     public InstallationStatusEntity(String code, String name, String displayName) {
@@ -96,29 +92,22 @@ public class InstallationStatusEntity extends BaseCodedEntity {
     }
 
     // Workflow management methods
-    public void addNextStatus(InstallationStatusEntity nextStatus) {
-        if (nextStatus != null && !nextStatus.equals(this)) {
-            nextPossibleStatuses.add(nextStatus);
-            nextStatus.getPreviousStatuses().add(this);
+    public void addNextPossibleStatusCode(String statusCode) {
+        if (statusCode != null && !statusCode.trim().isEmpty()) {
+            nextPossibleStatusCodes.add(statusCode);
         }
     }
 
-    public void removeNextStatus(InstallationStatusEntity nextStatus) {
-        if (nextStatus != null) {
-            nextPossibleStatuses.remove(nextStatus);
-            nextStatus.getPreviousStatuses().remove(this);
-        }
+    public void removeNextPossibleStatusCode(String statusCode) {
+        nextPossibleStatusCodes.remove(statusCode);
     }
 
-    public boolean canTransitionTo(InstallationStatusEntity targetStatus) {
-        return nextPossibleStatuses.contains(targetStatus);
+    public boolean canTransitionTo(String statusCode) {
+        return statusCode != null && nextPossibleStatusCodes.contains(statusCode);
     }
 
-    public List<InstallationStatusEntity> getOrderedNextStatuses() {
-        return nextPossibleStatuses.stream()
-                .sorted(Comparator.comparing(status ->
-                    status.getStatusOrder() != null ? status.getStatusOrder() : 50))
-                .toList();
+    public Set<String> getNextPossibleStatusCodes() {
+        return new HashSet<>(nextPossibleStatusCodes);
     }
 
     // Business logic methods
@@ -135,7 +124,7 @@ public class InstallationStatusEntity extends BaseCodedEntity {
     }
 
     public boolean isTerminalStatus() {
-        return finalStatus || (nextPossibleStatuses.isEmpty() && !errorStatus);
+        return finalStatus || (nextPossibleStatusCodes.isEmpty() && !errorStatus);
     }
 
     public boolean allowsStatusChange() {

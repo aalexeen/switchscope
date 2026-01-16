@@ -176,57 +176,41 @@ databaseChangeLog:
               - column:
                   name: status_order
 
-  # ManyToMany relationship table for status transitions
+  # Allowed transitions stored by status code (no self-referencing table)
   - changeSet:
-      id: create-installation-status-transitions
+      id: create-installation-status-allowed-transitions
       author: AALEXEEN
       changes:
         - createTable:
-            tableName: installation_status_transitions
+            tableName: installation_status_allowed_transitions
             columns:
               - column:
-                  name: from_status_id
+                  name: installation_status_id
                   type: UUID
                   constraints:
                     nullable: false
               - column:
-                  name: to_status_id
-                  type: UUID
+                  name: to_status_code
+                  type: VARCHAR(64)
                   constraints:
                     nullable: false
 
         - addForeignKeyConstraint:
-            baseTableName: installation_status_transitions
-            baseColumnNames: from_status_id
-            constraintName: fk_status_transition_from
-            referencedTableName: installation_statuses_catalog
-            referencedColumnNames: id
-            onDelete: CASCADE
-
-        - addForeignKeyConstraint:
-            baseTableName: installation_status_transitions
-            baseColumnNames: to_status_id
-            constraintName: fk_status_transition_to
+            baseTableName: installation_status_allowed_transitions
+            baseColumnNames: installation_status_id
+            constraintName: fk_installation_status_allowed_transition
             referencedTableName: installation_statuses_catalog
             referencedColumnNames: id
             onDelete: CASCADE
 
         - addUniqueConstraint:
-            tableName: installation_status_transitions
-            columnNames: from_status_id, to_status_id
-            constraintName: uk_status_transition_pair
+            tableName: installation_status_allowed_transitions
+            columnNames: installation_status_id, to_status_code
+            constraintName: uq_installation_status_allowed_transition_pair
 
         - createIndex:
-            tableName: installation_status_transitions
-            indexName: idx_status_transition_from
+            tableName: installation_status_allowed_transitions
+            indexName: idx_installation_status_allowed_transition
             columns:
               - column:
-                  name: from_status_id
-
-        - createIndex:
-            tableName: installation_status_transitions
-            indexName: idx_status_transition_to
-            columns:
-              - column:
-                  name: to_status_id
-
+                  name: installation_status_id
