@@ -14,6 +14,13 @@ export default {
   icon: 'pi-circle',
   iconColor: 'text-indigo-600',
 
+  routes: {
+    list: '/components/connectivity/connectors',
+    view: '/components/connectivity/connectors/:id',
+    create: '/components/connectivity/connectors/create',
+    edit: '/components/connectivity/connectors/edit/:id'
+  },
+
   // Composable reference
   composable: 'useConnectors',
 
