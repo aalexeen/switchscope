@@ -142,10 +142,12 @@
 
           <div class="space-y-4">
             <!-- Allowed Child Types -->
-            <div v-if="item.allowedChildTypeCodes && item.allowedChildTypeCodes.length > 0">
-              <h3 class="text-sm font-medium text-gray-700 mb-2">Can contain these component types:</h3>
+            <div v-if="containmentChildItems.length > 0">
+              <h3 class="text-sm font-medium text-gray-700 mb-2">
+                {{ containmentLabels.child }}
+              </h3>
               <RelatedItemsBadges
-                :items="item.allowedChildTypeCodes"
+                :items="containmentChildItems"
                 icon="pi-tag"
                 theme="blue"
                 empty-message="No allowed child types"
@@ -153,13 +155,28 @@
             </div>
 
             <!-- Allowed Child Categories -->
-            <div v-if="item.allowedChildCategoryCodes && item.allowedChildCategoryCodes.length > 0">
-              <h3 class="text-sm font-medium text-gray-700 mb-2">Can contain these categories:</h3>
+            <div v-if="containmentCategoryItems.length > 0">
+              <h3 class="text-sm font-medium text-gray-700 mb-2">
+                {{ containmentLabels.category }}
+              </h3>
               <RelatedItemsBadges
-                :items="item.allowedChildCategoryCodes"
+                :items="containmentCategoryItems"
                 icon="pi-folder"
                 theme="green"
                 empty-message="No allowed child categories"
+              />
+            </div>
+
+            <!-- Allowed Parent Types -->
+            <div v-if="containmentParentItems.length > 0">
+              <h3 class="text-sm font-medium text-gray-700 mb-2">
+                {{ containmentLabels.parent }}
+              </h3>
+              <RelatedItemsBadges
+                :items="containmentParentItems"
+                icon="pi-sitemap"
+                theme="indigo"
+                empty-message="No allowed parent types"
               />
             </div>
           </div>
@@ -255,6 +272,62 @@ const composable = computed(() => {
   return composableFactory();
 });
 
+const allItems = computed(() => {
+  const comp = composable.value;
+  const tableKey = config.value.tableKey;
+  if (!comp || !tableKey) return [];
+  const items = comp[tableKey];
+  return items?.value || items || [];
+});
+
+const relatedItemMap = computed(() => {
+  const map = new Map();
+  allItems.value.forEach((entry) => {
+    if (!entry?.id) return;
+    map.set(entry.id, {
+      code: entry.code || entry.displayName || entry.name || entry.id,
+      label: entry.displayName || entry.name || entry.code || entry.id
+    });
+  });
+  return map;
+});
+
+const containmentConfig = computed(() => config.value.sections?.containment || {});
+const containmentLabels = computed(() => ({
+  child: containmentConfig.value.childLabel || 'Can contain these component types:',
+  category: containmentConfig.value.categoryLabel || 'Can contain these categories:',
+  parent: containmentConfig.value.parentLabel || 'Can be child of these types:'
+}));
+
+const getContainmentItems = (key) => {
+  if (!key) return [];
+  const values = item.value?.[key];
+  if (!Array.isArray(values)) return [];
+
+  if (key.endsWith('Ids')) {
+    return values
+      .map((id) => relatedItemMap.value.get(id)?.code || id)
+      .filter(Boolean);
+  }
+
+  return values;
+};
+
+const containmentChildItems = computed(() => {
+  const key = containmentConfig.value.childKey || 'allowedChildTypeCodes';
+  return getContainmentItems(key);
+});
+
+const containmentCategoryItems = computed(() => {
+  const key = containmentConfig.value.categoryKey || 'allowedChildCategoryCodes';
+  return getContainmentItems(key);
+});
+
+const containmentParentItems = computed(() => {
+  const key = containmentConfig.value.parentKey;
+  return getContainmentItems(key);
+});
+
 const hasProperties = computed(() => {
   return item.value?.properties && Object.keys(item.value.properties).length > 0;
 });
@@ -273,8 +346,9 @@ const hasTransitions = computed(() => {
 
 const hasContainmentRules = computed(() => {
   return (
-    (item.value?.allowedChildTypeCodes && item.value.allowedChildTypeCodes.length > 0) ||
-    (item.value?.allowedChildCategoryCodes && item.value.allowedChildCategoryCodes.length > 0)
+    containmentChildItems.value.length > 0 ||
+    containmentCategoryItems.value.length > 0 ||
+    containmentParentItems.value.length > 0
   );
 });
 
