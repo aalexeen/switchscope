@@ -1,0 +1,78 @@
+/**
+ * Detail View Configuration for Router
+ */
+
+export default {
+  tableKey: 'routers',
+  composable: 'useRouters',
+
+  sections: {
+    basicInfo: {
+      fields: [
+        { key: 'name', label: 'Name', fallback: '-' },
+        { key: 'description', label: 'Description', fallback: 'No description' },
+        { key: 'manufacturer', label: 'Manufacturer', fallback: 'N/A' },
+        { key: 'model', label: 'Model', fallback: 'N/A' },
+        { key: 'serialNumber', label: 'Serial Number', fallback: 'N/A' },
+        { key: 'partNumber', label: 'Part Number', fallback: 'N/A' },
+        { key: 'ipAddress', label: 'IP Address', fallback: 'N/A' },
+        { key: 'hostname', label: 'Hostname', fallback: 'N/A' },
+        { key: 'managementIp', label: 'Management IP', fallback: 'N/A' },
+        { key: 'subnetMask', label: 'Subnet Mask', fallback: 'N/A' },
+        { key: 'defaultGateway', label: 'Default Gateway', fallback: 'N/A' },
+        { key: 'managementVlan', label: 'Management VLAN', fallback: '-' },
+        { key: 'componentTypeDisplayName', label: 'Router Type', fallback: '-' },
+        { key: 'componentTypeCode', label: 'Type Code', fallback: '-' },
+        { key: 'componentStatusDisplayName', label: 'Status', fallback: '-' },
+        { key: 'componentStatusCode', label: 'Status Code', fallback: '-' },
+        { key: 'componentNatureCode', label: 'Nature Code', fallback: '-' },
+        { key: 'operational', label: 'Operational', type: 'boolean' },
+        { key: 'installed', label: 'Installed', type: 'boolean' },
+        { key: 'managed', label: 'Managed', type: 'boolean' },
+        { key: 'reachable', label: 'Reachable', type: 'boolean' },
+        { key: 'monitoringStatus', label: 'Monitoring Status', fallback: '-' },
+        { key: 'networkConfiguration', label: 'Network Configuration', fallback: '-' },
+        { key: 'portCount', label: 'Port Count', fallback: '-' },
+        { key: 'firmwareVersion', label: 'Firmware Version', fallback: 'N/A' },
+        { key: 'softwareVersion', label: 'Software Version', fallback: 'N/A' },
+        { key: 'bootLoaderVersion', label: 'Boot Loader Version', fallback: 'N/A' },
+        { key: 'monitored', label: 'Monitored', type: 'boolean' },
+        { key: 'monitoringIntervalSeconds', label: 'Monitoring Interval (s)', fallback: '-' },
+        { key: 'lastPingTime', label: 'Last Ping Time', format: 'date', fallback: '-' },
+        { key: 'lastPingSuccess', label: 'Last Ping Success', type: 'boolean' },
+        { key: 'uptimeSeconds', label: 'Uptime (s)', fallback: '-' },
+        { key: 'consolePortType', label: 'Console Port Type', fallback: 'N/A' },
+        { key: 'hasRedundantPower', label: 'Redundant Power', type: 'boolean' },
+        { key: 'operatingTemperatureMin', label: 'Operating Temp Min (°C)', fallback: '-' },
+        { key: 'operatingTemperatureMax', label: 'Operating Temp Max (°C)', fallback: '-' },
+        { key: 'cpuUtilizationPercent', label: 'CPU Utilization (%)', fallback: '-' },
+        { key: 'memoryUtilizationPercent', label: 'Memory Utilization (%)', fallback: '-' },
+        { key: 'temperatureCelsius', label: 'Temperature (°C)', fallback: '-' },
+        { key: 'maxRoutes', label: 'Max Routes', fallback: '-' },
+        { key: 'supportsBgp', label: 'Supports BGP', type: 'boolean' },
+        { key: 'supportsOspf', label: 'Supports OSPF', type: 'boolean' },
+        { key: 'supportsEigrp', label: 'Supports EIGRP', type: 'boolean' },
+        { key: 'supportsRip', label: 'Supports RIP', type: 'boolean' },
+        { key: 'supportsStaticRouting', label: 'Supports Static Routing', type: 'boolean' },
+        { key: 'supportsNat', label: 'Supports NAT', type: 'boolean' },
+        { key: 'maxNatSessions', label: 'Max NAT Sessions', fallback: '-' },
+        { key: 'supportsIpsecVpn', label: 'Supports IPsec VPN', type: 'boolean' },
+        { key: 'maxVpnTunnels', label: 'Max VPN Tunnels', fallback: '-' },
+        { key: 'supportsAcl', label: 'Supports ACL', type: 'boolean' },
+        { key: 'supportsFirewall', label: 'Supports Firewall', type: 'boolean' },
+        { key: 'routingThroughputGbps', label: 'Routing Throughput (Gbps)', fallback: '-' },
+        { key: 'packetsPerSecond', label: 'Packets per Second', fallback: '-' },
+        { key: 'wanInterfaceTypes', label: 'WAN Interface Types', fallback: '-' },
+        { key: 'enterpriseRouter', label: 'Enterprise Router', type: 'boolean' },
+        { key: 'vpnCapability', label: 'VPN Capability', type: 'boolean' },
+        { key: 'componentPath', label: 'Component Path', fallback: '-' },
+        { key: 'locationAddress', label: 'Location Address', fallback: '-' },
+        { key: 'installationId', label: 'Installation ID', fallback: '-' },
+        { key: 'parentComponentName', label: 'Parent Component', fallback: '-' },
+        { key: 'parentComponentId', label: 'Parent Component ID', fallback: '-' },
+        { key: 'lastMaintenanceDate', label: 'Last Maintenance', format: 'date', fallback: '-' },
+        { key: 'nextMaintenanceDate', label: 'Next Maintenance', format: 'date', fallback: '-' }
+      ]
+    }
+  }
+};

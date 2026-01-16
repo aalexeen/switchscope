@@ -103,6 +103,17 @@ const router = createRouter({
       },
     },
     {
+      path: "/components/devices/switches/:id",
+      name: "network-switch-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'networkSwitches',
+        detailKey: 'networkSwitch'
+      },
+    },
+    {
       path: "/components/devices/routers",
       name: "routers",
       component: GenericTableView,
@@ -110,6 +121,17 @@ const router = createRouter({
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
         tableKey: 'routers' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/components/devices/routers/:id",
+      name: "router-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'routers',
+        detailKey: 'router'
       },
     },
     {
@@ -123,6 +145,17 @@ const router = createRouter({
       },
     },
     {
+      path: "/components/devices/access-points/:id",
+      name: "access-point-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'accessPoints',
+        detailKey: 'accessPoint'
+      },
+    },
+    {
       path: "/components/connectivity/cable-runs",
       name: "cable-runs",
       component: GenericTableView,
@@ -130,6 +163,17 @@ const router = createRouter({
         requiresAuth: true,
         roles: ['USER', 'ADMIN'],
         tableKey: 'cableRuns' // Tells GenericTableView which table config to use
+      },
+    },
+    {
+      path: "/components/connectivity/cable-runs/:id",
+      name: "cable-run-detail",
+      component: GenericDetailView,
+      meta: {
+        requiresAuth: true,
+        roles: ['USER', 'ADMIN'],
+        tableKey: 'cableRuns',
+        detailKey: 'cableRun'
       },
     },
     {

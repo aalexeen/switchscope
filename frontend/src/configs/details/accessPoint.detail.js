@@ -1,0 +1,78 @@
+/**
+ * Detail View Configuration for Access Point
+ */
+
+export default {
+  tableKey: 'accessPoints',
+  composable: 'useAccessPoints',
+
+  sections: {
+    basicInfo: {
+      fields: [
+        { key: 'name', label: 'Name', fallback: '-' },
+        { key: 'description', label: 'Description', fallback: 'No description' },
+        { key: 'manufacturer', label: 'Manufacturer', fallback: 'N/A' },
+        { key: 'model', label: 'Model', fallback: 'N/A' },
+        { key: 'serialNumber', label: 'Serial Number', fallback: 'N/A' },
+        { key: 'partNumber', label: 'Part Number', fallback: 'N/A' },
+        { key: 'ipAddress', label: 'IP Address', fallback: 'N/A' },
+        { key: 'hostname', label: 'Hostname', fallback: 'N/A' },
+        { key: 'managementIp', label: 'Management IP', fallback: 'N/A' },
+        { key: 'subnetMask', label: 'Subnet Mask', fallback: 'N/A' },
+        { key: 'defaultGateway', label: 'Default Gateway', fallback: 'N/A' },
+        { key: 'managementVlan', label: 'Management VLAN', fallback: '-' },
+        { key: 'componentTypeDisplayName', label: 'Access Point Type', fallback: '-' },
+        { key: 'componentTypeCode', label: 'Type Code', fallback: '-' },
+        { key: 'componentStatusDisplayName', label: 'Status', fallback: '-' },
+        { key: 'componentStatusCode', label: 'Status Code', fallback: '-' },
+        { key: 'componentNatureCode', label: 'Nature Code', fallback: '-' },
+        { key: 'operational', label: 'Operational', type: 'boolean' },
+        { key: 'installed', label: 'Installed', type: 'boolean' },
+        { key: 'managed', label: 'Managed', type: 'boolean' },
+        { key: 'reachable', label: 'Reachable', type: 'boolean' },
+        { key: 'monitoringStatus', label: 'Monitoring Status', fallback: '-' },
+        { key: 'networkConfiguration', label: 'Network Configuration', fallback: '-' },
+        { key: 'portCount', label: 'Port Count', fallback: '-' },
+        { key: 'firmwareVersion', label: 'Firmware Version', fallback: 'N/A' },
+        { key: 'softwareVersion', label: 'Software Version', fallback: 'N/A' },
+        { key: 'bootLoaderVersion', label: 'Boot Loader Version', fallback: 'N/A' },
+        { key: 'monitored', label: 'Monitored', type: 'boolean' },
+        { key: 'monitoringIntervalSeconds', label: 'Monitoring Interval (s)', fallback: '-' },
+        { key: 'lastPingTime', label: 'Last Ping Time', format: 'date', fallback: '-' },
+        { key: 'lastPingSuccess', label: 'Last Ping Success', type: 'boolean' },
+        { key: 'uptimeSeconds', label: 'Uptime (s)', fallback: '-' },
+        { key: 'consolePortType', label: 'Console Port Type', fallback: 'N/A' },
+        { key: 'hasRedundantPower', label: 'Redundant Power', type: 'boolean' },
+        { key: 'operatingTemperatureMin', label: 'Operating Temp Min (°C)', fallback: '-' },
+        { key: 'operatingTemperatureMax', label: 'Operating Temp Max (°C)', fallback: '-' },
+        { key: 'cpuUtilizationPercent', label: 'CPU Utilization (%)', fallback: '-' },
+        { key: 'memoryUtilizationPercent', label: 'Memory Utilization (%)', fallback: '-' },
+        { key: 'temperatureCelsius', label: 'Temperature (°C)', fallback: '-' },
+        { key: 'wifiStandard', label: 'WiFi Standard', fallback: '-' },
+        { key: 'maxClients', label: 'Max Clients', fallback: '-' },
+        { key: 'supportsDualBand', label: 'Supports Dual Band', type: 'boolean' },
+        { key: 'supports5Ghz', label: 'Supports 5GHz', type: 'boolean' },
+        { key: 'supports6Ghz', label: 'Supports 6GHz', type: 'boolean' },
+        { key: 'poeRequired', label: 'PoE Required', type: 'boolean' },
+        { key: 'poeConsumptionWatts', label: 'PoE Consumption (W)', fallback: '-' },
+        { key: 'coverageRadiusMeters', label: 'Coverage Radius (m)', fallback: '-' },
+        { key: 'maxThroughputMbps', label: 'Max Throughput (Mbps)', fallback: '-' },
+        { key: 'supportsWpa3', label: 'Supports WPA3', type: 'boolean' },
+        { key: 'supportsEnterpriseAuth', label: 'Supports Enterprise Auth', type: 'boolean' },
+        { key: 'controllerManaged', label: 'Controller Managed', type: 'boolean' },
+        { key: 'controllerIp', label: 'Controller IP', fallback: '-' },
+        { key: 'ssids', label: 'SSIDs', fallback: '-' },
+        { key: 'ssidCount', label: 'SSID Count', fallback: '-' },
+        { key: 'wifi6', label: 'WiFi 6', type: 'boolean' },
+        { key: 'modernSecurity', label: 'Modern Security', type: 'boolean' },
+        { key: 'componentPath', label: 'Component Path', fallback: '-' },
+        { key: 'locationAddress', label: 'Location Address', fallback: '-' },
+        { key: 'installationId', label: 'Installation ID', fallback: '-' },
+        { key: 'parentComponentName', label: 'Parent Component', fallback: '-' },
+        { key: 'parentComponentId', label: 'Parent Component ID', fallback: '-' },
+        { key: 'lastMaintenanceDate', label: 'Last Maintenance', format: 'date', fallback: '-' },
+        { key: 'nextMaintenanceDate', label: 'Next Maintenance', format: 'date', fallback: '-' }
+      ]
+    }
+  }
+};
