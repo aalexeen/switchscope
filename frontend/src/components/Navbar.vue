@@ -1,7 +1,7 @@
 <script setup>
 import logo from '@/assets/img/logo.png';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { onMounted } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useAuth } from '@/composables/useAuth';
 import { useToast } from 'vue-toastification';
 
@@ -18,6 +18,8 @@ const {
   isAdmin, 
   hasRole 
 } = useAuth();
+
+const isMenuOpen = ref(false);
 
 onMounted(async () => {
   // Initialize auth on component mount
@@ -49,13 +51,20 @@ const canAccessAdminRoutes = () => {
   return isAdmin.value;
 };
 
+watch(
+  () => route.path,
+  () => {
+    isMenuOpen.value = false;
+  }
+);
+
 </script>
 
 <template>
   <nav class="bg-green-700 border-b border-green-500">
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-      <div class="flex h-20 items-center justify-between">
-        <div class="flex flex-1 items-center justify-center md:items-stretch md:justify-start">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div class="flex h-20 items-center justify-between">
           <!-- Logo -->
           <RouterLink
             class="flex flex-shrink-0 items-center mr-4"
@@ -69,83 +78,93 @@ const canAccessAdminRoutes = () => {
             <span class="hidden md:block text-white text-2xl font-bold ml-2">SwitchScope</span>
           </RouterLink>
 
-          <!-- Only show navigation when logged in -->
-          <div
+          <button
             v-if="isLoggedIn"
-            class="md:ml-auto"
+            class="inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-green-800 md:hidden"
+            :aria-expanded="isMenuOpen"
+            aria-label="Toggle navigation"
+            @click="isMenuOpen = !isMenuOpen"
           >
-            <div class="flex space-x-2">
-              <!-- Home - Available to all authenticated users -->
+            <i :class="isMenuOpen ? 'pi pi-times' : 'pi pi-bars'" />
+          </button>
+        </div>
+
+        <!-- Only show navigation when logged in -->
+        <div
+          v-if="isLoggedIn"
+          :class="[isMenuOpen ? 'block' : 'hidden', 'md:block md:ml-auto']"
+        >
+          <div class="flex flex-col gap-1 pb-3 md:flex-row md:items-center md:gap-0 md:space-x-2 md:pb-0">
+            <!-- Home - Available to all authenticated users -->
+            <RouterLink
+              to="/"
+              :class="[isActiveLink('/')
+                         ? 'bg-green-900'
+                         : 'hover:bg-gray-900 hover:text-white',
+                       'text-white', 'px-3', 'py-2', 'rounded-md']"
+            >
+              Home
+            </RouterLink>
+
+            <!-- Dashboard - Available to both USER and ADMIN -->
+            <RouterLink
+              v-if="hasRole('USER') || hasRole('ADMIN')"
+              to="/dashboard"
+              :class="[isRemoveMacActive()
+                         ? 'bg-green-900'
+                         : 'hover:bg-gray-900 hover:text-white',
+                       'text-white', 'px-3', 'py-2', 'rounded-md']"
+            >
+              Dashboard
+            </RouterLink>
+
+            <!-- Admin-only navigation items -->
+            <template v-if="canAccessAdminRoutes()">
               <RouterLink
-                to="/"
-                :class="[isActiveLink('/')
+                to="/users/allusers"
+                :class="[isActiveLink('/users/allusers')
                            ? 'bg-green-900'
                            : 'hover:bg-gray-900 hover:text-white',
                          'text-white', 'px-3', 'py-2', 'rounded-md']"
               >
-                Home
+                All Users
               </RouterLink>
-
-              <!-- Dashboard - Available to both USER and ADMIN -->
+              
               <RouterLink
-                v-if="hasRole('USER') || hasRole('ADMIN')"
-                to="/dashboard"
-                :class="[isRemoveMacActive()
+                to="/users/add"
+                :class="[isActiveLink('/users/add')
                            ? 'bg-green-900'
                            : 'hover:bg-gray-900 hover:text-white',
                          'text-white', 'px-3', 'py-2', 'rounded-md']"
               >
-                Dashboard
+                Add User
               </RouterLink>
+            </template>
 
-              <!-- Admin-only navigation items -->
-              <template v-if="canAccessAdminRoutes()">
-                <RouterLink
-                  to="/users/allusers"
-                  :class="[isActiveLink('/users/allusers')
-                             ? 'bg-green-900'
-                             : 'hover:bg-gray-900 hover:text-white',
-                           'text-white', 'px-3', 'py-2', 'rounded-md']"
-                >
-                  All Users
-                </RouterLink>
-                
-                <RouterLink
-                  to="/users/add"
-                  :class="[isActiveLink('/users/add')
-                             ? 'bg-green-900'
-                             : 'hover:bg-gray-900 hover:text-white',
-                           'text-white', 'px-3', 'py-2', 'rounded-md']"
-                >
-                  Add User
-                </RouterLink>
-              </template>
+            <!-- My Account - Available to all authenticated users -->
+            <RouterLink
+              to="/user"
+              :class="[isActiveLink('/user')
+                         ? 'bg-green-900'
+                         : 'hover:bg-gray-900 hover:text-white',
+                       'text-white', 'px-3', 'py-2', 'rounded-md']"
+            >
+              My Account
+            </RouterLink>
 
-              <!-- My Account - Available to all authenticated users -->
-              <RouterLink
-                to="/user"
-                :class="[isActiveLink('/user')
-                           ? 'bg-green-900'
-                           : 'hover:bg-gray-900 hover:text-white',
-                         'text-white', 'px-3', 'py-2', 'rounded-md']"
-              >
-                My Account
-              </RouterLink>
+            <!-- Logout Button -->
+            <button
+              class="text-white px-3 py-2 rounded-md hover:bg-red-700"
+              @click="handleLogout"
+            >
+              Logout
+            </button>
 
-              <!-- Logout Button -->
-              <button
-                class="text-white px-3 py-2 rounded-md hover:bg-red-700"
-                @click="handleLogout"
-              >
-                Logout
-              </button>
-
-              <!-- User Name and Role Display -->
-              <div class="flex items-center space-x-2">
-                <span class="text-white px-3 py-2 bg-green-800 rounded-md">
-                  Welcome, {{ username }}
-                </span>
-              </div>
+            <!-- User Name and Role Display -->
+            <div class="flex items-center space-x-2">
+              <span class="text-white px-3 py-2 bg-green-800 rounded-md">
+                Welcome, {{ username }}
+              </span>
             </div>
           </div>
         </div>
