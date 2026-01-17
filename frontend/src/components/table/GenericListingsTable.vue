@@ -67,6 +67,7 @@ const { data, isLoading, error, fetchData, total } = props.composableData;
 
 // Toggle for showing all columns vs only visible ones
 const showAllColumns = ref(false);
+const editEnabled = ref(false);
 
 /**
  * Compute visible columns based on showAllColumns toggle
@@ -114,19 +115,20 @@ onMounted(async () => {
 
       <!-- Statistics and Controls -->
       <div class="bg-white rounded-lg shadow p-4 mb-6">
-        <div class="flex justify-between items-center">
-          <div class="text-sm text-gray-600">
-            <span class="font-medium">
-              Displaying: {{ displayedData.length }} {{ config.entityKeyPlural }}
-            </span>
-            <span
-              v-if="limit"
-              class="ml-4"
-            >
-              (Limit: {{ Math.min(limit, displayedData.length) }} of {{ total }})
-            </span>
-          </div>
-          <div class="flex space-x-2">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
+          <button
+            class="px-4 py-2 rounded text-sm transition-colors order-1"
+            :class="editEnabled
+              ? 'bg-red-600 hover:bg-red-700 text-white'
+              : 'bg-red-600/20 text-red-600 hover:bg-red-600/30 opacity-60'"
+            title="Toggle edit actions"
+            :aria-pressed="editEnabled"
+            @click="editEnabled = !editEnabled"
+          >
+            <i class="pi pi-pencil" />
+            Edit on/off
+          </button>
+          <div class="flex space-x-2 order-2 sm:order-3 sm:ml-auto">
             <!-- Toggle Show All Columns Button -->
             <button
               v-if="hiddenColumnsCount > 0"
@@ -145,6 +147,17 @@ onMounted(async () => {
               <i class="pi pi-refresh" />
               {{ isLoading ? 'Refreshing...' : 'Refresh' }}
             </button>
+          </div>
+          <div class="text-sm text-gray-600 whitespace-nowrap order-3 sm:order-2">
+            <span class="font-medium">
+              Displaying: {{ displayedData.length }} {{ config.entityKeyPlural }}
+            </span>
+            <span
+              v-if="limit"
+              class="ml-4"
+            >
+              (Limit: {{ Math.min(limit, displayedData.length) }} of {{ total }})
+            </span>
           </div>
         </div>
       </div>
@@ -207,6 +220,7 @@ onMounted(async () => {
                 :item="item"
                 :config="config"
                 :visible-columns="visibleColumns"
+                :edit-enabled="editEnabled"
                 @view="(i) => $emit('view', i)"
                 @edit="(i) => $emit('edit', i)"
                 @delete="(i) => $emit('delete', i)"

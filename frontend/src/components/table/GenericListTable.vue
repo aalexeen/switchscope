@@ -15,6 +15,10 @@ const props = defineProps({
   visibleColumns: {
     type: Array,
     required: true
+  },
+  editEnabled: {
+    type: Boolean,
+    default: true
   }
 });
 
@@ -80,6 +84,7 @@ const getColumnValue = (item, key) => {
         :item="item"
         :config="col"
         :is-expanded="isExpanded"
+        :edit-enabled="editEnabled"
         @toggle="toggleExpand"
         @view="$emit('view', item)"
         @edit="$emit('edit', item)"
