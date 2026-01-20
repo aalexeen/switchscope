@@ -117,8 +117,13 @@ const handleView = (item) => {
 };
 
 const handleEdit = (item) => {
-  // TODO: Implement edit modal or navigate to edit page
-  toast.info(`Edit: ${item.name}`);
+  // Navigate to detail view in edit mode
+  if (config.routes?.view) {
+    const viewPath = config.routes.view.replace(':id', item.id);
+    router.push({ path: viewPath, query: { edit: 'true' } });
+  } else {
+    toast.warning('Edit view not available for this table');
+  }
 };
 
 const handleDelete = async (item) => {
