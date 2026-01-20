@@ -6,12 +6,32 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository for ComponentCategoryEntity
  */
 @Repository
 public interface ComponentCategoryRepository extends ComponentCatalogRepository<ComponentCategoryEntity> {
+
+    /**
+     * Find category by id with eager loading of componentTypes
+     *
+     * @param id category id
+     * @return optional category with componentTypes loaded
+     */
+    @Query("SELECT cc FROM ComponentCategoryEntity cc LEFT JOIN FETCH cc.componentTypes WHERE cc.id = :id")
+    Optional<ComponentCategoryEntity> findByIdWithComponentTypes(@Param("id") UUID id);
+
+    /**
+     * Find all categories with eager loading of componentTypes
+     *
+     * @return list of categories with componentTypes loaded
+     */
+    @Override
+    @Query("SELECT DISTINCT cc FROM ComponentCategoryEntity cc LEFT JOIN FETCH cc.componentTypes ORDER BY cc.sortOrder, cc.displayName")
+    List<ComponentCategoryEntity> findAllWithAssociations();
 
     /**
      * Find infrastructure categories

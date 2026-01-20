@@ -27,7 +27,7 @@
           <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <div class="flex items-center gap-3">
               <button
-                @click="goBack"
+                @click="handleBack"
                 class="p-2 hover:bg-gray-100 rounded transition-colors"
                 title="Go back"
               >
@@ -39,26 +39,60 @@
                 class="text-2xl"
               ></i>
               <div>
-                <h1 class="text-2xl font-bold text-gray-900">{{ item.name }}</h1>
+                <h1 class="text-2xl font-bold text-gray-900">
+                  {{ isEditMode ? `Edit: ${item.name}` : item.name }}
+                </h1>
                 <p v-if="item.code" class="text-sm text-gray-500 font-mono">{{ item.code }}</p>
               </div>
             </div>
             <div class="flex items-center gap-2">
-              <span
-                v-if="item.active !== undefined"
-                :class="item.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                class="px-3 py-1 rounded-full text-sm font-medium"
-              >
-                {{ item.active ? 'Active' : 'Inactive' }}
-              </span>
-              <button
-                @click="handleEdit"
-                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors"
-              >
-                <i class="pi pi-pencil mr-2"></i>
-                Edit
-              </button>
+              <!-- View Mode Buttons -->
+              <template v-if="!isEditMode">
+                <span
+                  v-if="item.active !== undefined"
+                  :class="item.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                  class="px-3 py-1 rounded-full text-sm font-medium"
+                >
+                  {{ item.active ? 'Active' : 'Inactive' }}
+                </span>
+                <button
+                  @click="enterEditMode"
+                  class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors"
+                >
+                  <i class="pi pi-pencil mr-2"></i>
+                  Edit
+                </button>
+              </template>
+
+              <!-- Edit Mode Buttons -->
+              <template v-else>
+                <button
+                  @click="cancelEdit"
+                  :disabled="isSaving"
+                  class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded transition-colors disabled:opacity-50"
+                >
+                  <i class="pi pi-times mr-2"></i>
+                  Cancel
+                </button>
+                <button
+                  @click="saveChanges"
+                  :disabled="isSaving || !hasChanges"
+                  class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i :class="['pi mr-2', isSaving ? 'pi-spinner pi-spin' : 'pi-check']"></i>
+                  {{ isSaving ? 'Saving...' : 'Save' }}
+                </button>
+              </template>
             </div>
+          </div>
+
+          <!-- Unsaved Changes Warning -->
+          <div
+            v-if="isEditMode && hasChanges"
+            class="px-6 py-2 bg-yellow-50 border-b border-yellow-200 flex items-center gap-2 text-sm text-yellow-800"
+          >
+            <i class="pi pi-exclamation-triangle"></i>
+            You have unsaved changes
           </div>
         </div>
 
@@ -71,22 +105,35 @@
               :key="field.key"
               class="border-b border-gray-100 pb-3"
             >
-              <dt class="text-sm font-medium text-gray-500 mb-1">{{ field.label }}</dt>
+              <dt class="text-sm font-medium text-gray-500 mb-1 flex items-center gap-1">
+                {{ field.label }}
+                <span v-if="field.required && isEditMode" class="text-red-500">*</span>
+              </dt>
               <dd class="text-sm text-gray-900">
-                <component
-                  v-if="field.component"
-                  :is="field.component"
-                  :value="getFieldValue(item, field.key)"
-                  :item="item"
+                <!-- Edit Mode -->
+                <EditFieldRenderer
+                  v-if="isEditMode"
+                  v-model="editForm[field.key]"
+                  :field="field"
+                  :disabled="isSaving"
                 />
-                <span v-else>{{ formatFieldValue(item, field) }}</span>
+                <!-- View Mode -->
+                <template v-else>
+                  <component
+                    v-if="field.component"
+                    :is="field.component"
+                    :value="getFieldValue(item, field.key)"
+                    :item="item"
+                  />
+                  <span v-else>{{ formatFieldValue(item, field) }}</span>
+                </template>
               </dd>
             </div>
           </dl>
         </div>
 
-        <!-- Properties Section -->
-        <div v-if="hasProperties" class="bg-white rounded-lg shadow p-6">
+        <!-- Properties Section (View only - editing properties is complex) -->
+        <div v-if="hasProperties && !isEditMode" class="bg-white rounded-lg shadow p-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Properties</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div
@@ -109,8 +156,8 @@
           </div>
         </div>
 
-        <!-- Workflow / Status Transitions Section -->
-        <div v-if="config.sections?.workflow && hasTransitions" class="bg-white rounded-lg shadow p-6">
+        <!-- Workflow / Status Transitions Section (View only) -->
+        <div v-if="config.sections?.workflow && hasTransitions && !isEditMode" class="bg-white rounded-lg shadow p-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">
             <i class="pi pi-arrow-right-arrow-left mr-2 text-purple-500"></i>
             {{ config.sections.workflow.title || 'Workflow Transitions' }}
@@ -133,8 +180,8 @@
           </div>
         </div>
 
-        <!-- Containment Rules Section -->
-        <div v-if="config.sections?.containment && hasContainmentRules" class="bg-white rounded-lg shadow p-6">
+        <!-- Containment Rules Section (View only) -->
+        <div v-if="config.sections?.containment && hasContainmentRules && !isEditMode" class="bg-white rounded-lg shadow p-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">
             <i class="pi pi-sitemap mr-2 text-blue-500"></i>
             {{ config.sections.containment.title || 'Containment Rules' }}
@@ -182,9 +229,10 @@
           </div>
         </div>
 
-        <!-- Related Tables Section -->
+        <!-- Related Tables Section (View only) -->
         <div
           v-for="relatedSection in config.sections?.relatedTables || []"
+          v-if="!isEditMode"
           :key="relatedSection.key"
           class="bg-white rounded-lg shadow p-6"
         >
@@ -198,8 +246,8 @@
           <p v-else class="text-sm text-gray-500 italic">No related data available</p>
         </div>
 
-        <!-- Audit Information -->
-        <div v-if="item.createdAt || item.updatedAt" class="bg-white rounded-lg shadow p-6">
+        <!-- Audit Information (View only) -->
+        <div v-if="(item.createdAt || item.updatedAt) && !isEditMode" class="bg-white rounded-lg shadow p-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Audit Information</h2>
           <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div v-if="item.createdAt" class="border-b border-gray-100 pb-3">
@@ -230,20 +278,29 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import GenericListingsTable from '@/components/table/GenericListingsTable.vue';
 import RelatedItemsBadges from '@/components/detail/RelatedItemsBadges.vue';
+import EditFieldRenderer from '@/components/form/EditFieldRenderer.vue';
 import { detailViewRegistry } from '@/configs/details/detailViewRegistry';
 import { composableRegistry } from '@/configs/tables/tableRegistry';
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
 
 const item = ref(null);
 const isLoading = ref(false);
 const error = ref(null);
+
+// Edit mode state
+const isEditMode = ref(false);
+const editForm = ref({});
+const originalForm = ref({});
+const isSaving = ref(false);
 
 // Get config from route meta
 const config = computed(() => {
@@ -352,6 +409,28 @@ const hasContainmentRules = computed(() => {
   );
 });
 
+// Check if form has changes
+const hasChanges = computed(() => {
+  if (!isEditMode.value) return false;
+
+  const fields = config.value.sections?.basicInfo?.fields || [];
+  for (const field of fields) {
+    if (field.editable === false) continue;
+
+    const originalValue = originalForm.value[field.key];
+    const currentValue = editForm.value[field.key];
+
+    // Handle null/undefined comparison
+    const orig = originalValue ?? null;
+    const curr = currentValue ?? null;
+
+    if (orig !== curr) {
+      return true;
+    }
+  }
+  return false;
+});
+
 const loadItem = async () => {
   const id = route.params.id;
   if (!id) {
@@ -395,6 +474,11 @@ const loadItem = async () => {
     if (!item.value) {
       error.value = 'Item not found';
     }
+
+    // Check for edit mode from query param
+    if (route.query.edit === 'true' && item.value) {
+      enterEditMode();
+    }
   } catch (err) {
     console.error('Error loading item:', err);
     error.value = err.message || 'Failed to load item';
@@ -407,9 +491,127 @@ const goBack = () => {
   router.back();
 };
 
-const handleEdit = () => {
-  // TODO: Navigate to edit page
-  console.log('Edit:', item.value);
+// Handle back button with unsaved changes check
+const handleBack = () => {
+  if (isEditMode.value && hasChanges.value) {
+    if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
+      exitEditMode();
+      goBack();
+    }
+  } else {
+    if (isEditMode.value) {
+      exitEditMode();
+    } else {
+      goBack();
+    }
+  }
+};
+
+// Enter edit mode
+const enterEditMode = () => {
+  if (!item.value) return;
+
+  // Initialize edit form with current values
+  const fields = config.value.sections?.basicInfo?.fields || [];
+  const formData = {};
+
+  fields.forEach(field => {
+    formData[field.key] = item.value[field.key] ?? null;
+  });
+
+  editForm.value = { ...formData };
+  originalForm.value = { ...formData };
+  isEditMode.value = true;
+
+  // Update URL with edit query param
+  router.replace({
+    ...route,
+    query: { ...route.query, edit: 'true' }
+  });
+};
+
+// Exit edit mode
+const exitEditMode = () => {
+  isEditMode.value = false;
+  editForm.value = {};
+  originalForm.value = {};
+
+  // Remove edit query param from URL
+  const query = { ...route.query };
+  delete query.edit;
+  router.replace({ ...route, query });
+};
+
+// Cancel edit
+const cancelEdit = () => {
+  if (hasChanges.value) {
+    if (confirm('Are you sure you want to discard your changes?')) {
+      exitEditMode();
+    }
+  } else {
+    exitEditMode();
+  }
+};
+
+// Save changes
+const saveChanges = async () => {
+  if (!hasChanges.value || isSaving.value) return;
+
+  const comp = composable.value;
+  const tableKey = config.value.tableKey;
+
+  if (!comp || !tableKey) {
+    toast.error('Unable to save: composable not available');
+    return;
+  }
+
+  // Build update function name (e.g., 'updateComponentCategory')
+  // Convert plural to singular for update function
+  const singularKey = tableKey.endsWith('ies')
+    ? tableKey.slice(0, -3) + 'y'
+    : tableKey.endsWith('es')
+      ? tableKey.slice(0, -2)
+      : tableKey.endsWith('s')
+        ? tableKey.slice(0, -1)
+        : tableKey;
+
+  const updateFnName = `update${singularKey.charAt(0).toUpperCase() + singularKey.slice(1)}`;
+  const updateFn = comp[updateFnName];
+
+  if (!updateFn) {
+    toast.error(`Update method ${updateFnName} not found`);
+    return;
+  }
+
+  isSaving.value = true;
+
+  try {
+    // Build payload - merge original item with changed fields
+    const payload = {
+      ...item.value,
+      ...editForm.value
+    };
+
+    // Remove read-only fields that shouldn't be sent to API
+    delete payload.createdAt;
+    delete payload.updatedAt;
+
+    await updateFn(item.value.id, payload);
+
+    // Update local item with new values
+    Object.assign(item.value, editForm.value);
+
+    toast.success('Changes saved successfully');
+    exitEditMode();
+
+    // Refresh data
+    await loadItem();
+  } catch (err) {
+    console.error('Error saving changes:', err);
+    toast.error(err.response?.data?.message || err.message || 'Failed to save changes');
+  } finally {
+    isSaving.value = false;
+  }
 };
 
 const getFieldValue = (item, key) => {
@@ -454,8 +656,8 @@ const formatPropertyKey = (key) => {
 };
 
 const formatPropertyValue = (value) => {
-  if (value === 'true') return '✓ Yes';
-  if (value === 'false') return '✗ No';
+  if (value === 'true') return 'Yes';
+  if (value === 'false') return 'No';
   return value;
 };
 
@@ -463,6 +665,25 @@ const getRelatedData = (relatedSection) => {
   // TODO: Implement related data fetching based on section config
   return [];
 };
+
+// Watch for route changes (e.g., navigating to different item)
+watch(() => route.params.id, (newId, oldId) => {
+  if (newId !== oldId) {
+    exitEditMode();
+    loadItem();
+  }
+});
+
+// Handle browser back/forward with edit mode
+watch(() => route.query.edit, (newEdit) => {
+  if (newEdit === 'true' && !isEditMode.value && item.value) {
+    enterEditMode();
+  } else if (newEdit !== 'true' && isEditMode.value) {
+    isEditMode.value = false;
+    editForm.value = {};
+    originalForm.value = {};
+  }
+});
 
 onMounted(() => {
   loadItem();
