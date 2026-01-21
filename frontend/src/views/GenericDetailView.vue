@@ -567,9 +567,12 @@ const saveChanges = async () => {
 
   // Build update function name (e.g., 'updateComponentCategory')
   // Convert plural to singular for update function
+  // Note: 'es' check only applies to words ending in -ses, -xes, -ches, -shes, -zes
+  // Words like 'types' should just remove 's', not 'es'
   const singularKey = tableKey.endsWith('ies')
     ? tableKey.slice(0, -3) + 'y'
-    : tableKey.endsWith('es')
+    : (tableKey.endsWith('ses') || tableKey.endsWith('xes') ||
+       tableKey.endsWith('ches') || tableKey.endsWith('shes') || tableKey.endsWith('zes'))
       ? tableKey.slice(0, -2)
       : tableKey.endsWith('s')
         ? tableKey.slice(0, -1)

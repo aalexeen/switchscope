@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository for ComponentTypeEntity
@@ -218,4 +219,16 @@ public interface ComponentTypeRepository extends ComponentCatalogRepository<Comp
            "LEFT JOIN FETCH ct.category " +
            "ORDER BY ct.sortOrder, ct.displayName")
     List<ComponentTypeEntity> findAllWithAssociations();
+
+    /**
+     * Find component type by ID with eager loading of category association.
+     * Used for updates to preserve associations.
+     *
+     * @param id the component type ID
+     * @return optional component type with category loaded
+     */
+    @Query("SELECT ct FROM ComponentTypeEntity ct " +
+           "LEFT JOIN FETCH ct.category " +
+           "WHERE ct.id = :id")
+    Optional<ComponentTypeEntity> findByIdWithCategory(@Param("id") UUID id);
 }
