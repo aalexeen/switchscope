@@ -448,11 +448,15 @@ Automatically loads relation data for `searchable-select` type.
   - Example of handling FK changes in service layer
   - Fixed GenericDetailView plural→singular conversion bug (`types` → `type`)
 
+- [x] **ComponentModel** - Full edit support with FK relation
+  - Backend: Custom controller (not AbstractCatalogController), findByIdWithComponentType, manual FK handling
+  - Frontend: Custom ComponentModelDetailView.vue with edit mode support
+  - Polymorphic: SwitchModel uses switchModel.detail.js config with searchable-select for componentTypeId
+
 ### Pending
 
 - [ ] **ComponentStatus** - Workflow transitions (complex)
 - [ ] **ComponentNature** - Simple catalog
-- [ ] **ComponentModel** - Has componentTypeId FK
 - [ ] **LocationType** - Parent-child hierarchy
 - [ ] **InstallationStatus** - Workflow transitions
 - [ ] **InstallableType** - Simple catalog
@@ -516,6 +520,8 @@ Automatically loads relation data for `searchable-select` type.
 | `repository/component/ComponentCategoryRepository.java` | Modified | Added findByIdWithComponentTypes |
 | `repository/component/ComponentTypeRepository.java` | Modified | Added findByIdWithCategory |
 | `web/AbstractCatalogController.java` | Modified | Auto-detect UpdatableCrudService |
+| `web/catalog/ComponentModelController.java` | Modified | Manual FK handling for componentTypeId |
+| `repository/component/ComponentModelRepository.java` | Modified | Added findByIdWithComponentType |
 
 ### Frontend
 
@@ -527,3 +533,5 @@ Automatically loads relation data for `searchable-select` type.
 | `configs/details/componentCategory.detail.js` | Modified | Added editType to all fields |
 | `configs/details/componentType.detail.js` | Modified | Added editType, searchable-select for categoryId |
 | `views/GenericTableView.vue` | Modified | Edit button navigates to ?edit=true |
+| `views/ComponentModelDetailView.vue` | Modified | Added edit mode with EditFieldRenderer |
+| `configs/details/componentModels/switchModel.detail.js` | Modified | Added editType to all fields |

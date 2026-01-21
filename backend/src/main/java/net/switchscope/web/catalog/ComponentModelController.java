@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.switchscope.error.NotFoundException;
 import net.switchscope.mapper.component.catalog.connectivity.CableRunModelMapper;
 import net.switchscope.mapper.component.catalog.connectivity.ConnectorModelMapper;
 import net.switchscope.mapper.component.catalog.connectivity.PatchPanelModelMapper;
@@ -14,6 +15,7 @@ import net.switchscope.mapper.component.catalog.device.AccessPointModelMapper;
 import net.switchscope.mapper.component.catalog.device.RouterModelMapper;
 import net.switchscope.mapper.component.catalog.device.SwitchModelMapper;
 import net.switchscope.mapper.component.catalog.housing.RackModelMapper;
+import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.model.component.catalog.ComponentModel;
 import net.switchscope.model.component.catalog.connectiviy.CableRunModel;
 import net.switchscope.model.component.catalog.connectiviy.ConnectorModel;
@@ -22,10 +24,13 @@ import net.switchscope.model.component.catalog.device.AccessPointModel;
 import net.switchscope.model.component.catalog.device.RouterModel;
 import net.switchscope.model.component.catalog.device.SwitchModel;
 import net.switchscope.model.component.catalog.housing.RackModelEntity;
+import net.switchscope.repository.component.ComponentModelRepository;
+import net.switchscope.repository.component.ComponentTypeRepository;
 import net.switchscope.service.component.catalog.ComponentModelService;
 import net.switchscope.to.component.catalog.ComponentModelTo;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -43,6 +48,8 @@ public class ComponentModelController {
     static final String REST_URL = "/api/catalogs/component-models";
 
     private final ComponentModelService service;
+    private final ComponentModelRepository repository;
+    private final ComponentTypeRepository componentTypeRepository;
 
     // Polymorphic mappers for different model types
     private final SwitchModelMapper switchModelMapper;
@@ -78,11 +85,28 @@ public class ComponentModelController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
     public ComponentModelTo update(@PathVariable UUID id, @RequestBody ComponentModelTo to) {
         log.info("update component model {} with id={}", to, id);
-        ComponentModel entity = service.getById(id);
+
+        // 1. Load existing entity with associations
+        ComponentModel entity = repository.findByIdWithComponentType(id)
+                .orElseThrow(() -> new NotFoundException("Component model with id=" + id + " not found"));
+
+        // 2. Handle componentTypeId FK change (mapper ignores componentType)
+        if (to.getComponentTypeId() != null &&
+                (entity.getComponentType() == null ||
+                 !Objects.equals(to.getComponentTypeId(), entity.getComponentType().getId()))) {
+            ComponentTypeEntity newComponentType = componentTypeRepository.findById(to.getComponentTypeId())
+                    .orElseThrow(() -> new NotFoundException("Component type with id=" + to.getComponentTypeId() + " not found"));
+            entity.setComponentType(newComponentType);
+        }
+
+        // 3. Apply other field updates via mapper
         updateFromDto(entity, to);
-        return mapToDto(service.update(id, entity));
+
+        // 4. Save and return
+        return mapToDto(repository.save(entity));
     }
 
     @DeleteMapping("/{id}")
