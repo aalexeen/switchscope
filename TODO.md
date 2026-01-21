@@ -96,7 +96,7 @@ public interface UpdatableCrudService<E, T extends BaseTo> extends CrudService<E
 
 #### 1.2 Update Service Implementation
 
-**Pattern:** Load existing → MapStruct updateFromTo → Save
+**Pattern:** Load existing → Handle FK changes → MapStruct updateFromTo → Save
 
 ```java
 @Service
@@ -122,6 +122,51 @@ public class YourEntityService implements UpdatableCrudService<YourEntity, YourE
     }
 }
 ```
+
+#### 1.2.1 Handling FK Relations in Service (IMPORTANT!)
+
+When entity has FK relations (e.g., `categoryId`), the mapper ignores the association
+to preserve it. You must handle FK changes **manually** in the service:
+
+```java
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class ComponentTypeService implements UpdatableCrudService<ComponentTypeEntity, ComponentTypeTo> {
+
+    private final ComponentTypeRepository repository;
+    private final ComponentCategoryRepository categoryRepository;  // FK repository
+    private final ComponentTypeMapper mapper;
+
+    @Override
+    @Transactional
+    public ComponentTypeEntity updateFromDto(UUID id, ComponentTypeTo dto) {
+        // 1. Load existing entity with all associations
+        ComponentTypeEntity existing = repository.findByIdWithCategory(id)
+                .orElseThrow(() -> new NotFoundException("Component type not found"));
+
+        // 2. Handle FK change BEFORE mapper (mapper ignores 'category')
+        if (dto.getCategoryId() != null &&
+                !Objects.equals(dto.getCategoryId(), existing.getCategory().getId())) {
+            ComponentCategoryEntity newCategory = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new NotFoundException("Category not found"));
+            existing.setCategory(newCategory);
+        }
+
+        // 3. Use mapper to update other fields (preserves properties)
+        mapper.updateFromTo(existing, dto);
+
+        // 4. Save and return
+        return repository.save(existing);
+    }
+}
+```
+
+**Key Points:**
+- Mapper has `@Mapping(target = "category", ignore = true)` — it won't update FK
+- DTO contains `categoryId` (UUID), not the full `category` entity
+- Service must manually: check if changed → load related entity → set it
+- Order matters: handle FK changes BEFORE calling mapper
 
 #### 1.3 Repository: Add Fetch Join Query
 
@@ -257,6 +302,43 @@ export default {
 | `icon-class` | Icon picker | PrimeIcons classes |
 | `readonly` | Display only | Immutable fields (code) |
 
+#### 2.2.1 Searchable Select for FK Relations (Complete Example)
+
+**Use Case:** ComponentType has FK to ComponentCategory (`categoryId`)
+
+**Frontend Config:** `componentType.detail.js`
+```javascript
+{
+  key: 'categoryId',           // DTO field name (UUID)
+  label: 'Category',
+  editType: 'searchable-select',
+  required: true,
+  relation: {
+    composable: 'useComponentCategories',  // Composable to load options
+    dataKey: 'componentCategories',        // Property name in composable result
+    valueKey: 'id',                        // Option value field (sent to API)
+    labelKey: 'displayName',               // Option display text
+    searchFields: ['name', 'code', 'displayName']  // Fields for filtering
+  }
+}
+```
+
+**How It Works:**
+1. `EditFieldRenderer` detects `editType: 'searchable-select'`
+2. Loads relation composable dynamically: `composableRegistry['componentCategories']()`
+3. Fetches data: `composable.fetchComponentCategories()`
+4. Passes options to `SearchableDropdown` component
+5. User selects category → `categoryId` (UUID) stored in form
+6. On save → DTO sent to backend with `categoryId`
+7. Backend service handles FK change (see section 1.2.1)
+
+**SearchableDropdown Features:**
+- Type-ahead search filtering
+- Keyboard navigation (↑↓ Enter Escape)
+- Shows icon/color from option if available
+- Clear button to deselect
+- Scrollable list (max 6 visible)
+
 #### 2.3 Register in Detail View Registry
 
 **File:** `frontend/src/configs/details/detailViewRegistry.js`
@@ -360,9 +442,14 @@ Automatically loads relation data for `searchable-select` type.
   - Frontend: All field types including color-class, icon-class
   - Properties preserved on update
 
+- [x] **ComponentType** - Full edit support with FK relation
+  - Backend: UpdatableCrudService, findByIdWithCategory, manual FK handling
+  - Frontend: searchable-select for categoryId (dropdown with search)
+  - Example of handling FK changes in service layer
+  - Fixed GenericDetailView plural→singular conversion bug (`types` → `type`)
+
 ### Pending
 
-- [ ] **ComponentType** - Has categoryId FK (needs searchable-select)
 - [ ] **ComponentStatus** - Workflow transitions (complex)
 - [ ] **ComponentNature** - Simple catalog
 - [ ] **ComponentModel** - Has componentTypeId FK
@@ -425,7 +512,9 @@ Automatically loads relation data for `searchable-select` type.
 |------|--------|-------------|
 | `service/UpdatableCrudService.java` | Created | New interface with updateFromDto |
 | `service/component/ComponentCategoryService.java` | Modified | Implements UpdatableCrudService |
+| `service/component/ComponentTypeService.java` | Modified | Implements UpdatableCrudService, handles FK change |
 | `repository/component/ComponentCategoryRepository.java` | Modified | Added findByIdWithComponentTypes |
+| `repository/component/ComponentTypeRepository.java` | Modified | Added findByIdWithCategory |
 | `web/AbstractCatalogController.java` | Modified | Auto-detect UpdatableCrudService |
 
 ### Frontend
@@ -434,6 +523,7 @@ Automatically loads relation data for `searchable-select` type.
 |------|--------|-------------|
 | `components/form/SearchableDropdown.vue` | Created | Dropdown with search for FK fields |
 | `components/form/EditFieldRenderer.vue` | Created | Renders edit inputs by type |
-| `views/GenericDetailView.vue` | Modified | Added edit mode support |
+| `views/GenericDetailView.vue` | Modified | Added edit mode, fixed plural→singular bug |
 | `configs/details/componentCategory.detail.js` | Modified | Added editType to all fields |
+| `configs/details/componentType.detail.js` | Modified | Added editType, searchable-select for categoryId |
 | `views/GenericTableView.vue` | Modified | Edit button navigates to ?edit=true |
