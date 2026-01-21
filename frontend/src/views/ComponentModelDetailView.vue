@@ -36,29 +36,62 @@
               <i class="pi pi-box text-indigo-600 text-2xl"></i>
               <div>
                 <h1 class="text-2xl font-bold text-gray-900">
-                  {{ model.modelDesignation || model.name }}
+                  {{ isEditMode ? `Edit: ${model.modelDesignation || model.name}` : (model.modelDesignation || model.name) }}
                 </h1>
                 <p v-if="model.manufacturer && model.modelNumber" class="text-sm text-gray-500">
-                  {{ model.manufacturer }} • {{ model.modelNumber }}
+                  {{ model.manufacturer }} - {{ model.modelNumber }}
                 </p>
               </div>
             </div>
             <div class="flex items-center gap-2">
               <span
-                v-if="model.lifecycleStatus"
+                v-if="model.lifecycleStatus && !isEditMode"
                 :class="getLifecycleStatusClass(model.lifecycleStatus)"
                 class="px-3 py-1 rounded-full text-sm font-medium"
               >
                 {{ model.lifecycleStatus }}
               </span>
-              <button
-                @click="handleEdit"
-                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors"
-              >
-                <i class="pi pi-pencil mr-2"></i>
-                Edit
-              </button>
+
+              <!-- View Mode Buttons -->
+              <template v-if="!isEditMode">
+                <button
+                  @click="enterEditMode"
+                  class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors"
+                >
+                  <i class="pi pi-pencil mr-2"></i>
+                  Edit
+                </button>
+              </template>
+
+              <!-- Edit Mode Buttons -->
+              <template v-else>
+                <button
+                  @click="cancelEdit"
+                  :disabled="isSaving"
+                  class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded transition-colors disabled:opacity-50"
+                >
+                  <i class="pi pi-times mr-2"></i>
+                  Cancel
+                </button>
+                <button
+                  @click="saveChanges"
+                  :disabled="isSaving || !hasChanges"
+                  class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i :class="['pi mr-2', isSaving ? 'pi-spinner pi-spin' : 'pi-check']"></i>
+                  {{ isSaving ? 'Saving...' : 'Save' }}
+                </button>
+              </template>
             </div>
+          </div>
+
+          <!-- Unsaved Changes Warning -->
+          <div
+            v-if="isEditMode && hasChanges"
+            class="px-6 py-2 bg-yellow-50 border-b border-yellow-100 text-yellow-700 text-sm flex items-center gap-2"
+          >
+            <i class="pi pi-exclamation-triangle"></i>
+            You have unsaved changes
           </div>
         </div>
 
@@ -98,9 +131,17 @@
                     class="text-sm font-medium text-gray-500 mb-1"
                   >
                     {{ field.label }}
+                    <span v-if="field.required && isEditMode" class="text-red-500">*</span>
                   </dt>
                   <dd :class="field.type === 'heading' ? 'text-xl font-bold' : 'text-sm text-gray-900'">
-                    <FieldRenderer :model="model" :field="field" />
+                    <!-- Edit Mode -->
+                    <EditFieldRenderer
+                      v-if="isEditMode && field.editType && field.editable !== false"
+                      v-model="editForm[field.key]"
+                      :field="field"
+                    />
+                    <!-- View Mode -->
+                    <FieldRenderer v-else :model="model" :field="field" />
                   </dd>
                 </div>
               </dl>
@@ -125,10 +166,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from 'vue';
+import { ref, computed, onMounted, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import FieldRenderer from '@/components/detail/FieldRenderer.vue';
+import EditFieldRenderer from '@/components/form/EditFieldRenderer.vue';
 
 // Import model configs
 import switchModelConfig from '@/configs/details/componentModels/switchModel.detail';
@@ -141,11 +184,18 @@ import { useComponentModels } from '@/composables/useComponentModels';
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
 
 const model = ref(null);
 const isLoading = ref(false);
 const error = ref(null);
 const collapsedSections = reactive({});
+
+// Edit mode state
+const isEditMode = ref(false);
+const editForm = ref({});
+const originalForm = ref({});
+const isSaving = ref(false);
 
 // Map discriminator types to configs
 const configMap = {
@@ -170,7 +220,7 @@ const config = computed(() => {
 });
 
 // Get composable
-const { componentModels, fetchComponentModels } = useComponentModels();
+const { componentModels, fetchComponentModels, updateComponentModel } = useComponentModels();
 
 // Sort sections by priority
 const sortedSections = computed(() => {
@@ -185,6 +235,26 @@ const sortedSections = computed(() => {
     }, {});
 
   return sorted;
+});
+
+// Check if form has changes
+const hasChanges = computed(() => {
+  if (!isEditMode.value) return false;
+
+  for (const key of Object.keys(editForm.value)) {
+    const currentValue = editForm.value[key];
+    const originalValue = originalForm.value[key];
+
+    // Handle null/undefined comparison
+    if (currentValue === originalValue) continue;
+    if (currentValue == null && originalValue == null) continue;
+    if (currentValue === '' && originalValue == null) continue;
+    if (currentValue == null && originalValue === '') continue;
+
+    // Values are different
+    return true;
+  }
+  return false;
 });
 
 const loadModel = async () => {
@@ -217,12 +287,110 @@ const loadModel = async () => {
 };
 
 const goBack = () => {
+  if (isEditMode.value && hasChanges.value) {
+    if (!confirm('You have unsaved changes. Are you sure you want to leave?')) {
+      return;
+    }
+  }
   router.push({ name: 'component-models' });
 };
 
-const handleEdit = () => {
-  // TODO: Navigate to edit page
-  console.log('Edit:', model.value);
+// Enter edit mode
+const enterEditMode = () => {
+  if (!model.value) return;
+
+  // Collect all editable fields from all sections
+  const formData = {};
+  const sections = config.value.sections || {};
+
+  Object.values(sections).forEach(section => {
+    if (section.fields) {
+      section.fields.forEach(field => {
+        if (field.editType && field.editable !== false) {
+          formData[field.key] = model.value[field.key] ?? null;
+        }
+      });
+    }
+  });
+
+  editForm.value = { ...formData };
+  originalForm.value = { ...formData };
+  isEditMode.value = true;
+
+  // Update URL with edit query param
+  router.replace({
+    ...route,
+    query: { ...route.query, edit: 'true' }
+  });
+};
+
+// Exit edit mode
+const exitEditMode = () => {
+  isEditMode.value = false;
+  editForm.value = {};
+  originalForm.value = {};
+
+  // Remove edit query param from URL
+  const query = { ...route.query };
+  delete query.edit;
+  router.replace({ ...route, query });
+};
+
+// Cancel edit
+const cancelEdit = () => {
+  if (hasChanges.value) {
+    if (confirm('Are you sure you want to discard your changes?')) {
+      exitEditMode();
+    }
+  } else {
+    exitEditMode();
+  }
+};
+
+// Save changes
+const saveChanges = async () => {
+  if (!hasChanges.value || isSaving.value) return;
+
+  isSaving.value = true;
+
+  try {
+    // Build payload - merge original model with changed fields
+    const payload = {
+      ...model.value,
+      ...editForm.value
+    };
+
+    // Remove read-only fields that shouldn't be sent to API
+    delete payload.createdAt;
+    delete payload.updatedAt;
+    delete payload.createdDate;
+    delete payload.updatedDate;
+    delete payload.modelDesignation;
+    delete payload.lifecycleStatus;
+    delete payload.currentlySupported;
+    delete payload.availableForPurchase;
+    delete payload.operatingTemperatureRange;
+    delete payload.humidityRange;
+    delete payload.categoryName;
+    delete payload.componentTypeCode;
+    delete payload.componentTypeDisplayName;
+
+    await updateComponentModel(model.value.id, payload);
+
+    // Update local model with new values
+    Object.assign(model.value, editForm.value);
+
+    toast.success('Model updated successfully');
+    exitEditMode();
+
+    // Refresh data
+    await loadModel();
+  } catch (err) {
+    console.error('Error saving changes:', err);
+    toast.error(err.response?.data?.message || err.message || 'Failed to save changes');
+  } finally {
+    isSaving.value = false;
+  }
 };
 
 const toggleSection = (key) => {
@@ -238,6 +406,17 @@ const getLifecycleStatusClass = (status) => {
   };
   return statusMap[status] || 'bg-gray-100 text-gray-800';
 };
+
+// Watch for edit query param
+watch(() => route.query.edit, (newEdit) => {
+  if (newEdit === 'true' && !isEditMode.value && model.value) {
+    enterEditMode();
+  } else if (newEdit !== 'true' && isEditMode.value) {
+    isEditMode.value = false;
+    editForm.value = {};
+    originalForm.value = {};
+  }
+});
 
 onMounted(() => {
   loadModel();

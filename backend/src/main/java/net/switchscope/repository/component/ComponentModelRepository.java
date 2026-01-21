@@ -228,4 +228,16 @@ public interface ComponentModelRepository extends BaseRepository<ComponentModel>
            "LEFT JOIN FETCH cm.componentType " +
            "ORDER BY cm.manufacturer, cm.modelNumber")
     List<ComponentModel> findAllWithAssociations();
+
+    /**
+     * Find component model by ID with eager loading of componentType association.
+     * Used for updates to preserve associations.
+     *
+     * @param id the component model ID
+     * @return optional component model with componentType loaded
+     */
+    @Query("SELECT cm FROM ComponentModel cm " +
+           "LEFT JOIN FETCH cm.componentType " +
+           "WHERE cm.id = :id")
+    Optional<ComponentModel> findByIdWithComponentType(@Param("id") UUID id);
 }
