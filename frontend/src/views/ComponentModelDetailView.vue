@@ -371,9 +371,7 @@ const cancelEdit = () => {
 
 // Save changes
 const saveChanges = async () => {
-  console.log('saveChanges called, hasChanges:', hasChanges.value, 'isSaving:', isSaving.value);
   if (!hasChanges.value || isSaving.value) {
-    console.log('saveChanges skipped - no changes or already saving');
     return;
   }
 
@@ -385,7 +383,6 @@ const saveChanges = async () => {
       ...model.value,
       ...editForm.value
     };
-    console.log('Payload to send:', JSON.stringify(payload, null, 2));
 
     // Remove read-only fields that shouldn't be sent to API
     delete payload.createdAt;
@@ -402,9 +399,7 @@ const saveChanges = async () => {
     delete payload.componentTypeCode;
     delete payload.componentTypeDisplayName;
 
-    console.log('Calling updateComponentModel with id:', model.value.id);
     const result = await updateComponentModel(model.value.id, payload);
-    console.log('updateComponentModel result:', result);
 
     // Update local model with new values
     Object.assign(model.value, editForm.value);
