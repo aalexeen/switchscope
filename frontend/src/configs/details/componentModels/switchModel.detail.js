@@ -11,6 +11,8 @@
  * - readonly: non-editable display
  */
 
+import { createBaseSections, overviewSection } from './_baseFields';
+
 export default {
   tableKey: 'componentModels',
   composable: 'useComponentModels',
@@ -19,39 +21,7 @@ export default {
     // ============================================
     // PRIORITY 1: Overview (Always visible)
     // ============================================
-    overview: {
-      title: 'Overview',
-      priority: 1,
-      collapsible: false,
-      fields: [
-        { key: 'modelDesignation', label: 'Model', type: 'heading', fallback: '-', editType: 'readonly', editable: false },
-        { key: 'name', label: 'Name', fallback: '-', editType: 'input', required: true, validation: { maxLength: 128 } },
-        { key: 'manufacturer', label: 'Manufacturer', fallback: '-', editType: 'input', required: true, validation: { maxLength: 128 } },
-        { key: 'modelNumber', label: 'Model Number', fallback: '-', editType: 'input', required: true, validation: { maxLength: 128 } },
-        {
-          key: 'componentTypeId',
-          label: 'Component Type',
-          fallback: '-',
-          viewKey: 'componentTypeDisplayName',
-          editType: 'searchable-select',
-          required: true,
-          relation: {
-            composable: 'useComponentTypes',
-            dataKey: 'componentTypes',
-            valueKey: 'id',
-            labelKey: 'displayName',
-            searchFields: ['name', 'code', 'displayName']
-          }
-        },
-        { key: 'categoryName', label: 'Category', fallback: '-', editType: 'readonly', editable: false },
-        { key: 'lifecycleStatus', label: 'Lifecycle Status', type: 'badge', fallback: 'Unknown', editType: 'readonly', editable: false },
-        { key: 'active', label: 'Active', type: 'boolean', editType: 'checkbox' },
-        { key: 'discontinued', label: 'Discontinued', type: 'boolean', editType: 'checkbox' },
-        { key: 'endOfLife', label: 'End of Life', type: 'boolean', editType: 'checkbox' },
-        { key: 'currentlySupported', label: 'Currently Supported', type: 'boolean', editType: 'readonly', editable: false },
-        { key: 'availableForPurchase', label: 'Available for Purchase', type: 'boolean', editType: 'readonly', editable: false }
-      ]
-    },
+    overview: { ...overviewSection },
 
     // ============================================
     // PRIORITY 2: Switch Classification
@@ -212,95 +182,6 @@ export default {
       ]
     },
 
-    // ============================================
-    // PRIORITY 11: Product Information
-    // ============================================
-    productInformation: {
-      title: 'Product Information',
-      priority: 11,
-      collapsible: true,
-      fields: [
-        { key: 'productFamily', label: 'Product Family', fallback: '-', editType: 'input', validation: { maxLength: 128 } },
-        { key: 'series', label: 'Series', fallback: '-', editType: 'input', validation: { maxLength: 128 } },
-        { key: 'partNumber', label: 'Part Number', fallback: '-', editType: 'input', validation: { maxLength: 64 } },
-        { key: 'sku', label: 'SKU', fallback: '-', editType: 'input', validation: { maxLength: 64 } },
-        { key: 'description', label: 'Description', fallback: 'No description', editType: 'textarea', validation: { maxLength: 2000 } }
-      ]
-    },
-
-    // ============================================
-    // PRIORITY 12: Lifecycle & Dates
-    // ============================================
-    lifecycleDates: {
-      title: 'Lifecycle & Dates',
-      priority: 12,
-      collapsible: true,
-      fields: [
-        { key: 'releaseDate', label: 'Release Date', type: 'date', fallback: '-', editType: 'date' },
-        { key: 'discontinueDate', label: 'Discontinue Date', type: 'date', fallback: '-', editType: 'date' },
-        { key: 'warrantyYears', label: 'Warranty (Years)', fallback: '-', editType: 'number', validation: { min: 0, max: 100 } },
-        { key: 'expectedLifespanYears', label: 'Expected Lifespan (Years)', fallback: '-', editType: 'number', validation: { min: 0, max: 50 } },
-        { key: 'maintenanceIntervalMonths', label: 'Maintenance Interval (Months)', fallback: '-', editType: 'number', validation: { min: 0, max: 120 } }
-      ]
-    },
-
-    // ============================================
-    // PRIORITY 13: Documentation & Support
-    // ============================================
-    documentationSupport: {
-      title: 'Documentation & Support',
-      priority: 13,
-      collapsible: true,
-      fields: [
-        { key: 'datasheetUrl', label: 'Datasheet URL', type: 'url', fallback: '-', editType: 'input', validation: { maxLength: 512 } },
-        { key: 'manualUrl', label: 'Manual URL', type: 'url', fallback: '-', editType: 'input', validation: { maxLength: 512 } },
-        { key: 'supportUrl', label: 'Support URL', type: 'url', fallback: '-', editType: 'input', validation: { maxLength: 512 } }
-      ]
-    },
-
-    // ============================================
-    // PRIORITY 14: Certifications & Compliance
-    // ============================================
-    certificationsCompliance: {
-      title: 'Certifications & Compliance',
-      priority: 14,
-      collapsible: true,
-      fields: [
-        { key: 'certifications', label: 'Certifications', fallback: '-', editType: 'textarea', validation: { maxLength: 1000 } },
-        { key: 'complianceStandards', label: 'Compliance Standards', fallback: '-', editType: 'textarea', validation: { maxLength: 1000 } }
-      ]
-    },
-
-    // ============================================
-    // PRIORITY 15: Pricing
-    // ============================================
-    pricing: {
-      title: 'Pricing',
-      priority: 15,
-      collapsible: true,
-      fields: [
-        { key: 'msrp', label: 'MSRP', type: 'currency', fallback: '-', editType: 'number', validation: { min: 0, max: 10000000 } },
-        { key: 'listPrice', label: 'List Price', type: 'currency', fallback: '-', editType: 'number', validation: { min: 0, max: 10000000 } },
-        { key: 'currencyCode', label: 'Currency', fallback: 'USD', editType: 'input', validation: { maxLength: 3 } }
-      ]
-    },
-
-    // ============================================
-    // PRIORITY 16: Internal Notes & Metadata
-    // ============================================
-    internalNotes: {
-      title: 'Internal Notes & Metadata',
-      priority: 16,
-      collapsible: true,
-      fields: [
-        { key: 'verified', label: 'Verified', type: 'boolean', editType: 'checkbox' },
-        { key: 'verificationDate', label: 'Verification Date', type: 'date', fallback: '-', editType: 'date' },
-        { key: 'notes', label: 'Internal Notes', type: 'textarea', fallback: 'No notes', editType: 'textarea', validation: { maxLength: 5000 } },
-        { key: 'createdAt', label: 'Created At', type: 'datetime', fallback: '-', editType: 'readonly', editable: false },
-        { key: 'updatedAt', label: 'Updated At', type: 'datetime', fallback: '-', editType: 'readonly', editable: false },
-        { key: 'createdDate', label: 'Created Date', type: 'datetime', fallback: '-', editType: 'readonly', editable: false },
-        { key: 'updatedDate', label: 'Updated Date', type: 'datetime', fallback: '-', editType: 'readonly', editable: false }
-      ]
-    }
+    ...createBaseSections(11)
   }
 };
