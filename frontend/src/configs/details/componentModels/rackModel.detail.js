@@ -3,6 +3,8 @@
  * Displays comprehensive specifications for server/network racks
  */
 
+import { overviewSection } from './_baseFields';
+
 export default {
   tableKey: 'componentModels',
   composable: 'useComponentModels',
@@ -11,39 +13,7 @@ export default {
     // ============================================
     // PRIORITY 1: Overview (Always visible)
     // ============================================
-    overview: {
-      title: 'Overview',
-      priority: 1,
-      collapsible: false,
-      fields: [
-        { key: 'modelDesignation', label: 'Model', type: 'heading', fallback: '-', editType: 'readonly', editable: false },
-        { key: 'name', label: 'Name', fallback: '-', editType: 'input', required: true, validation: { maxLength: 128 } },
-        { key: 'manufacturer', label: 'Manufacturer', fallback: '-', editType: 'input', required: true, validation: { maxLength: 128 } },
-        { key: 'modelNumber', label: 'Model Number', fallback: '-', editType: 'input', required: true, validation: { maxLength: 128 } },
-        {
-          key: 'componentTypeId',
-          label: 'Component Type',
-          fallback: '-',
-          viewKey: 'componentTypeDisplayName',
-          editType: 'searchable-select',
-          required: true,
-          relation: {
-            composable: 'useComponentTypes',
-            dataKey: 'componentTypes',
-            valueKey: 'id',
-            labelKey: 'displayName',
-            searchFields: ['name', 'code', 'displayName']
-          }
-        },
-        { key: 'categoryName', label: 'Category', fallback: '-', editType: 'readonly', editable: false },
-        { key: 'lifecycleStatus', label: 'Lifecycle Status', type: 'badge', fallback: 'Unknown', editType: 'readonly', editable: false },
-        { key: 'active', label: 'Active', type: 'boolean', editType: 'checkbox' },
-        { key: 'discontinued', label: 'Discontinued', type: 'boolean', editType: 'checkbox' },
-        { key: 'endOfLife', label: 'End of Life', type: 'boolean', editType: 'checkbox' },
-        { key: 'currentlySupported', label: 'Currently Supported', type: 'boolean', editType: 'readonly', editable: false },
-        { key: 'availableForPurchase', label: 'Available for Purchase', type: 'boolean', editType: 'readonly', editable: false }
-      ]
-    },
+    overview: { ...overviewSection },
 
     // ============================================
     // PRIORITY 2: Rack Classification

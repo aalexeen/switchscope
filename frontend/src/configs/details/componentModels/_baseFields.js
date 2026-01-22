@@ -14,18 +14,32 @@ export const overviewSection = {
   priority: 1,
   collapsible: false,
   fields: [
-    { key: 'modelDesignation', label: 'Model', type: 'heading', fallback: '-' },
-    { key: 'name', label: 'Name', fallback: '-' },
-    { key: 'manufacturer', label: 'Manufacturer', fallback: '-' },
-    { key: 'modelNumber', label: 'Model Number', fallback: '-' },
-    { key: 'componentTypeDisplayName', label: 'Component Type', fallback: '-' },
-    { key: 'categoryName', label: 'Category', fallback: '-' },
-    { key: 'lifecycleStatus', label: 'Lifecycle Status', type: 'badge', fallback: 'Unknown' },
-    { key: 'active', label: 'Active', type: 'boolean' },
-    { key: 'discontinued', label: 'Discontinued', type: 'boolean' },
-    { key: 'endOfLife', label: 'End of Life', type: 'boolean' },
-    { key: 'currentlySupported', label: 'Currently Supported', type: 'boolean' },
-    { key: 'availableForPurchase', label: 'Available for Purchase', type: 'boolean' }
+    { key: 'modelDesignation', label: 'Model', type: 'heading', fallback: '-', editType: 'readonly', editable: false },
+    { key: 'name', label: 'Name', fallback: '-', editType: 'input', required: true, validation: { maxLength: 128 } },
+    { key: 'manufacturer', label: 'Manufacturer', fallback: '-', editType: 'input', required: true, validation: { maxLength: 128 } },
+    { key: 'modelNumber', label: 'Model Number', fallback: '-', editType: 'input', required: true, validation: { maxLength: 128 } },
+    {
+      key: 'componentTypeId',
+      label: 'Component Type',
+      fallback: '-',
+      viewKey: 'componentTypeDisplayName',
+      editType: 'searchable-select',
+      required: true,
+      relation: {
+        composable: 'useComponentTypes',
+        dataKey: 'componentTypes',
+        valueKey: 'id',
+        labelKey: 'displayName',
+        searchFields: ['name', 'code', 'displayName']
+      }
+    },
+    { key: 'categoryName', label: 'Category', fallback: '-', editType: 'readonly', editable: false },
+    { key: 'lifecycleStatus', label: 'Lifecycle Status', type: 'badge', fallback: 'Unknown', editType: 'readonly', editable: false },
+    { key: 'active', label: 'Active', type: 'boolean', editType: 'checkbox' },
+    { key: 'discontinued', label: 'Discontinued', type: 'boolean', editType: 'checkbox' },
+    { key: 'endOfLife', label: 'End of Life', type: 'boolean', editType: 'checkbox' },
+    { key: 'currentlySupported', label: 'Currently Supported', type: 'boolean', editType: 'readonly', editable: false },
+    { key: 'availableForPurchase', label: 'Available for Purchase', type: 'boolean', editType: 'readonly', editable: false }
   ]
 };
 
@@ -36,11 +50,11 @@ export const productInformationSection = {
   title: 'Product Information',
   collapsible: true,
   fields: [
-    { key: 'productFamily', label: 'Product Family', fallback: '-' },
-    { key: 'series', label: 'Series', fallback: '-' },
-    { key: 'partNumber', label: 'Part Number', fallback: '-' },
-    { key: 'sku', label: 'SKU', fallback: '-' },
-    { key: 'description', label: 'Description', fallback: 'No description' }
+    { key: 'productFamily', label: 'Product Family', fallback: '-', editType: 'input', validation: { maxLength: 128 } },
+    { key: 'series', label: 'Series', fallback: '-', editType: 'input', validation: { maxLength: 128 } },
+    { key: 'partNumber', label: 'Part Number', fallback: '-', editType: 'input', validation: { maxLength: 64 } },
+    { key: 'sku', label: 'SKU', fallback: '-', editType: 'input', validation: { maxLength: 64 } },
+    { key: 'description', label: 'Description', fallback: 'No description', editType: 'textarea', validation: { maxLength: 2000 } }
   ]
 };
 
@@ -51,11 +65,11 @@ export const lifecycleDatesSection = {
   title: 'Lifecycle & Dates',
   collapsible: true,
   fields: [
-    { key: 'releaseDate', label: 'Release Date', type: 'date', fallback: '-' },
-    { key: 'discontinueDate', label: 'Discontinue Date', type: 'date', fallback: '-' },
-    { key: 'warrantyYears', label: 'Warranty (Years)', fallback: '-' },
-    { key: 'expectedLifespanYears', label: 'Expected Lifespan (Years)', fallback: '-' },
-    { key: 'maintenanceIntervalMonths', label: 'Maintenance Interval (Months)', fallback: '-' }
+    { key: 'releaseDate', label: 'Release Date', type: 'date', fallback: '-', editType: 'date' },
+    { key: 'discontinueDate', label: 'Discontinue Date', type: 'date', fallback: '-', editType: 'date' },
+    { key: 'warrantyYears', label: 'Warranty (Years)', fallback: '-', editType: 'number', validation: { min: 0, max: 100 } },
+    { key: 'expectedLifespanYears', label: 'Expected Lifespan (Years)', fallback: '-', editType: 'number', validation: { min: 0, max: 50 } },
+    { key: 'maintenanceIntervalMonths', label: 'Maintenance Interval (Months)', fallback: '-', editType: 'number', validation: { min: 0, max: 120 } }
   ]
 };
 
@@ -66,9 +80,9 @@ export const documentationSupportSection = {
   title: 'Documentation & Support',
   collapsible: true,
   fields: [
-    { key: 'datasheetUrl', label: 'Datasheet URL', type: 'url', fallback: '-' },
-    { key: 'manualUrl', label: 'Manual URL', type: 'url', fallback: '-' },
-    { key: 'supportUrl', label: 'Support URL', type: 'url', fallback: '-' }
+    { key: 'datasheetUrl', label: 'Datasheet URL', type: 'url', fallback: '-', editType: 'input', validation: { maxLength: 512 } },
+    { key: 'manualUrl', label: 'Manual URL', type: 'url', fallback: '-', editType: 'input', validation: { maxLength: 512 } },
+    { key: 'supportUrl', label: 'Support URL', type: 'url', fallback: '-', editType: 'input', validation: { maxLength: 512 } }
   ]
 };
 
@@ -79,8 +93,8 @@ export const certificationsComplianceSection = {
   title: 'Certifications & Compliance',
   collapsible: true,
   fields: [
-    { key: 'certifications', label: 'Certifications', fallback: '-' },
-    { key: 'complianceStandards', label: 'Compliance Standards', fallback: '-' }
+    { key: 'certifications', label: 'Certifications', fallback: '-', editType: 'textarea', validation: { maxLength: 1000 } },
+    { key: 'complianceStandards', label: 'Compliance Standards', fallback: '-', editType: 'textarea', validation: { maxLength: 1000 } }
   ]
 };
 
@@ -91,9 +105,9 @@ export const pricingSection = {
   title: 'Pricing',
   collapsible: true,
   fields: [
-    { key: 'msrp', label: 'MSRP', type: 'currency', fallback: '-' },
-    { key: 'listPrice', label: 'List Price', type: 'currency', fallback: '-' },
-    { key: 'currencyCode', label: 'Currency', fallback: 'USD' }
+    { key: 'msrp', label: 'MSRP', type: 'currency', fallback: '-', editType: 'number', validation: { min: 0, max: 10000000 } },
+    { key: 'listPrice', label: 'List Price', type: 'currency', fallback: '-', editType: 'number', validation: { min: 0, max: 10000000 } },
+    { key: 'currencyCode', label: 'Currency', fallback: 'USD', editType: 'input', validation: { maxLength: 3 } }
   ]
 };
 
@@ -104,13 +118,13 @@ export const internalNotesSection = {
   title: 'Internal Notes & Metadata',
   collapsible: true,
   fields: [
-    { key: 'verified', label: 'Verified', type: 'boolean' },
-    { key: 'verificationDate', label: 'Verification Date', type: 'date', fallback: '-' },
-    { key: 'notes', label: 'Internal Notes', type: 'textarea', fallback: 'No notes' },
-    { key: 'createdAt', label: 'Created At', type: 'datetime', fallback: '-' },
-    { key: 'updatedAt', label: 'Updated At', type: 'datetime', fallback: '-' },
-    { key: 'createdDate', label: 'Created Date', type: 'datetime', fallback: '-' },
-    { key: 'updatedDate', label: 'Updated Date', type: 'datetime', fallback: '-' }
+    { key: 'verified', label: 'Verified', type: 'boolean', editType: 'checkbox' },
+    { key: 'verificationDate', label: 'Verification Date', type: 'date', fallback: '-', editType: 'date' },
+    { key: 'notes', label: 'Internal Notes', type: 'textarea', fallback: 'No notes', editType: 'textarea', validation: { maxLength: 5000 } },
+    { key: 'createdAt', label: 'Created At', type: 'datetime', fallback: '-', editType: 'readonly', editable: false },
+    { key: 'updatedAt', label: 'Updated At', type: 'datetime', fallback: '-', editType: 'readonly', editable: false },
+    { key: 'createdDate', label: 'Created Date', type: 'datetime', fallback: '-', editType: 'readonly', editable: false },
+    { key: 'updatedDate', label: 'Updated Date', type: 'datetime', fallback: '-', editType: 'readonly', editable: false }
   ]
 };
 
@@ -121,10 +135,10 @@ export const physicalSpecificationsSection = {
   title: 'Physical Specifications',
   collapsible: true,
   fields: [
-    { key: 'formFactor', label: 'Form Factor', fallback: '-' },
-    { key: 'rackUnits', label: 'Rack Units (U)', fallback: '-' },
-    { key: 'dimensionsMm', label: 'Dimensions (W×D×H mm)', fallback: '-' },
-    { key: 'weightKg', label: 'Weight (kg)', fallback: '-' }
+    { key: 'formFactor', label: 'Form Factor', fallback: '-', editType: 'input', validation: { maxLength: 64 } },
+    { key: 'rackUnits', label: 'Rack Units (U)', fallback: '-', editType: 'number', validation: { min: 1, max: 48 } },
+    { key: 'dimensionsMm', label: 'Dimensions (W×D×H mm)', fallback: '-', editType: 'input', validation: { maxLength: 64 } },
+    { key: 'weightKg', label: 'Weight (kg)', fallback: '-', editType: 'number', validation: { min: 0.001, max: 1000 } }
   ]
 };
 
@@ -135,19 +149,19 @@ export const powerEnvironmentalSection = {
   title: 'Power & Environmental',
   collapsible: true,
   fields: [
-    { key: 'powerSummary', label: 'Power Summary', type: 'summary', fallback: '-' },
-    { key: 'powerConsumptionWatts', label: 'Power Consumption (W)', fallback: '-' },
-    { key: 'maxPowerConsumptionWatts', label: 'Max Power Consumption (W)', fallback: '-' },
-    { key: 'powerInputType', label: 'Power Input Type', fallback: 'AC' },
-    { key: 'redundantPowerSupply', label: 'Redundant Power Supply', type: 'boolean' },
-    { key: 'fanless', label: 'Fanless', type: 'boolean' },
-    { key: 'noiseLevelDb', label: 'Noise Level (dB)', fallback: '-' },
-    { key: 'operatingTemperatureRange', label: 'Operating Temperature', type: 'summary', fallback: '-' },
-    { key: 'operatingTemperatureMin', label: 'Min Operating Temp (°C)', fallback: '-' },
-    { key: 'operatingTemperatureMax', label: 'Max Operating Temp (°C)', fallback: '-' },
-    { key: 'humidityRange', label: 'Operating Humidity', type: 'summary', fallback: '-' },
-    { key: 'operatingHumidityMin', label: 'Min Operating Humidity (%)', fallback: '-' },
-    { key: 'operatingHumidityMax', label: 'Max Operating Humidity (%)', fallback: '-' }
+    { key: 'powerSummary', label: 'Power Summary', type: 'summary', fallback: '-', editType: 'readonly', editable: false },
+    { key: 'powerConsumptionWatts', label: 'Power Consumption (W)', fallback: '-', editType: 'number', validation: { min: 0, max: 10000 } },
+    { key: 'maxPowerConsumptionWatts', label: 'Max Power Consumption (W)', fallback: '-', editType: 'number', validation: { min: 0, max: 10000 } },
+    { key: 'powerInputType', label: 'Power Input Type', fallback: 'AC', editType: 'input', validation: { maxLength: 32 } },
+    { key: 'redundantPowerSupply', label: 'Redundant Power Supply', type: 'boolean', editType: 'checkbox' },
+    { key: 'fanless', label: 'Fanless', type: 'boolean', editType: 'checkbox' },
+    { key: 'noiseLevelDb', label: 'Noise Level (dB)', fallback: '-', editType: 'number', validation: { min: 0, max: 100 } },
+    { key: 'operatingTemperatureRange', label: 'Operating Temperature', type: 'summary', fallback: '-', editType: 'readonly', editable: false },
+    { key: 'operatingTemperatureMin', label: 'Min Operating Temp (°C)', fallback: '-', editType: 'number', validation: { min: -40, max: 100 } },
+    { key: 'operatingTemperatureMax', label: 'Max Operating Temp (°C)', fallback: '-', editType: 'number', validation: { min: -40, max: 100 } },
+    { key: 'humidityRange', label: 'Operating Humidity', type: 'summary', fallback: '-', editType: 'readonly', editable: false },
+    { key: 'operatingHumidityMin', label: 'Min Operating Humidity (%)', fallback: '-', editType: 'number', validation: { min: 0, max: 100 } },
+    { key: 'operatingHumidityMax', label: 'Max Operating Humidity (%)', fallback: '-', editType: 'number', validation: { min: 0, max: 100 } }
   ]
 };
 
@@ -158,12 +172,12 @@ export const managementMonitoringSection = {
   title: 'Management & Monitoring',
   collapsible: true,
   fields: [
-    { key: 'managementSummary', label: 'Management Summary', type: 'summary', fallback: '-' },
-    { key: 'managementInterfaces', label: 'Management Interfaces', fallback: '-' },
-    { key: 'webManagement', label: 'Web Management', type: 'boolean' },
-    { key: 'supportsSsh', label: 'SSH Support', type: 'boolean' },
-    { key: 'supportsTelnet', label: 'Telnet Support', type: 'boolean' },
-    { key: 'snmpVersions', label: 'SNMP Versions', fallback: '-' }
+    { key: 'managementSummary', label: 'Management Summary', type: 'summary', fallback: '-', editType: 'readonly', editable: false },
+    { key: 'managementInterfaces', label: 'Management Interfaces', fallback: '-', editType: 'input', validation: { maxLength: 128 } },
+    { key: 'webManagement', label: 'Web Management', type: 'boolean', editType: 'checkbox' },
+    { key: 'supportsSsh', label: 'SSH Support', type: 'boolean', editType: 'checkbox' },
+    { key: 'supportsTelnet', label: 'Telnet Support', type: 'boolean', editType: 'checkbox' },
+    { key: 'snmpVersions', label: 'SNMP Versions', fallback: '-', editType: 'input', validation: { maxLength: 64 } }
   ]
 };
 
