@@ -28,6 +28,18 @@
       :class="inputClasses"
     />
 
+    <!-- Date Input -->
+    <input
+      v-else-if="editType === 'date'"
+      :value="dateInputValue"
+      @input="$emit('update:modelValue', $event.target.value ? `${$event.target.value}T00:00:00` : null)"
+      type="date"
+      :placeholder="field.placeholder || `Select ${field.label}...`"
+      :disabled="disabled"
+      :required="field.required"
+      :class="inputClasses"
+    />
+
     <!-- Textarea -->
     <textarea
       v-else-if="editType === 'textarea'"
@@ -214,6 +226,20 @@ const inputClasses = computed(() => [
     ? 'bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed'
     : 'bg-white border-gray-300 hover:border-gray-400 text-gray-900'
 ]);
+
+const dateInputValue = computed(() => {
+  if (!props.modelValue) return '';
+  if (typeof props.modelValue === 'string') {
+    return props.modelValue.substring(0, 10);
+  }
+  try {
+    const date = new Date(props.modelValue);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toISOString().substring(0, 10);
+  } catch {
+    return '';
+  }
+});
 
 // Color presets for color-class picker
 const colorPresets = [

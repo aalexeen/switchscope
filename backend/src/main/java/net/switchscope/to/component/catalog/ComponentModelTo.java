@@ -161,6 +161,9 @@ public abstract class ComponentModelTo extends NamedTo {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private String categoryName;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private String discriminatorType;
+
     protected ComponentModelTo(UUID id, OffsetDateTime createdAt, OffsetDateTime updatedAt, String name) {
         super(id, name);
         this.setCreatedAt(createdAt);
@@ -171,4 +174,3 @@ public abstract class ComponentModelTo extends NamedTo {
         super(id, name);
     }
 }
-

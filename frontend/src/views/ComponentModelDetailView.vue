@@ -107,9 +107,14 @@
               class="px-6 py-4 border-b border-gray-200 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
               @click="section.collapsible && toggleSection(key)"
             >
-              <h2 class="text-lg font-semibold text-gray-900">
-                {{ section.title }}
-              </h2>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  {{ section.title }}
+                </h2>
+                <p v-if="section.description" class="mt-1 text-xs text-gray-500">
+                  {{ section.description }}
+                </p>
+              </div>
               <i
                 v-if="section.collapsible"
                 :class="collapsedSections[key] ? 'pi-chevron-down' : 'pi-chevron-up'"
@@ -205,18 +210,35 @@ const configMap = {
   'RACK_MODEL': rackModelConfig
 };
 
+const configAliases = {
+  'SWITCH': 'SWITCH_MODEL',
+  'ROUTER': 'ROUTER_MODEL',
+  'ACCESS_POINT': 'ACCESS_POINT_MODEL',
+  'ACCESSPOINT': 'ACCESS_POINT_MODEL',
+  'RACK': 'RACK_MODEL'
+};
+
+const resolveConfigKey = (rawType) => {
+  if (!rawType) return null;
+  const normalized = String(rawType).toUpperCase();
+  if (configMap[normalized]) return normalized;
+  return configAliases[normalized] || null;
+};
+
 // Get configuration based on model type
 const config = computed(() => {
   if (!model.value) return switchModelConfig; // Default
 
   // Try to detect discriminator type from various possible fields
-  const discriminatorType =
+  const rawType =
     model.value.discriminatorType ||
     model.value.modelClass ||
     model.value.modelType ||
+    model.value.componentTypeCode ||
     'SWITCH_MODEL'; // Default
 
-  return configMap[discriminatorType] || switchModelConfig;
+  const resolvedType = resolveConfigKey(rawType) || 'SWITCH_MODEL';
+  return configMap[resolvedType] || switchModelConfig;
 });
 
 // Get composable
@@ -349,7 +371,11 @@ const cancelEdit = () => {
 
 // Save changes
 const saveChanges = async () => {
-  if (!hasChanges.value || isSaving.value) return;
+  console.log('saveChanges called, hasChanges:', hasChanges.value, 'isSaving:', isSaving.value);
+  if (!hasChanges.value || isSaving.value) {
+    console.log('saveChanges skipped - no changes or already saving');
+    return;
+  }
 
   isSaving.value = true;
 
@@ -359,6 +385,7 @@ const saveChanges = async () => {
       ...model.value,
       ...editForm.value
     };
+    console.log('Payload to send:', JSON.stringify(payload, null, 2));
 
     // Remove read-only fields that shouldn't be sent to API
     delete payload.createdAt;
@@ -375,7 +402,9 @@ const saveChanges = async () => {
     delete payload.componentTypeCode;
     delete payload.componentTypeDisplayName;
 
-    await updateComponentModel(model.value.id, payload);
+    console.log('Calling updateComponentModel with id:', model.value.id);
+    const result = await updateComponentModel(model.value.id, payload);
+    console.log('updateComponentModel result:', result);
 
     // Update local model with new values
     Object.assign(model.value, editForm.value);

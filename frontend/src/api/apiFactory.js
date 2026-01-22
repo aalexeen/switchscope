@@ -52,7 +52,12 @@ export function createApiModule(baseURL) {
        * @returns {Promise} Axios response with updated item
        */
       update(id, payload) {
-        return components.put(`${baseURL}/${id}`, payload);
+        const url = `${baseURL}/${id}`;
+        console.log(`[API] PUT ${url}`, payload);
+        return components.put(url, payload).then(response => {
+          console.log(`[API] PUT ${url} response:`, response.status, response.data);
+          return response;
+        });
       },
 
       /**

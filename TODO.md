@@ -199,6 +199,13 @@ public interface YourEntityMapper extends BaseMapper<YourEntity, YourEntityTo> {
 
 ---
 
+## Frontend Detail View Requirements (Component Models)
+
+- **Discriminator-aware configs:** detail views must select the correct model config using a discriminator field from the API (e.g., `discriminatorType`) so the edit schema matches the entity type.
+- **Component type UX:** view mode should show `componentTypeDisplayName` while edit mode should bind `componentTypeId` via searchable select.
+- **Computed sections:** classification fields that are computed in the backend must remain read-only and can include a short description explaining their source.
+- **Date inputs:** editable date fields should use a date picker input and store values as `YYYY-MM-DDT00:00:00` for API compatibility.
+
 ### Phase 2: Frontend - Edit Mode in GenericDetailView
 
 #### 2.1 Detail Config with Edit Types

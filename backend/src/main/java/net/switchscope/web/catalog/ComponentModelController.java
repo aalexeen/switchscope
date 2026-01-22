@@ -1,5 +1,6 @@
 package net.switchscope.web.catalog;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.SneakyThrows;
 import net.switchscope.error.NotFoundException;
 import net.switchscope.mapper.component.catalog.connectivity.CableRunModelMapper;
 import net.switchscope.mapper.component.catalog.connectivity.ConnectorModelMapper;
@@ -50,6 +52,7 @@ public class ComponentModelController {
     private final ComponentModelService service;
     private final ComponentModelRepository repository;
     private final ComponentTypeRepository componentTypeRepository;
+    private final ObjectMapper objectMapper;
 
     // Polymorphic mappers for different model types
     private final SwitchModelMapper switchModelMapper;
@@ -84,16 +87,29 @@ public class ComponentModelController {
         return mapToDto(service.create(entity));
     }
 
+    /**
+     * Update component model.
+     * Accepts raw JSON and determines concrete DTO type from existing entity in DB.
+     * This avoids Jackson polymorphic deserialization issues with abstract ComponentModelTo.
+     */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    public ComponentModelTo update(@PathVariable UUID id, @RequestBody ComponentModelTo to) {
-        log.info("update component model {} with id={}", to, id);
+    @SneakyThrows
+    public ComponentModelTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
+        log.info("update component model with id={}", id);
 
-        // 1. Load existing entity with associations
+        // 1. Load existing entity to determine concrete type
         ComponentModel entity = repository.findByIdWithComponentType(id)
                 .orElseThrow(() -> new NotFoundException("Component model with id=" + id + " not found"));
 
-        // 2. Handle componentTypeId FK change (mapper ignores componentType)
+        // 2. Determine DTO class from entity type and deserialize JSON
+        Class<? extends ComponentModelTo> dtoClass = getDtoClassForEntity(entity);
+        log.info("Entity type: {}, DTO class: {}", entity.getClass().getSimpleName(), dtoClass.getSimpleName());
+        ComponentModelTo to = objectMapper.readValue(jsonPayload, dtoClass);
+        log.info("Deserialized DTO: name={}, manufacturer={}", to.getName(), to.getManufacturer());
+        log.info("Entity before update: name={}, manufacturer={}", entity.getName(), entity.getManufacturer());
+
+        // 3. Handle componentTypeId FK change (mapper ignores componentType)
         if (to.getComponentTypeId() != null &&
                 (entity.getComponentType() == null ||
                  !Objects.equals(to.getComponentTypeId(), entity.getComponentType().getId()))) {
@@ -102,11 +118,14 @@ public class ComponentModelController {
             entity.setComponentType(newComponentType);
         }
 
-        // 3. Apply other field updates via mapper
+        // 4. Apply other field updates via mapper
         updateFromDto(entity, to);
+        log.info("Entity after update: name={}, manufacturer={}", entity.getName(), entity.getManufacturer());
 
-        // 4. Save and return
-        return mapToDto(repository.save(entity));
+        // 5. Save and return
+        ComponentModel saved = repository.save(entity);
+        log.info("Saved entity: name={}, manufacturer={}", saved.getName(), saved.getManufacturer());
+        return mapToDto(saved);
     }
 
     @DeleteMapping("/{id}")
@@ -120,19 +139,33 @@ public class ComponentModelController {
     @SuppressWarnings("unchecked")
     private ComponentModelTo mapToDto(ComponentModel model) {
         if (model instanceof SwitchModel) {
-            return switchModelMapper.toTo((SwitchModel) model);
+            ComponentModelTo to = switchModelMapper.toTo((SwitchModel) model);
+            to.setDiscriminatorType("SWITCH_MODEL");
+            return to;
         } else if (model instanceof RouterModel) {
-            return routerModelMapper.toTo((RouterModel) model);
+            ComponentModelTo to = routerModelMapper.toTo((RouterModel) model);
+            to.setDiscriminatorType("ROUTER_MODEL");
+            return to;
         } else if (model instanceof AccessPointModel) {
-            return accessPointModelMapper.toTo((AccessPointModel) model);
+            ComponentModelTo to = accessPointModelMapper.toTo((AccessPointModel) model);
+            to.setDiscriminatorType("ACCESS_POINT_MODEL");
+            return to;
         } else if (model instanceof CableRunModel) {
-            return cableRunModelMapper.toTo((CableRunModel) model);
+            ComponentModelTo to = cableRunModelMapper.toTo((CableRunModel) model);
+            to.setDiscriminatorType("CABLE_RUN_MODEL");
+            return to;
         } else if (model instanceof ConnectorModel) {
-            return connectorModelMapper.toTo((ConnectorModel) model);
+            ComponentModelTo to = connectorModelMapper.toTo((ConnectorModel) model);
+            to.setDiscriminatorType("CONNECTOR_MODEL");
+            return to;
         } else if (model instanceof PatchPanelModel) {
-            return patchPanelModelMapper.toTo((PatchPanelModel) model);
+            ComponentModelTo to = patchPanelModelMapper.toTo((PatchPanelModel) model);
+            to.setDiscriminatorType("PATCH_PANEL_MODEL");
+            return to;
         } else if (model instanceof RackModelEntity) {
-            return rackModelMapper.toTo((RackModelEntity) model);
+            ComponentModelTo to = rackModelMapper.toTo((RackModelEntity) model);
+            to.setDiscriminatorType("RACK_MODEL");
+            return to;
         } else {
             throw new IllegalArgumentException("Unknown component model type: " + model.getClass().getName());
         }
@@ -179,6 +212,30 @@ public class ComponentModelController {
             rackModelMapper.updateFromTo((RackModelEntity) model, (net.switchscope.to.component.catalog.housing.RackModelTo) to);
         } else {
             throw new IllegalArgumentException("Component model type mismatch: entity=" + model.getClass().getName() + ", to=" + to.getClass().getName());
+        }
+    }
+
+    /**
+     * Determines the concrete DTO class based on entity type.
+     * Used for deserializing JSON into the correct DTO subclass.
+     */
+    private Class<? extends ComponentModelTo> getDtoClassForEntity(ComponentModel entity) {
+        if (entity instanceof SwitchModel) {
+            return net.switchscope.to.component.catalog.device.SwitchModelTo.class;
+        } else if (entity instanceof RouterModel) {
+            return net.switchscope.to.component.catalog.device.RouterModelTo.class;
+        } else if (entity instanceof AccessPointModel) {
+            return net.switchscope.to.component.catalog.device.AccessPointModelTo.class;
+        } else if (entity instanceof CableRunModel) {
+            return net.switchscope.to.component.catalog.connectivity.CableRunModelTo.class;
+        } else if (entity instanceof ConnectorModel) {
+            return net.switchscope.to.component.catalog.connectivity.ConnectorModelTo.class;
+        } else if (entity instanceof PatchPanelModel) {
+            return net.switchscope.to.component.catalog.connectivity.PatchPanelModelTo.class;
+        } else if (entity instanceof RackModelEntity) {
+            return net.switchscope.to.component.catalog.housing.RackModelTo.class;
+        } else {
+            throw new IllegalArgumentException("Unknown component model entity type: " + entity.getClass().getName());
         }
     }
 }

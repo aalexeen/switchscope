@@ -100,7 +100,8 @@ const props = defineProps({
 
 // Get value from model
 const value = computed(() => {
-  return props.model[props.field.key];
+  const key = props.field.viewKey || props.field.key;
+  return props.model[key];
 });
 
 // Format value with fallback
