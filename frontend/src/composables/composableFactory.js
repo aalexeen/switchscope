@@ -175,11 +175,8 @@ export function createEntityComposable(config) {
      * @param {Object} data - Updated data
      */
     const updateEntity = async (id, data) => {
-      console.log(`[Composable] updateEntity called for ${apiKey}, id:`, id);
       try {
-        console.log(`[Composable] Calling api.${apiKey}.update()`);
         const response = await api[apiKey].update(id, data);
-        console.log(`[Composable] API response:`, response);
         const updated = response.data;
         const index = entities.value.findIndex(e => e.id === id);
         if (index !== -1) {

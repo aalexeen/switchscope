@@ -120,12 +120,9 @@ public class ComponentModelController {
 
         // 4. Apply other field updates via mapper
         updateFromDto(entity, to);
-        log.info("Entity after update: name={}, manufacturer={}", entity.getName(), entity.getManufacturer());
 
         // 5. Save and return
-        ComponentModel saved = repository.save(entity);
-        log.info("Saved entity: name={}, manufacturer={}", saved.getName(), saved.getManufacturer());
-        return mapToDto(saved);
+        return mapToDto(repository.save(entity));
     }
 
     @DeleteMapping("/{id}")
