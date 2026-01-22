@@ -32,6 +32,7 @@ export default {
           key: 'componentTypeId',
           label: 'Component Type',
           fallback: '-',
+          viewKey: 'componentTypeDisplayName',
           editType: 'searchable-select',
           required: true,
           relation: {
@@ -235,8 +236,8 @@ export default {
       priority: 12,
       collapsible: true,
       fields: [
-        { key: 'releaseDate', label: 'Release Date', type: 'date', fallback: '-', editType: 'input', validation: { maxLength: 32 } },
-        { key: 'discontinueDate', label: 'Discontinue Date', type: 'date', fallback: '-', editType: 'input', validation: { maxLength: 32 } },
+        { key: 'releaseDate', label: 'Release Date', type: 'date', fallback: '-', editType: 'date' },
+        { key: 'discontinueDate', label: 'Discontinue Date', type: 'date', fallback: '-', editType: 'date' },
         { key: 'warrantyYears', label: 'Warranty (Years)', fallback: '-', editType: 'number', validation: { min: 0, max: 100 } },
         { key: 'expectedLifespanYears', label: 'Expected Lifespan (Years)', fallback: '-', editType: 'number', validation: { min: 0, max: 50 } },
         { key: 'maintenanceIntervalMonths', label: 'Maintenance Interval (Months)', fallback: '-', editType: 'number', validation: { min: 0, max: 120 } }
@@ -293,7 +294,7 @@ export default {
       collapsible: true,
       fields: [
         { key: 'verified', label: 'Verified', type: 'boolean', editType: 'checkbox' },
-        { key: 'verificationDate', label: 'Verification Date', type: 'date', fallback: '-', editType: 'input', validation: { maxLength: 32 } },
+        { key: 'verificationDate', label: 'Verification Date', type: 'date', fallback: '-', editType: 'date' },
         { key: 'notes', label: 'Internal Notes', type: 'textarea', fallback: 'No notes', editType: 'textarea', validation: { maxLength: 5000 } },
         { key: 'createdAt', label: 'Created At', type: 'datetime', fallback: '-', editType: 'readonly', editable: false },
         { key: 'updatedAt', label: 'Updated At', type: 'datetime', fallback: '-', editType: 'readonly', editable: false },
