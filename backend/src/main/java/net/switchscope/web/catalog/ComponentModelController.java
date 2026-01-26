@@ -1,5 +1,6 @@
 package net.switchscope.web.catalog;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.SneakyThrows;
 import net.switchscope.error.NotFoundException;
+import net.switchscope.security.policy.UpdatePolicy;
+import net.switchscope.security.policy.UpdatePolicyResolver;
+import net.switchscope.security.policy.UpdatePolicyValidator;
 import net.switchscope.mapper.component.catalog.connectivity.CableRunModelMapper;
 import net.switchscope.mapper.component.catalog.connectivity.ConnectorModelMapper;
 import net.switchscope.mapper.component.catalog.connectivity.PatchPanelModelMapper;
@@ -31,7 +35,10 @@ import net.switchscope.repository.component.ComponentTypeRepository;
 import net.switchscope.service.component.catalog.ComponentModelService;
 import net.switchscope.to.component.catalog.ComponentModelTo;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,6 +60,10 @@ public class ComponentModelController {
     private final ComponentModelRepository repository;
     private final ComponentTypeRepository componentTypeRepository;
     private final ObjectMapper objectMapper;
+
+    // Policy validation
+    private final UpdatePolicyResolver policyResolver;
+    private final UpdatePolicyValidator policyValidator;
 
     // Polymorphic mappers for different model types
     private final SwitchModelMapper switchModelMapper;
@@ -91,6 +102,7 @@ public class ComponentModelController {
      * Update component model.
      * Accepts raw JSON and determines concrete DTO type from existing entity in DB.
      * This avoids Jackson polymorphic deserialization issues with abstract ComponentModelTo.
+     * Validates field nullification against role-based update policy.
      */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
@@ -109,6 +121,12 @@ public class ComponentModelController {
         log.info("Deserialized DTO: name={}, manufacturer={}", to.getName(), to.getManufacturer());
         log.info("Entity before update: name={}, manufacturer={}", entity.getName(), entity.getManufacturer());
 
+        // 2.5. Validate field nullifications against policy
+        Map<String, JsonNode> presentFields = extractPresentFields(jsonPayload);
+        UpdatePolicy policy = policyResolver.resolve();
+        log.debug("Applying update policy: {}", policy.getPolicyName());
+        policyValidator.validate(dtoClass, presentFields, policy);
+
         // 3. Handle componentTypeId FK change (mapper ignores componentType)
         if (to.getComponentTypeId() != null &&
                 (entity.getComponentType() == null ||
@@ -123,6 +141,22 @@ public class ComponentModelController {
 
         // 5. Save and return
         return mapToDto(repository.save(entity));
+    }
+
+    /**
+     * Extracts all fields present in JSON payload with their values.
+     * Used to detect explicitly set null values vs absent fields.
+     */
+    @SneakyThrows
+    private Map<String, JsonNode> extractPresentFields(String jsonPayload) {
+        Map<String, JsonNode> fields = new HashMap<>();
+        JsonNode root = objectMapper.readTree(jsonPayload);
+        Iterator<String> fieldNames = root.fieldNames();
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            fields.put(fieldName, root.get(fieldName));
+        }
+        return fields;
     }
 
     @DeleteMapping("/{id}")

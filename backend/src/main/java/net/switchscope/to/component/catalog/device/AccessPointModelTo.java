@@ -5,6 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import net.switchscope.security.policy.FieldAccess;
+import net.switchscope.security.policy.FieldAccessLevel;
 import net.switchscope.validation.NoHtml;
 
 import java.math.BigDecimal;
@@ -92,18 +94,23 @@ public class AccessPointModelTo extends DeviceModelTo {
 
     // Computed read-only fields
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String bandSummary;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean wifi6;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean enterprise;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean hasAdvancedFeatures;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private BigDecimal powerEfficiency;
 
     public AccessPointModelTo(UUID id, OffsetDateTime createdAt, OffsetDateTime updatedAt, String name) {

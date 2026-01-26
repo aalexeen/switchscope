@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import net.switchscope.security.policy.FieldAccess;
+import net.switchscope.security.policy.FieldAccessLevel;
 import net.switchscope.validation.NoHtml;
 
 import java.math.BigDecimal;
@@ -83,18 +85,23 @@ public class RouterModelTo extends DeviceModelTo {
 
     // Computed read-only fields
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String interfaceSummary;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean enterpriseRouter;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean hasAdvancedRouting;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean hasVpnCapability;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private BigDecimal powerEfficiency;
 
     public RouterModelTo(UUID id, OffsetDateTime createdAt, OffsetDateTime updatedAt, String name) {

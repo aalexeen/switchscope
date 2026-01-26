@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import net.switchscope.security.policy.FieldAccess;
+import net.switchscope.security.policy.FieldAccessLevel;
 import net.switchscope.to.component.catalog.ComponentModelTo;
 import net.switchscope.validation.NoHtml;
 
@@ -80,24 +82,31 @@ public class RackModelTo extends ComponentModelTo {
 
     // Computed read-only fields
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String rackCategory;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String sizeCategory;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String dimensionsDescription;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String featuresSummary;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean compact;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean fullHeight;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean halfHeight;
 
     public RackModelTo(UUID id, OffsetDateTime createdAt, OffsetDateTime updatedAt, String name) {
