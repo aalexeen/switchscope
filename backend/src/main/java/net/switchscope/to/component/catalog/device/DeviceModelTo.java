@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import net.switchscope.security.policy.FieldAccess;
+import net.switchscope.security.policy.FieldAccessLevel;
 import net.switchscope.to.component.catalog.ComponentModelTo;
 import net.switchscope.validation.NoHtml;
 
@@ -66,12 +68,15 @@ public abstract class DeviceModelTo extends ComponentModelTo {
 
     // Computed read-only fields
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String managementSummary;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String powerSummary;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String deviceTypeSummary;
 
     protected DeviceModelTo(UUID id, OffsetDateTime createdAt, OffsetDateTime updatedAt, String name) {

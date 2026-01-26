@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import net.switchscope.security.policy.FieldAccess;
+import net.switchscope.security.policy.FieldAccessLevel;
 import net.switchscope.to.component.catalog.ComponentModelTo;
 import net.switchscope.validation.NoHtml;
 
@@ -89,18 +91,23 @@ public class PatchPanelModelTo extends ComponentModelTo {
 
     // Computed read-only fields
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String portSummary;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String specificationSummary;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean fiberPanel;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean copperPanel;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean highDensity;
 
     public PatchPanelModelTo(UUID id, OffsetDateTime createdAt, OffsetDateTime updatedAt, String name) {

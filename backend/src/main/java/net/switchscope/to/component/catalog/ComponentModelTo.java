@@ -5,6 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import net.switchscope.security.policy.FieldAccess;
+import net.switchscope.security.policy.FieldAccessLevel;
 import net.switchscope.to.NamedTo;
 import net.switchscope.validation.NoHtml;
 
@@ -24,11 +26,13 @@ public abstract class ComponentModelTo extends NamedTo {
     @NotBlank
     @Size(max = 128)
     @NoHtml
+    @FieldAccess(FieldAccessLevel.REQUIRED)
     private String manufacturer;
 
     @NotBlank
     @Size(max = 128)
     @NoHtml
+    @FieldAccess(FieldAccessLevel.REQUIRED)
     private String modelNumber;
 
     @Size(max = 128)
@@ -42,19 +46,25 @@ public abstract class ComponentModelTo extends NamedTo {
     // Component type relationship
     @NotNull
     @Schema(description = "Component type ID")
+    @FieldAccess(FieldAccessLevel.REQUIRED)
     private UUID componentTypeId;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY, description = "Component type code")
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String componentTypeCode;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY, description = "Component type display name")
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String componentTypeDisplayName;
 
     // Model status and lifecycle
+    @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private Boolean active = true;
 
+    @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private Boolean discontinued = false;
 
+    @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private Boolean endOfLife = false;
 
     private LocalDateTime releaseDate;
@@ -126,11 +136,14 @@ public abstract class ComponentModelTo extends NamedTo {
 
     // Catalog management
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private LocalDateTime createdDate;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private LocalDateTime updatedDate;
 
+    @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private Boolean verified = false;
 
     private LocalDateTime verificationDate;
@@ -141,27 +154,35 @@ public abstract class ComponentModelTo extends NamedTo {
 
     // Computed read-only fields
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String modelDesignation;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String lifecycleStatus;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean currentlySupported;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean availableForPurchase;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String operatingTemperatureRange;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String humidityRange;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String categoryName;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String discriminatorType;
 
     protected ComponentModelTo(UUID id, OffsetDateTime createdAt, OffsetDateTime updatedAt, String name) {
