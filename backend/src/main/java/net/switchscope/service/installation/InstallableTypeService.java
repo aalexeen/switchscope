@@ -3,10 +3,12 @@ package net.switchscope.service.installation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import net.switchscope.mapper.installation.catalog.InstallableTypeMapper;
 import net.switchscope.model.installation.catalog.InstallableTypeEntity;
 import net.switchscope.repository.installation.InstallableTypeRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.UpdatableCrudService;
 import net.switchscope.service.component.InstallableComponentRegistry;
+import net.switchscope.to.installation.catalog.InstallableTypeTo;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,9 +16,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class InstallableTypeService implements CrudService<InstallableTypeEntity> {
+public class InstallableTypeService implements UpdatableCrudService<InstallableTypeEntity, InstallableTypeTo> {
 
     private final InstallableTypeRepository repository;
+    private final InstallableTypeMapper mapper;
     private final InstallableComponentRegistry registry;
 
     @Override
@@ -48,6 +51,16 @@ public class InstallableTypeService implements CrudService<InstallableTypeEntity
         repository.getExisted(id);
         entity.setId(id);
         InstallableTypeEntity saved = repository.save(entity);
+        saved.setRegistry(registry);
+        return saved;
+    }
+
+    @Override
+    @Transactional
+    public InstallableTypeEntity updateFromDto(UUID id, InstallableTypeTo dto) {
+        InstallableTypeEntity existing = repository.getExisted(id);
+        mapper.updateFromTo(existing, dto);
+        InstallableTypeEntity saved = repository.save(existing);
         saved.setRegistry(registry);
         return saved;
     }

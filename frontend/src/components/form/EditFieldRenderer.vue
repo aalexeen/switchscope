@@ -4,7 +4,7 @@
     <input
       v-if="editType === 'input' || editType === 'text'"
       :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="$emit('update:modelValue', $event.target.value || null)"
       type="text"
       :placeholder="field.placeholder || `Enter ${field.label}...`"
       :disabled="disabled"
@@ -44,7 +44,7 @@
     <textarea
       v-else-if="editType === 'textarea'"
       :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="$emit('update:modelValue', $event.target.value || null)"
       :placeholder="field.placeholder || `Enter ${field.label}...`"
       :disabled="disabled"
       :required="field.required"
@@ -120,7 +120,7 @@
     <div v-else-if="editType === 'color-class'" class="space-y-2">
       <input
         :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)"
+        @input="$emit('update:modelValue', $event.target.value || null)"
         type="text"
         :placeholder="field.placeholder || 'e.g., text-blue-600'"
         :disabled="disabled"
@@ -148,7 +148,7 @@
         <i v-if="modelValue" :class="['pi absolute left-3 top-1/2 -translate-y-1/2 text-gray-600', modelValue]"></i>
         <input
           :value="modelValue"
-          @input="$emit('update:modelValue', $event.target.value)"
+          @input="$emit('update:modelValue', $event.target.value || null)"
           type="text"
           :placeholder="field.placeholder || 'e.g., pi-folder'"
           :disabled="disabled"
@@ -181,7 +181,7 @@
     <input
       v-else
       :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="$emit('update:modelValue', $event.target.value || null)"
       type="text"
       :placeholder="field.placeholder || `Enter ${field.label}...`"
       :disabled="disabled"

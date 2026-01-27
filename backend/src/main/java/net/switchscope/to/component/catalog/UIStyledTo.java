@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import net.switchscope.security.policy.FieldAccess;
+import net.switchscope.security.policy.FieldAccessLevel;
 
 import java.util.UUID;
 
@@ -16,9 +18,11 @@ import java.util.UUID;
 public abstract class UIStyledTo extends BaseCodedTo {
 
     @Size(max = 128)
+    @FieldAccess(FieldAccessLevel.ADMIN_NULLABLE)
     private String colorClass;
 
     @Size(max = 128)
+    @FieldAccess(FieldAccessLevel.ADMIN_NULLABLE)
     private String iconClass;
 
     protected UIStyledTo(UUID id, String name, String code, String displayName) {
