@@ -1,40 +1,125 @@
 package net.switchscope.web.catalog;
 
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import net.switchscope.mapper.BaseMapper;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.component.catalog.ComponentStatusMapper;
 import net.switchscope.model.component.ComponentStatusEntity;
-import net.switchscope.service.CrudService;
+import net.switchscope.security.policy.UpdatePolicy;
+import net.switchscope.security.policy.UpdatePolicyResolver;
+import net.switchscope.security.policy.UpdatePolicyValidator;
 import net.switchscope.service.component.ComponentStatusService;
 import net.switchscope.to.component.catalog.ComponentStatusTo;
-import net.switchscope.web.AbstractCatalogController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * Controller for ComponentStatus catalog entities.
+ * Custom implementation to support role-based field access validation.
+ */
+@Slf4j
 @RestController
 @RequestMapping(value = ComponentStatusController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
-public class ComponentStatusController extends AbstractCatalogController<ComponentStatusEntity, ComponentStatusTo> {
+public class ComponentStatusController {
 
     static final String REST_URL = "/api/catalogs/component-statuses";
 
     private final ComponentStatusService service;
     private final ComponentStatusMapper mapper;
+    private final ObjectMapper objectMapper;
 
-    @Override
-    protected CrudService<ComponentStatusEntity> getService() {
-        return service;
+    // Policy validation
+    private final UpdatePolicyResolver policyResolver;
+    private final UpdatePolicyValidator policyValidator;
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public List<ComponentStatusTo> getAll() {
+        log.info("getAll component statuses");
+        return mapper.toToList(service.getAll());
     }
 
-    @Override
-    protected BaseMapper<ComponentStatusEntity, ComponentStatusTo> getMapper() {
-        return mapper;
+    @GetMapping("/{id}")
+    @Transactional(readOnly = true)
+    public ComponentStatusTo get(@PathVariable UUID id) {
+        log.info("get component status {}", id);
+        return mapper.toTo(service.getById(id));
     }
 
-    @Override
-    protected String getEntityName() {
-        return "component status";
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ComponentStatusTo create(@RequestBody ComponentStatusTo dto) {
+        log.info("create component status {}", dto);
+        ComponentStatusEntity entity = mapper.toEntity(dto);
+        ComponentStatusEntity created = service.create(entity);
+        return mapper.toTo(created);
+    }
+
+    /**
+     * Update component status with role-based field access validation.
+     * Validates field nullification against update policy before applying changes.
+     */
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
+    @SneakyThrows
+    public ComponentStatusTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
+        log.info("update component status with id={}", id);
+
+        // 1. Deserialize JSON into DTO
+        ComponentStatusTo dto = objectMapper.readValue(jsonPayload, ComponentStatusTo.class);
+
+        // 2. Validate field nullifications against policy
+        Map<String, JsonNode> presentFields = extractPresentFields(jsonPayload);
+        UpdatePolicy policy = policyResolver.resolve();
+        log.debug("Applying update policy: {}", policy.getPolicyName());
+        policyValidator.validate(ComponentStatusTo.class, presentFields, policy);
+
+        // 3. Delegate to service for actual update (mapping done in service within transaction)
+        return service.updateAndMapToDto(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
+    public void delete(@PathVariable UUID id) {
+        log.info("delete component status {}", id);
+        service.delete(id);
+    }
+
+    /**
+     * Extracts all fields present in JSON payload with their values.
+     * Used to detect explicitly set null values vs absent fields.
+     */
+    @SneakyThrows
+    private Map<String, JsonNode> extractPresentFields(String jsonPayload) {
+        Map<String, JsonNode> fields = new HashMap<>();
+        JsonNode root = objectMapper.readTree(jsonPayload);
+        Iterator<String> fieldNames = root.fieldNames();
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            fields.put(fieldName, root.get(fieldName));
+        }
+        return fields;
     }
 }

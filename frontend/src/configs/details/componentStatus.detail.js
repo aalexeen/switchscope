@@ -3,7 +3,7 @@
  */
 
 export default {
-  tableKey: 'componentStatuses', // Key to look up in composableRegistry
+  tableKey: 'componentStatuses',
   composable: 'useComponentStatuses',
 
   sections: {
@@ -13,21 +13,119 @@ export default {
     },
     basicInfo: {
       fields: [
-        { key: 'displayName', label: 'Display Name', fallback: '-' },
-        { key: 'code', label: 'Code' },
-        { key: 'lifecyclePhase', label: 'Lifecycle Phase', fallback: '-' },
-        { key: 'description', label: 'Description', fallback: 'No description' },
-        { key: 'available', label: 'Available', type: 'boolean' },
-        { key: 'operational', label: 'Operational', type: 'boolean' },
-        { key: 'canAcceptInstallations', label: 'Can Accept Installations', type: 'boolean' },
-        { key: 'requiresAttention', label: 'Requires Attention', type: 'boolean' },
-        { key: 'physicallyPresent', label: 'Physically Present', type: 'boolean' },
-        { key: 'inInventory', label: 'In Inventory', type: 'boolean' },
-        { key: 'inTransition', label: 'In Transition', type: 'boolean' },
-        { key: 'canBeReserved', label: 'Can Be Reserved', type: 'boolean' },
-        { key: 'sortOrder', label: 'Sort Order', fallback: '-' },
-        { key: 'colorClass', label: 'Color Class', fallback: '-' },
-        { key: 'iconClass', label: 'Icon Class', fallback: '-' }
+        {
+          key: 'name',
+          label: 'Name',
+          fallback: '-',
+          editType: 'input',
+          required: true,
+          validation: { maxLength: 128 }
+        },
+        {
+          key: 'displayName',
+          label: 'Display Name',
+          fallback: '-',
+          editType: 'input',
+          required: true,
+          validation: { maxLength: 128 }
+        },
+        {
+          key: 'code',
+          label: 'Code',
+          editType: 'readonly',
+          editable: false,
+          required: true
+        },
+        {
+          key: 'lifecyclePhase',
+          label: 'Lifecycle Phase',
+          fallback: '-',
+          editType: 'input',
+          validation: { maxLength: 64 }
+        },
+        {
+          key: 'description',
+          label: 'Description',
+          fallback: 'No description',
+          editType: 'textarea',
+          rows: 3,
+          validation: { maxLength: 1024 }
+        },
+        {
+          key: 'active',
+          label: 'Active',
+          type: 'boolean',
+          editType: 'checkbox'
+        },
+        {
+          key: 'available',
+          label: 'Available',
+          type: 'boolean',
+          editType: 'checkbox'
+        },
+        {
+          key: 'operational',
+          label: 'Operational',
+          type: 'boolean',
+          editType: 'checkbox'
+        },
+        {
+          key: 'canAcceptInstallations',
+          label: 'Can Accept Installations',
+          type: 'boolean',
+          editType: 'checkbox'
+        },
+        {
+          key: 'requiresAttention',
+          label: 'Requires Attention',
+          type: 'boolean',
+          editType: 'checkbox'
+        },
+        {
+          key: 'physicallyPresent',
+          label: 'Physically Present',
+          type: 'boolean',
+          editType: 'checkbox'
+        },
+        {
+          key: 'inInventory',
+          label: 'In Inventory',
+          type: 'boolean',
+          editType: 'checkbox'
+        },
+        {
+          key: 'inTransition',
+          label: 'In Transition',
+          type: 'boolean',
+          editType: 'checkbox'
+        },
+        {
+          key: 'canBeReserved',
+          label: 'Can Be Reserved',
+          type: 'boolean',
+          editType: 'checkbox'
+        },
+        {
+          key: 'sortOrder',
+          label: 'Sort Order',
+          fallback: '0',
+          editType: 'number',
+          validation: { min: 0, max: 999 }
+        },
+        {
+          key: 'colorClass',
+          label: 'Color Class',
+          fallback: '-',
+          editType: 'color-class',
+          placeholder: 'e.g., text-green-600'
+        },
+        {
+          key: 'iconClass',
+          label: 'Icon Class',
+          fallback: '-',
+          editType: 'icon-class',
+          placeholder: 'e.g., pi-check-circle'
+        }
       ]
     }
   }
