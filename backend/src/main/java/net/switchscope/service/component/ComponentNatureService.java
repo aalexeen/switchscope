@@ -3,9 +3,11 @@ package net.switchscope.service.component;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import net.switchscope.mapper.component.catalog.ComponentNatureMapper;
 import net.switchscope.model.component.ComponentNatureEntity;
 import net.switchscope.repository.component.ComponentNatureRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.UpdatableCrudService;
+import net.switchscope.to.component.catalog.ComponentNatureTo;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,9 +15,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ComponentNatureService implements CrudService<ComponentNatureEntity> {
+public class ComponentNatureService implements UpdatableCrudService<ComponentNatureEntity, ComponentNatureTo> {
 
     private final ComponentNatureRepository repository;
+    private final ComponentNatureMapper mapper;
 
     @Override
     public List<ComponentNatureEntity> getAll() {
@@ -40,6 +43,14 @@ public class ComponentNatureService implements CrudService<ComponentNatureEntity
         repository.getExisted(id);
         entity.setId(id);
         return repository.save(entity);
+    }
+
+    @Override
+    @Transactional
+    public ComponentNatureEntity updateFromDto(UUID id, ComponentNatureTo dto) {
+        ComponentNatureEntity existing = repository.getExisted(id);
+        mapper.updateFromTo(existing, dto);
+        return repository.save(existing);
     }
 
     @Override
