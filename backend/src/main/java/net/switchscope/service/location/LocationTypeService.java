@@ -3,9 +3,11 @@ package net.switchscope.service.location;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import net.switchscope.mapper.location.catalog.LocationTypeMapper;
 import net.switchscope.model.location.catalog.LocationTypeEntity;
 import net.switchscope.repository.location.LocationTypeRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.UpdatableCrudService;
+import net.switchscope.to.location.catalog.LocationTypeTo;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,9 +15,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class LocationTypeService implements CrudService<LocationTypeEntity> {
+public class LocationTypeService implements UpdatableCrudService<LocationTypeEntity, LocationTypeTo> {
 
     private final LocationTypeRepository repository;
+    private final LocationTypeMapper mapper;
 
     @Override
     public List<LocationTypeEntity> getAll() {
@@ -40,6 +43,14 @@ public class LocationTypeService implements CrudService<LocationTypeEntity> {
         repository.getExisted(id);
         entity.setId(id);
         return repository.save(entity);
+    }
+
+    @Override
+    @Transactional
+    public LocationTypeEntity updateFromDto(UUID id, LocationTypeTo dto) {
+        LocationTypeEntity existing = repository.getExisted(id);
+        mapper.updateFromTo(existing, dto);
+        return repository.save(existing);
     }
 
     @Override
