@@ -3,9 +3,11 @@ package net.switchscope.service.installation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import net.switchscope.mapper.installation.catalog.InstallationStatusMapper;
 import net.switchscope.model.installation.catalog.InstallationStatusEntity;
 import net.switchscope.repository.installation.InstallationStatusRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.UpdatableCrudService;
+import net.switchscope.to.installation.catalog.InstallationStatusTo;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,9 +15,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class InstallationStatusService implements CrudService<InstallationStatusEntity> {
+public class InstallationStatusService implements UpdatableCrudService<InstallationStatusEntity, InstallationStatusTo> {
 
     private final InstallationStatusRepository repository;
+    private final InstallationStatusMapper mapper;
 
     @Override
     public List<InstallationStatusEntity> getAll() {
@@ -40,6 +43,14 @@ public class InstallationStatusService implements CrudService<InstallationStatus
         repository.getExisted(id);
         entity.setId(id);
         return repository.save(entity);
+    }
+
+    @Override
+    @Transactional
+    public InstallationStatusEntity updateFromDto(UUID id, InstallationStatusTo dto) {
+        InstallationStatusEntity existing = repository.getExisted(id);
+        mapper.updateFromTo(existing, dto);
+        return repository.save(existing);
     }
 
     @Override
