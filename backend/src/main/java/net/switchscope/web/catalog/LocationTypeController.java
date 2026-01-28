@@ -95,10 +95,8 @@ public class LocationTypeController {
         log.debug("Applying update policy: {}", policy.getPolicyName());
         policyValidator.validate(LocationTypeTo.class, presentFields, policy);
 
-        // 3. Delegate to service for actual update (uses updateFromDto pattern)
-        LocationTypeEntity updated = service.updateFromDto(id, dto);
-
-        return mapper.toTo(updated);
+        // 3. Delegate to service for actual update (mapping done in service within transaction)
+        return service.updateAndMapToDto(id, dto);
     }
 
     @DeleteMapping("/{id}")
