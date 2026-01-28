@@ -53,6 +53,17 @@ public class LocationTypeService implements UpdatableCrudService<LocationTypeEnt
         return repository.save(existing);
     }
 
+    /**
+     * Update location type and return DTO (mapping within transaction to avoid LazyInitializationException).
+     */
+    @Transactional
+    public LocationTypeTo updateAndMapToDto(UUID id, LocationTypeTo dto) {
+        LocationTypeEntity existing = repository.getExisted(id);
+        mapper.updateFromTo(existing, dto);
+        LocationTypeEntity saved = repository.save(existing);
+        return mapper.toTo(saved);
+    }
+
     @Override
     @Transactional
     public void delete(UUID id) {
