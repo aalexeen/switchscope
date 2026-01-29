@@ -2,7 +2,6 @@ package net.switchscope.web.port;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ public class PortController {
     private final FiberPortMapper fiberPortMapper;
 
     @GetMapping
-    @Transactional(readOnly = true)
     public List<PortTo> getAll() {
         log.info("getAll ports");
         return service.getAll().stream()
@@ -41,7 +39,6 @@ public class PortController {
     }
 
     @GetMapping("/{id}")
-    @Transactional(readOnly = true)
     public PortTo get(@PathVariable UUID id) {
         log.info("get port {}", id);
         return mapToDto(service.getById(id));

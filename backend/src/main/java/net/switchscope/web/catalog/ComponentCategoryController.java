@@ -15,7 +15,6 @@ import net.switchscope.to.component.catalog.ComponentCategoryTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,14 +52,12 @@ public class ComponentCategoryController {
     private final UpdatePolicyValidator policyValidator;
 
     @GetMapping
-    @Transactional(readOnly = true)
     public List<ComponentCategoryTo> getAll() {
         log.info("getAll component categories");
         return mapper.toToList(service.getAll());
     }
 
     @GetMapping("/{id}")
-    @Transactional(readOnly = true)
     public ComponentCategoryTo get(@PathVariable UUID id) {
         log.info("get component category {}", id);
         return mapper.toTo(service.getById(id));

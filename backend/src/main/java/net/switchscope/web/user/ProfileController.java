@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import net.switchscope.mapper.UserMapper;
 import net.switchscope.model.User;
+import net.switchscope.service.UserService;
 import net.switchscope.to.UserTo;
 import net.switchscope.web.AuthUser;
 
@@ -28,6 +28,7 @@ public class ProfileController extends AbstractUserController {
     static final String REST_URL = "/api/profile";
 
     private final UserMapper mapper;
+    private final UserService userService;
 
     @GetMapping
     public User get(@AuthenticationPrincipal AuthUser authUser) {
@@ -54,11 +55,9 @@ public class ProfileController extends AbstractUserController {
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Transactional
     public void update(@RequestBody @Valid UserTo userTo, @AuthenticationPrincipal AuthUser authUser) {
         log.info("update {} with id={}", userTo, authUser.id());
         assureIdConsistent(userTo, authUser.id());
-        User user = authUser.getUser();
-        repository.prepareAndSave(mapper.updateFromTo(user, userTo));
+        userService.updateFromTo(authUser.getUser(), userTo);
     }
 }

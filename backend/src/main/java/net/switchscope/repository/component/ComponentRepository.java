@@ -158,5 +158,20 @@ public interface ComponentRepository extends BaseRepository<Component> {
            "LEFT JOIN FETCH c.parentComponent " +
            "ORDER BY c.name")
     List<Component> findAllWithAssociations();
+
+    /**
+     * Find component by ID with eager loading of associations
+     *
+     * @param id component ID
+     * @return optional component with associations loaded
+     */
+    @Query("SELECT c FROM Component c " +
+           "LEFT JOIN FETCH c.componentStatus " +
+           "LEFT JOIN FETCH c.componentType " +
+           "LEFT JOIN FETCH c.componentNature " +
+           "LEFT JOIN FETCH c.installation " +
+           "LEFT JOIN FETCH c.parentComponent " +
+           "WHERE c.id = :id")
+    Optional<Component> findByIdWithAssociations(@Param("id") UUID id);
 }
 
