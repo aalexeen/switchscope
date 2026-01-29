@@ -15,7 +15,6 @@ import net.switchscope.to.installation.catalog.InstallationStatusTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,14 +52,12 @@ public class InstallationStatusController {
     private final UpdatePolicyValidator policyValidator;
 
     @GetMapping
-    @Transactional(readOnly = true)
     public List<InstallationStatusTo> getAll() {
         log.info("getAll installation statuses");
         return mapper.toToList(service.getAll());
     }
 
     @GetMapping("/{id}")
-    @Transactional(readOnly = true)
     public InstallationStatusTo get(@PathVariable UUID id) {
         log.info("get installation status {}", id);
         return mapper.toTo(service.getById(id));

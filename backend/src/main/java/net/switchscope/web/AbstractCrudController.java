@@ -2,7 +2,6 @@ package net.switchscope.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +16,7 @@ import java.util.UUID;
  * Abstract controller for basic CRUD operations.
  * Provides standard REST endpoints for entities.
  * Uses DTOs for API contract while working with Entities internally.
+ * Transaction management is delegated to service layer.
  *
  * @param <E> the entity type
  * @param <T> the DTO (Transfer Object) type
@@ -31,7 +31,6 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
     protected abstract String getEntityName();
 
     @GetMapping
-    @Transactional(readOnly = true)
     public List<T> getAll() {
         log.info("getAll {}", getEntityName());
         List<E> entities = getService().getAll();
@@ -39,7 +38,6 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
     }
 
     @GetMapping("/{id}")
-    @Transactional(readOnly = true)
     public T get(@PathVariable UUID id) {
         log.info("get {} {}", getEntityName(), id);
         E entity = getService().getById(id);

@@ -8,7 +8,6 @@ import net.switchscope.to.BaseTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +17,7 @@ import java.util.UUID;
  * Abstract controller for catalog (reference) entities.
  * Provides read access for all authenticated users and write access only for ADMIN role.
  * Uses DTOs for API contract while working with Entities internally.
+ * Transaction management is delegated to service layer.
  * <p>
  * Supports the "gold standard" update pattern when service implements {@link UpdatableCrudService}:
  * - Service loads existing entity with associations
@@ -37,7 +37,6 @@ public abstract class AbstractCatalogController<E, T extends BaseTo> {
     protected abstract String getEntityName();
 
     @GetMapping
-    @Transactional(readOnly = true)
     public List<T> getAll() {
         log.info("getAll {}", getEntityName());
         List<E> entities = getService().getAll();
@@ -45,7 +44,6 @@ public abstract class AbstractCatalogController<E, T extends BaseTo> {
     }
 
     @GetMapping("/{id}")
-    @Transactional(readOnly = true)
     public T get(@PathVariable UUID id) {
         log.info("get {} {}", getEntityName(), id);
         E entity = getService().getById(id);

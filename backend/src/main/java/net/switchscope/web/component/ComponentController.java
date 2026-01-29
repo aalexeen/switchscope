@@ -1,11 +1,13 @@
 package net.switchscope.web.component;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.component.connectivity.CableRunMapper;
 import net.switchscope.mapper.component.connectivity.ConnectorMapper;
@@ -24,8 +26,18 @@ import net.switchscope.model.component.device.Router;
 import net.switchscope.model.component.housing.Rack;
 import net.switchscope.service.component.ComponentService;
 import net.switchscope.to.component.ComponentTo;
+import net.switchscope.to.component.connectivity.CableRunTo;
+import net.switchscope.to.component.connectivity.ConnectorTo;
+import net.switchscope.to.component.connectivity.PatchPanelTo;
+import net.switchscope.to.component.device.AccessPointTo;
+import net.switchscope.to.component.device.NetworkSwitchTo;
+import net.switchscope.to.component.device.RouterTo;
+import net.switchscope.to.component.housing.RackTo;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -43,6 +55,7 @@ public class ComponentController {
     static final String REST_URL = "/api/components";
 
     private final ComponentService service;
+    private final ObjectMapper objectMapper;
 
     // Polymorphic mappers for different component types
     private final NetworkSwitchMapper networkSwitchMapper;
@@ -54,7 +67,6 @@ public class ComponentController {
     private final RackMapper rackMapper;
 
     @GetMapping
-    @Transactional(readOnly = true)
     public List<ComponentTo> getAll() {
         log.info("getAll components");
         List<Component> components = service.getAll();
@@ -72,7 +84,6 @@ public class ComponentController {
     }
 
     @GetMapping("/{id}")
-    @Transactional(readOnly = true)
     public ComponentTo get(@PathVariable UUID id) {
         log.info("get component {}", id);
         return mapToDto(service.getById(id));
@@ -86,12 +97,77 @@ public class ComponentController {
         return mapToDto(service.create(entity));
     }
 
+    /**
+     * Update component.
+     * Accepts raw JSON and determines concrete DTO type from existing entity in DB.
+     * This avoids Jackson polymorphic deserialization issues with abstract ComponentTo.
+     * Validates field nullification against role-based update policy.
+     */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ComponentTo update(@PathVariable UUID id, @RequestBody ComponentTo to) {
-        log.info("update component {} with id={}", to, id);
-        Component entity = service.getById(id);
-        updateFromDto(entity, to);
-        return mapToDto(service.update(id, entity));
+    @SneakyThrows
+    public ComponentTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
+        log.info("update component with id={}", id);
+
+        // 1. Get entity type to determine DTO class
+        Component existing = service.getById(id);
+        Class<? extends ComponentTo> dtoClass = getDtoClassForEntity(existing);
+        log.debug("Entity type: {}, DTO class: {}", existing.getClass().getSimpleName(), dtoClass.getSimpleName());
+
+        // 2. Deserialize JSON to concrete DTO type
+        ComponentTo dto = objectMapper.readValue(jsonPayload, dtoClass);
+
+        // 3. Extract present fields for policy validation
+        Map<String, JsonNode> presentFields = extractPresentFields(jsonPayload);
+
+        // 4. Delegate to service (handles validation, FK changes, mapping, save in transaction)
+        Component updated = service.updateWithPolicyValidation(
+                id,
+                dto,
+                dtoClass,
+                presentFields,
+                this::updateFromDto
+        );
+
+        return mapToDto(updated);
+    }
+
+    /**
+     * Extracts all fields present in JSON payload with their values.
+     * Used to detect explicitly set null values vs absent fields.
+     */
+    @SneakyThrows
+    private Map<String, JsonNode> extractPresentFields(String jsonPayload) {
+        Map<String, JsonNode> fields = new HashMap<>();
+        JsonNode root = objectMapper.readTree(jsonPayload);
+        Iterator<String> fieldNames = root.fieldNames();
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            fields.put(fieldName, root.get(fieldName));
+        }
+        return fields;
+    }
+
+    /**
+     * Determines the concrete DTO class based on entity type.
+     */
+    private Class<? extends ComponentTo> getDtoClassForEntity(Component entity) {
+        if (entity instanceof NetworkSwitch) {
+            return NetworkSwitchTo.class;
+        } else if (entity instanceof Router) {
+            return RouterTo.class;
+        } else if (entity instanceof AccessPoint) {
+            return AccessPointTo.class;
+        } else if (entity instanceof CableRun) {
+            return CableRunTo.class;
+        } else if (entity instanceof Connector) {
+            return ConnectorTo.class;
+        } else if (entity instanceof PatchPanel) {
+            return PatchPanelTo.class;
+        } else if (entity instanceof Rack) {
+            return RackTo.class;
+        } else {
+            throw new IllegalArgumentException("Unknown component entity type: " + entity.getClass().getName());
+        }
     }
 
     @DeleteMapping("/{id}")
