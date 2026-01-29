@@ -1,6 +1,7 @@
 package net.switchscope.service.component;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,14 +63,51 @@ public class ComponentService implements CrudService<Component> {
     private final UpdatePolicyResolver policyResolver;
     private final UpdatePolicyValidator policyValidator;
 
+    // Polymorphic mappers for different component types
+    private final NetworkSwitchMapper networkSwitchMapper;
+    private final RouterMapper routerMapper;
+    private final AccessPointMapper accessPointMapper;
+    private final CableRunMapper cableRunMapper;
+    private final ConnectorMapper connectorMapper;
+    private final PatchPanelMapper patchPanelMapper;
+    private final RackMapper rackMapper;
+
     @Override
     public List<Component> getAll() {
         return repository.findAllWithAssociations();
     }
 
+    /**
+     * Get all components and map to DTOs within transaction.
+     * This ensures lazy-loaded associations are accessible during mapping.
+     */
+    public List<ComponentTo> getAllAsDto() {
+        List<Component> components = repository.findAllWithAssociations();
+        return components.stream()
+                .map(this::mapToDto)
+                .filter(dto -> {
+                    if (dto == null) {
+                        log.warn("Filtered out null DTO from result");
+                        return false;
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+    }
+
     @Override
     public Component getById(UUID id) {
         return repository.getExisted(id);
+    }
+
+    /**
+     * Get component by ID and map to DTO within transaction.
+     */
+    public ComponentTo getByIdAsDto(UUID id) {
+        Component component = repository.findByIdWithAssociations(id)
+                .orElseThrow(() -> new NotFoundException("Component with id=" + id + " not found"));
+        initializeLazyAssociations(component);
+        return mapToDto(component);
     }
 
     @Override
@@ -128,6 +166,94 @@ public class ComponentService implements CrudService<Component> {
 
         // 5. Save and return
         return repository.save(entity);
+    }
+
+    /**
+     * Update component with role-based policy validation and return as DTO.
+     * Maps result within transaction to avoid LazyInitializationException.
+     *
+     * @param id            component ID
+     * @param dto           deserialized DTO
+     * @param dtoClass      DTO class for policy lookup
+     * @param presentFields JSON fields present in request (for null detection)
+     * @param mapperFunction function to apply DTO to entity via mapper
+     * @return updated component as DTO
+     */
+    @Transactional
+    public ComponentTo updateWithPolicyValidationAndReturnDto(
+            UUID id,
+            ComponentTo dto,
+            Class<? extends ComponentTo> dtoClass,
+            Map<String, JsonNode> presentFields,
+            BiConsumer<Component, ComponentTo> mapperFunction) {
+
+        Component updated = updateWithPolicyValidation(id, dto, dtoClass, presentFields, mapperFunction);
+        return mapToDto(updated);
+    }
+
+    /**
+     * Create component and return as DTO within transaction.
+     */
+    @Transactional
+    public ComponentTo createAndReturnDto(Component entity) {
+        Component saved = repository.save(entity);
+        return mapToDto(saved);
+    }
+
+    /**
+     * Initialize lazy associations for polymorphic component types.
+     * This ensures all type-specific lazy fields are loaded before mapping.
+     */
+    private void initializeLazyAssociations(Component component) {
+        if (component instanceof NetworkSwitch networkSwitch) {
+            Hibernate.initialize(networkSwitch.getSwitchModel());
+        } else if (component instanceof PatchPanel patchPanel) {
+            Hibernate.initialize(patchPanel.getPatchPanelModel());
+        } else if (component instanceof CableRun cableRun) {
+            Hibernate.initialize(cableRun.getCableModel());
+        } else if (component instanceof Connector connector) {
+            Hibernate.initialize(connector.getConnectorModel());
+        } else if (component instanceof Rack rack) {
+            Hibernate.initialize(rack.getRackType());
+        }
+        // Router and AccessPoint don't have lazy model fields
+    }
+
+    /**
+     * Map component entity to DTO.
+     * Must be called within transaction context.
+     */
+    private ComponentTo mapToDto(Component component) {
+        if (component == null) {
+            log.warn("Attempting to map null component");
+            return null;
+        }
+
+        try {
+            initializeLazyAssociations(component);
+
+            if (component instanceof NetworkSwitch networkSwitch) {
+                return networkSwitchMapper.toTo(networkSwitch);
+            } else if (component instanceof Router router) {
+                return routerMapper.toTo(router);
+            } else if (component instanceof AccessPoint accessPoint) {
+                return accessPointMapper.toTo(accessPoint);
+            } else if (component instanceof CableRun cableRun) {
+                return cableRunMapper.toTo(cableRun);
+            } else if (component instanceof Connector connector) {
+                return connectorMapper.toTo(connector);
+            } else if (component instanceof PatchPanel patchPanel) {
+                return patchPanelMapper.toTo(patchPanel);
+            } else if (component instanceof Rack rack) {
+                return rackMapper.toTo(rack);
+            } else {
+                log.error("Unknown component type: {} for component id: {}", component.getClass().getName(), component.getId());
+                throw new IllegalArgumentException("Unknown component type: " + component.getClass().getName());
+            }
+        } catch (Exception e) {
+            log.error("Error mapping component id: {}, type: {}", component.getId(), component.getClass().getName(), e);
+            throw e;
+        }
     }
 
     /**

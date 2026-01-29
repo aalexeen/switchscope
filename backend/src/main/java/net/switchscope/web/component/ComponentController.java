@@ -69,24 +69,13 @@ public class ComponentController {
     @GetMapping
     public List<ComponentTo> getAll() {
         log.info("getAll components");
-        List<Component> components = service.getAll();
-        log.debug("Found {} components", components.size());
-        return components.stream()
-                .map(this::mapToDto)
-                .filter(dto -> {
-                    if (dto == null) {
-                        log.warn("Filtered out null DTO from result");
-                        return false;
-                    }
-                    return true;
-                })
-                .collect(Collectors.toList());
+        return service.getAllAsDto();
     }
 
     @GetMapping("/{id}")
     public ComponentTo get(@PathVariable UUID id) {
         log.info("get component {}", id);
-        return mapToDto(service.getById(id));
+        return service.getByIdAsDto(id);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -94,7 +83,7 @@ public class ComponentController {
     public ComponentTo create(@RequestBody ComponentTo to) {
         log.info("create component {}", to);
         Component entity = mapToEntity(to);
-        return mapToDto(service.create(entity));
+        return service.createAndReturnDto(entity);
     }
 
     /**
@@ -119,16 +108,14 @@ public class ComponentController {
         // 3. Extract present fields for policy validation
         Map<String, JsonNode> presentFields = extractPresentFields(jsonPayload);
 
-        // 4. Delegate to service (handles validation, FK changes, mapping, save in transaction)
-        Component updated = service.updateWithPolicyValidation(
+        // 4. Delegate to service (handles validation, FK changes, mapping, save, and DTO conversion in transaction)
+        return service.updateWithPolicyValidationAndReturnDto(
                 id,
                 dto,
                 dtoClass,
                 presentFields,
                 this::updateFromDto
         );
-
-        return mapToDto(updated);
     }
 
     /**
@@ -178,38 +165,6 @@ public class ComponentController {
     }
 
     // Helper methods for polymorphic mapping
-    @SuppressWarnings("unchecked")
-    private ComponentTo mapToDto(Component component) {
-        if (component == null) {
-            log.warn("Attempting to map null component");
-            return null;
-        }
-
-        try {
-            if (component instanceof NetworkSwitch) {
-                return networkSwitchMapper.toTo((NetworkSwitch) component);
-            } else if (component instanceof Router) {
-                return routerMapper.toTo((Router) component);
-            } else if (component instanceof AccessPoint) {
-                return accessPointMapper.toTo((AccessPoint) component);
-            } else if (component instanceof CableRun) {
-                return cableRunMapper.toTo((CableRun) component);
-            } else if (component instanceof Connector) {
-                return connectorMapper.toTo((Connector) component);
-            } else if (component instanceof PatchPanel) {
-                return patchPanelMapper.toTo((PatchPanel) component);
-            } else if (component instanceof Rack) {
-                return rackMapper.toTo((Rack) component);
-            } else {
-                log.error("Unknown component type: {} for component id: {}", component.getClass().getName(), component.getId());
-                throw new IllegalArgumentException("Unknown component type: " + component.getClass().getName());
-            }
-        } catch (Exception e) {
-            log.error("Error mapping component id: {}, type: {}", component.getId(), component.getClass().getName(), e);
-            throw e;
-        }
-    }
-
     @SuppressWarnings("unchecked")
     private Component mapToEntity(ComponentTo to) {
         // Determine component type from TO class name or discriminator field
