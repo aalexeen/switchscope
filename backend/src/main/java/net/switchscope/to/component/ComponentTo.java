@@ -25,18 +25,22 @@ public abstract class ComponentTo extends NamedTo {
 
     @Size(max = 128)
     @NoHtml
+    @FieldAccess(FieldAccessLevel.ADMIN_NULLABLE)
     private String manufacturer;
 
     @Size(max = 128)
     @NoHtml
+    @FieldAccess(FieldAccessLevel.ADMIN_NULLABLE)
     private String model;
 
     @Size(max = 128)
     @NoHtml
+    @FieldAccess(FieldAccessLevel.ADMIN_NULLABLE)
     private String serialNumber;
 
     @Size(max = 128)
     @NoHtml
+    @FieldAccess(FieldAccessLevel.ADMIN_NULLABLE)
     private String partNumber;
 
     @NotNull
