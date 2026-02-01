@@ -25,7 +25,7 @@ import java.util.UUID;
 public class Installation extends BaseEntity {
 
     // Location where the component is installed
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "location_id", nullable = false)
     @NotNull
     private Location location;
@@ -47,7 +47,7 @@ public class Installation extends BaseEntity {
     private UUID installedItemId;
 
     // Current status of the installation
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "status_id", nullable = false)
     @NotNull
     private InstallationStatusEntity status;

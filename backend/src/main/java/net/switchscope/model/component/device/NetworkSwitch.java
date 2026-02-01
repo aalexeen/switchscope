@@ -32,7 +32,7 @@ import java.util.UUID;
 public class NetworkSwitch extends HasPortsImpl {
 
     // Link to switch model catalog
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "switch_model_id")
     private SwitchModel switchModel;
 

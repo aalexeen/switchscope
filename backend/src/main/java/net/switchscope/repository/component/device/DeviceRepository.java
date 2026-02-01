@@ -109,7 +109,9 @@ public interface DeviceRepository extends BaseRepository<Device> {
            "LEFT JOIN FETCH d.componentStatus " +
            "LEFT JOIN FETCH d.componentType " +
            "LEFT JOIN FETCH d.componentNature " +
-           "LEFT JOIN FETCH d.installation " +
+           "LEFT JOIN FETCH d.installation i " +
+           "LEFT JOIN FETCH i.status " +
+           "LEFT JOIN FETCH i.location " +
            "LEFT JOIN FETCH d.parentComponent " +
            "ORDER BY d.name")
     List<Device> findNetworkSwitches();
@@ -124,7 +126,9 @@ public interface DeviceRepository extends BaseRepository<Device> {
            "LEFT JOIN FETCH d.componentStatus " +
            "LEFT JOIN FETCH d.componentType " +
            "LEFT JOIN FETCH d.componentNature " +
-           "LEFT JOIN FETCH d.installation " +
+           "LEFT JOIN FETCH d.installation i " +
+           "LEFT JOIN FETCH i.status " +
+           "LEFT JOIN FETCH i.location " +
            "LEFT JOIN FETCH d.parentComponent " +
            "LEFT JOIN FETCH d.switchModel " +
            "ORDER BY d.name")
@@ -139,7 +143,9 @@ public interface DeviceRepository extends BaseRepository<Device> {
            "LEFT JOIN FETCH d.componentStatus " +
            "LEFT JOIN FETCH d.componentType " +
            "LEFT JOIN FETCH d.componentNature " +
-           "LEFT JOIN FETCH d.installation " +
+           "LEFT JOIN FETCH d.installation i " +
+           "LEFT JOIN FETCH i.status " +
+           "LEFT JOIN FETCH i.location " +
            "LEFT JOIN FETCH d.parentComponent " +
            "ORDER BY d.name")
     List<Device> findRouters();
@@ -153,7 +159,9 @@ public interface DeviceRepository extends BaseRepository<Device> {
            "LEFT JOIN FETCH d.componentStatus " +
            "LEFT JOIN FETCH d.componentType " +
            "LEFT JOIN FETCH d.componentNature " +
-           "LEFT JOIN FETCH d.installation " +
+           "LEFT JOIN FETCH d.installation i " +
+           "LEFT JOIN FETCH i.status " +
+           "LEFT JOIN FETCH i.location " +
            "LEFT JOIN FETCH d.parentComponent " +
            "ORDER BY d.name")
     List<Device> findAccessPoints();

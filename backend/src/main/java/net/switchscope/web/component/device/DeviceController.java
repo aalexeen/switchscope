@@ -2,6 +2,7 @@ package net.switchscope.web.component.device;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,7 @@ public class DeviceController {
     private final AccessPointMapper accessPointMapper;
 
     @GetMapping
+    @Transactional(readOnly = true)
     public List<DeviceTo> getAll() {
         log.info("getAll devices");
         return service.getAll().stream()
@@ -49,6 +51,7 @@ public class DeviceController {
     }
 
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     public DeviceTo get(@PathVariable UUID id) {
         log.info("get device {}", id);
         return mapToDto(service.getById(id));

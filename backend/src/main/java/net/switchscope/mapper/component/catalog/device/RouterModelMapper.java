@@ -43,7 +43,6 @@ public interface RouterModelMapper extends DeviceModelMapper<RouterModel, Router
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     @Mapping(target = "deviceSpecs", ignore = true)
-    @Mapping(target = "supportedWanInterfaces", ignore = true)
     @Override
     RouterModel toEntity(RouterModelTo to);
 
@@ -55,8 +54,6 @@ public interface RouterModelMapper extends DeviceModelMapper<RouterModel, Router
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     @Mapping(target = "deviceSpecs", ignore = true)
-    @Mapping(target = "supportedWanInterfaces", ignore = true)
     @Override
     RouterModel updateFromTo(@MappingTarget RouterModel entity, RouterModelTo to);
 }
-
