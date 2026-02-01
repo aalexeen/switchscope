@@ -42,7 +42,6 @@ public class DeviceController {
     private final AccessPointMapper accessPointMapper;
 
     @GetMapping
-    @Transactional(readOnly = true)
     public List<DeviceTo> getAll() {
         log.info("getAll devices");
         return service.getAll().stream()
@@ -51,7 +50,6 @@ public class DeviceController {
     }
 
     @GetMapping("/{id}")
-    @Transactional(readOnly = true)
     public DeviceTo get(@PathVariable UUID id) {
         log.info("get device {}", id);
         return mapToDto(service.getById(id));
