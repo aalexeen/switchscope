@@ -20,13 +20,18 @@ public class InstallationService implements CrudService<Installation> {
 
     @Override
     public List<Installation> getAll() {
-        return repository.findAllWithRelationships();
+        List<Installation> installations = repository.findAllWithRelationships();
+        // Initialize required associations while the transactional session is open
+        installations.forEach(this::initializeForMapping);
+        return installations;
     }
 
     @Override
     public Installation getById(UUID id) {
-        return repository.findByIdWithRelationships(id)
+        Installation installation = repository.findByIdWithRelationships(id)
                 .orElseThrow(() -> new IllegalArgumentException("Installation not found with id: " + id));
+        initializeForMapping(installation);
+        return installation;
     }
 
     @Override
@@ -48,5 +53,27 @@ public class InstallationService implements CrudService<Installation> {
     @Transactional
     public void delete(UUID id) {
         repository.deleteExisted(id);
+    }
+
+    /**
+     * Touches lazily-loaded associations that are needed by mappers to avoid
+     * LazyInitializationException after the transaction closes.
+     */
+    private void initializeForMapping(Installation installation) {
+        if (installation == null) {
+            return;
+        }
+        if (installation.getLocation() != null) {
+            installation.getLocation().getFullPath();
+        }
+        if (installation.getComponent() != null) {
+            installation.getComponent().getName();
+        }
+        if (installation.getInstalledItemType() != null) {
+            installation.getInstalledItemType().getCode();
+        }
+        if (installation.getStatus() != null) {
+            installation.getStatus().getCode();
+        }
     }
 }
