@@ -44,6 +44,7 @@ public interface HousingRepository extends BaseRepository<Component> {
            "LEFT JOIN FETCH c.componentNature " +
            "LEFT JOIN FETCH c.installation " +
            "LEFT JOIN FETCH c.parentComponent " +
+           "LEFT JOIN FETCH c.rackType " +
            "ORDER BY c.name")
     List<Component> findRacks();
 

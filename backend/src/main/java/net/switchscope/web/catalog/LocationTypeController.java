@@ -54,13 +54,13 @@ public class LocationTypeController {
     @GetMapping
     public List<LocationTypeTo> getAll() {
         log.info("getAll location types");
-        return mapper.toToList(service.getAll());
+        return service.getAllAsDto();
     }
 
     @GetMapping("/{id}")
     public LocationTypeTo get(@PathVariable UUID id) {
         log.info("get location type {}", id);
-        return mapper.toTo(service.getById(id));
+        return service.getByIdAsDto(id);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -69,8 +69,7 @@ public class LocationTypeController {
     public LocationTypeTo create(@RequestBody LocationTypeTo dto) {
         log.info("create location type {}", dto);
         LocationTypeEntity entity = mapper.toEntity(dto);
-        LocationTypeEntity created = service.create(entity);
-        return mapper.toTo(created);
+        return service.createAndReturnDto(entity);
     }
 
     /**

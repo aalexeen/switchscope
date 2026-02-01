@@ -44,6 +44,7 @@ public interface ConnectivityRepository extends BaseRepository<Component> {
            "LEFT JOIN FETCH c.componentNature " +
            "LEFT JOIN FETCH c.installation " +
            "LEFT JOIN FETCH c.parentComponent " +
+           "LEFT JOIN FETCH c.patchPanelModel " +
            "ORDER BY c.name")
     List<Component> findPatchPanels();
 
@@ -58,6 +59,9 @@ public interface ConnectivityRepository extends BaseRepository<Component> {
            "LEFT JOIN FETCH c.componentNature " +
            "LEFT JOIN FETCH c.installation " +
            "LEFT JOIN FETCH c.parentComponent " +
+           "LEFT JOIN FETCH c.connectorModel " +
+           "LEFT JOIN FETCH c.cableRun " +
+           "LEFT JOIN FETCH c.port " +
            "ORDER BY c.name")
     List<Component> findConnectors();
 
@@ -72,6 +76,9 @@ public interface ConnectivityRepository extends BaseRepository<Component> {
            "LEFT JOIN FETCH c.componentNature " +
            "LEFT JOIN FETCH c.installation " +
            "LEFT JOIN FETCH c.parentComponent " +
+           "LEFT JOIN FETCH c.cableModel " +
+           "LEFT JOIN FETCH c.startLocation " +
+           "LEFT JOIN FETCH c.endLocation " +
            "ORDER BY c.name")
     List<Component> findCableRuns();
 
