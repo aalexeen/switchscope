@@ -16,7 +16,8 @@ import java.util.UUID;
 public interface LocationRepository extends net.switchscope.repository.BaseRepository<Location> {
 
     /**
-     * Find all locations with all relationships eagerly loaded
+     * Find all locations with type and parent eagerly loaded.
+     * Note: Does NOT fetch childLocations to avoid N+1 on collections.
      *
      * @return list of all locations with relationships
      */
@@ -25,6 +26,19 @@ public interface LocationRepository extends net.switchscope.repository.BaseRepos
            "LEFT JOIN FETCH l.parentLocation " +
            "ORDER BY l.name")
     List<Location> findAllWithRelationships();
+
+    /**
+     * Find all locations with ALL relationships eagerly loaded including childLocations.
+     * Used for getAllAsDto() to avoid LazyInitializationException during DTO mapping.
+     *
+     * @return list of all locations with all relationships
+     */
+    @Query("SELECT DISTINCT l FROM Location l " +
+           "LEFT JOIN FETCH l.type " +
+           "LEFT JOIN FETCH l.parentLocation " +
+           "LEFT JOIN FETCH l.childLocations " +
+           "ORDER BY l.name")
+    List<Location> findAllWithAllRelationships();
 
     /**
      * Find location by ID with all relationships eagerly loaded
@@ -37,6 +51,20 @@ public interface LocationRepository extends net.switchscope.repository.BaseRepos
            "LEFT JOIN FETCH l.parentLocation " +
            "WHERE l.id = :id")
     Optional<Location> findByIdWithRelationships(@Param("id") UUID id);
+
+    /**
+     * Find location by ID with ALL relationships eagerly loaded including childLocations.
+     * Used for getByIdAsDto() to avoid LazyInitializationException during DTO mapping.
+     *
+     * @param id location ID
+     * @return optional location with all relationships
+     */
+    @Query("SELECT l FROM Location l " +
+           "LEFT JOIN FETCH l.type " +
+           "LEFT JOIN FETCH l.parentLocation " +
+           "LEFT JOIN FETCH l.childLocations " +
+           "WHERE l.id = :id")
+    Optional<Location> findByIdWithAllRelationships(@Param("id") UUID id);
 
     /**
      * Find location by name

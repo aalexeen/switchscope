@@ -115,6 +115,22 @@ public interface DeviceRepository extends BaseRepository<Device> {
     List<Device> findNetworkSwitches();
 
     /**
+     * Find NetworkSwitch devices with all relationships including switchModel.
+     * Used for getAllAsDto() to avoid LazyInitializationException.
+     *
+     * @return list of network switches with switchModel loaded
+     */
+    @Query("SELECT DISTINCT d FROM NetworkSwitch d " +
+           "LEFT JOIN FETCH d.componentStatus " +
+           "LEFT JOIN FETCH d.componentType " +
+           "LEFT JOIN FETCH d.componentNature " +
+           "LEFT JOIN FETCH d.installation " +
+           "LEFT JOIN FETCH d.parentComponent " +
+           "LEFT JOIN FETCH d.switchModel " +
+           "ORDER BY d.name")
+    List<Device> findNetworkSwitchesWithModel();
+
+    /**
      * Find Router devices with eager loading
      *
      * @return list of routers
