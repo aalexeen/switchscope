@@ -97,7 +97,7 @@ public class RouterModel extends DeviceModel {
     private Integer maxVpnTunnels;
 
     // WAN interface types supported
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "router_model_wan_interfaces",
                     joinColumns = @JoinColumn(name = "router_model_id"))
     @Column(name = "interface_type")
