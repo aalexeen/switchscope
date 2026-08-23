@@ -358,6 +358,45 @@ Spring Security при том же покрытии), не резолвинг ha
       `componentNatureId: null` отвязывал, а отсутствие поля не трогало
 - [ ] Проверить, что `REQUIRED` / `READ_ONLY` и NOT NULL-колонки не обнуляются ни при каких условиях
 
+### Дублирование каталожных контроллеров схлопывается здесь же
+
+Измерено 2026-08-23. Семь каталожных контроллеров написаны в обход `AbstractCrudController`
+и повторяют друг друга почти дословно — после нормализации имён:
+
+```
+ComponentNature vs ComponentCategory:    0 различающихся строк из 129
+ComponentNature vs ComponentStatus:      6
+ComponentNature vs InstallableType:      8
+ComponentNature vs InstallationStatus:   8
+ComponentNature vs LocationType:        21
+```
+
+Приватный `extractPresentFields` скопирован **восемь раз** (семь каталогов + `ComponentModel`).
+Это ровно тот метод, который переписывает пункт «унифицировать чтение запроса» выше, — поэтому
+рефакторить контроллеры **до** 1.2 значит трогать его дважды. Делать вместе.
+
+**Мешает не JSON, а разъезд контрактов сервисов** — это и есть настоящий объём работ:
+
+| контракт | сигнатура | кто |
+|---|---|---|
+| `DtoCrudService<E,T>` | **`T`** `updateFromDto(UUID,T)`, `T createFromDto(T)` | требует `AbstractCrudController` |
+| `UpdatableCrudService<E,T>` | **`E`** `updateFromDto(UUID,T)`, `createFromDto` нет | шесть каталожных сервисов |
+| `CrudService<E>` + свои методы | `updateAndMapToDto` | `ComponentStatusService` |
+| то же + `*AsDto` / `*ReturnDto` | `getAllAsDto`, `createAndReturnDto`, … | `LocationTypeService` |
+
+Два интерфейса несут **одноимённый `updateFromDto` с разными типами возврата** — вот развилка,
+из-за которой каталоги пошли своим путём.
+
+**Вехой брать не `AbstractCatalogController`.** Он мёртв (наследует только тестовая фикстура)
+и содержит дефект, который чинил `be4f97f`: `getMapper().toEntity(dto)` + `service.update(...)`,
+то есть сохранение detached-сущности с обнулением ассоциаций — против чего прямо предупреждает
+javadoc `AbstractCrudController`. Его удаление уже стоит в ПРИОРИТЕТЕ 2.
+
+**Гарантия корректности рефакторинга:** коды прав выводятся из класса и метода, поэтому
+консолидация обязана быть permission-neutral — `python3 tools/generate_permission_seed.py --check`
+остаётся на 81 праве, отчёт на старте — на `0 без аннотации / 0 отсутствующих / 0 непроксируемых`.
+Сдвинулось хоть одно — `@PermissionResource` уехал не туда.
+
 **Конвейер:**
 
 ```
