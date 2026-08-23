@@ -138,6 +138,9 @@ databaseChangeLog:
       file: fill/06-fill-user-role-role-id.yaml
       relativeToChangelogFile: true
   - include:
+      file: fill/07-fill-role-permissions-user-catalog.yaml
+      relativeToChangelogFile: true
+  - include:
       file: fill/10-fill-component-categories-catalog.yaml
       relativeToChangelogFile: true
   - include:

@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-role-permissions-user-catalog
+      author: AALEXEEN
+      comment: >
+        Gives USER create/update/delete on the catalogs, which fill/05 withheld.
+
+        fill/05 froze "what a USER can reach today" - but today already includes a regression.
+        Before be4f97f method security was not actually applied, so USER could edit the catalogs;
+        turning it on took that away silently. The frontend still assumes the old behaviour: of the
+        50 routes carrying meta.roles in router/index.js only four are ADMIN-only (the /users/**
+        ones), all 16 catalog routes are ['USER','ADMIN'], and CellActions.vue gates no buttons at
+        all. So the snapshot was taken one day too late, and this restores what the application is
+        built to do.
+
+        Deliberately rows rather than a release: this is the first time the claim that
+        role_permissions IS the configuration gets tested on something that matters. While the
+        catalog domain is in SHADOW this changes no behaviour - @PreAuthorize("hasRole('ADMIN')")
+        still refuses - so it can sit and be observed before enforcement is promoted.
+
+        If the product decision turns out to be the opposite - USER must not edit catalogs - then
+        the work is in the frontend (16 routes plus the buttons), and this changeset is the thing
+        to roll back.
+      changes:
+        - sql:
+            splitStatements: false
+            sql: >
+              INSERT INTO role_permissions (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r JOIN permissions p ON p.domain = 'catalog'
+              WHERE r.code = 'USER'
+                AND NOT EXISTS (SELECT 1 FROM role_permissions rp
+                                WHERE rp.role_id = r.id AND rp.permission_id = p.id);
+      rollback:
+        - sql:
+            splitStatements: false
+            sql: >
+              DELETE FROM role_permissions rp
+              USING roles r, permissions p
+              WHERE rp.role_id = r.id AND rp.permission_id = p.id
+                AND r.code = 'USER' AND p.domain = 'catalog' AND p.action <> 'read';
