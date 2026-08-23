@@ -18,7 +18,6 @@ import net.switchscope.service.component.InstallableComponentRegistry;
 import net.switchscope.to.component.catalog.ComponentTypeTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -89,7 +88,6 @@ public class ComponentTypeController {
     @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
     public ComponentTypeTo create(@Valid @RequestBody ComponentTypeTo dto) {
         log.info("create component type {}", dto);
         ComponentTypeEntity entity = mapper.toEntity(dto);
@@ -104,7 +102,6 @@ public class ComponentTypeController {
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
     @SneakyThrows
     public ComponentTypeTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component type with id={}", id);
@@ -127,7 +124,6 @@ public class ComponentTypeController {
     @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable UUID id) {
         log.info("delete component type {}", id);
         service.delete(id);

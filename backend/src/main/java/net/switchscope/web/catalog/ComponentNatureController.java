@@ -17,7 +17,6 @@ import net.switchscope.service.component.ComponentNatureService;
 import net.switchscope.to.component.catalog.ComponentNatureTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,7 +71,6 @@ public class ComponentNatureController {
     @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
     public ComponentNatureTo create(@Valid @RequestBody ComponentNatureTo dto) {
         log.info("create component nature {}", dto);
         ComponentNatureEntity entity = mapper.toEntity(dto);
@@ -86,7 +84,6 @@ public class ComponentNatureController {
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
     @SneakyThrows
     public ComponentNatureTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component nature with id={}", id);
@@ -109,7 +106,6 @@ public class ComponentNatureController {
     @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable UUID id) {
         log.info("delete component nature {}", id);
         service.delete(id);

@@ -17,7 +17,6 @@ import net.switchscope.service.location.LocationTypeService;
 import net.switchscope.to.location.catalog.LocationTypeTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,7 +71,6 @@ public class LocationTypeController {
     @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
     public LocationTypeTo create(@Valid @RequestBody LocationTypeTo dto) {
         log.info("create location type {}", dto);
         LocationTypeEntity entity = mapper.toEntity(dto);
@@ -85,7 +83,6 @@ public class LocationTypeController {
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
     @SneakyThrows
     public LocationTypeTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update location type with id={}", id);
@@ -106,7 +103,6 @@ public class LocationTypeController {
     @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable UUID id) {
         log.info("delete location type {}", id);
         service.delete(id);

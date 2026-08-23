@@ -136,7 +136,7 @@ class AbstractCatalogControllerTest {
     }
 
     @Test
-    @DisplayName("Should create entity with ADMIN role and return 201")
+    @DisplayName("Should create entity for an authenticated caller and return 201")
     void createAsAdmin() throws Exception {
         TestEntity input = new TestEntity(null, "New");
         TestEntity created = new TestEntity(UUID.fromString("00000000-0000-0000-0000-0000000000AA"), "New");
@@ -156,20 +156,14 @@ class AbstractCatalogControllerTest {
         assertThat(captor.getValue().getName()).isEqualTo("New");
     }
 
-    @Test
-    @DisplayName("Should reject create for non-ADMIN with 403")
-    void createForbiddenForNonAdmin() throws Exception {
-        TestEntity input = new TestEntity(null, "New");
-
-        mockMvc.perform(post(BASE_URL)
-                        .with(httpBasic("user", "password"))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(input)))
-                .andExpect(status().isForbidden());
-    }
+    // There was a "rejects create for non-ADMIN with 403" case here. It asserted the
+    // hasRole('ADMIN') that promoting the catalog domain removed, and it cannot be rewritten as a
+    // permission assertion: TestEntityController is @AuthenticatedOnly, so the advisor exempts it
+    // by design. What refuses a caller on the real catalog routes is now role_permissions, and
+    // PermissionEnforcementTest is where that is asserted against a controller that has a resource.
 
     @Test
-    @DisplayName("Should update entity with ADMIN role and pass id to service")
+    @DisplayName("Should update entity for an authenticated caller and pass id to service")
     void updateAsAdmin() throws Exception {
         UUID id = UUID.fromString("00000000-0000-0000-0000-0000000000BB");
         TestEntity input = new TestEntity(null, "Upd");
@@ -191,7 +185,7 @@ class AbstractCatalogControllerTest {
     }
 
     @Test
-    @DisplayName("Should delete entity with ADMIN role and return 204")
+    @DisplayName("Should delete entity for an authenticated caller and return 204")
     void deleteAsAdmin() throws Exception {
         UUID id = UUID.fromString("00000000-0000-0000-0000-0000000000CC");
 

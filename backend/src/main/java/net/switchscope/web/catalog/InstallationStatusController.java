@@ -17,7 +17,6 @@ import net.switchscope.service.installation.InstallationStatusService;
 import net.switchscope.to.installation.catalog.InstallationStatusTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,7 +71,6 @@ public class InstallationStatusController {
     @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
     public InstallationStatusTo create(@Valid @RequestBody InstallationStatusTo dto) {
         log.info("create installation status {}", dto);
         InstallationStatusEntity entity = mapper.toEntity(dto);
@@ -86,7 +84,6 @@ public class InstallationStatusController {
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
     @SneakyThrows
     public InstallationStatusTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update installation status with id={}", id);
@@ -109,7 +106,6 @@ public class InstallationStatusController {
     @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable UUID id) {
         log.info("delete installation status {}", id);
         service.delete(id);

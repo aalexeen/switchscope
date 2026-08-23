@@ -17,7 +17,6 @@ import net.switchscope.service.installation.InstallableTypeService;
 import net.switchscope.to.installation.catalog.InstallableTypeTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,7 +71,6 @@ public class InstallableTypeController {
     @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
     public InstallableTypeTo create(@Valid @RequestBody InstallableTypeTo dto) {
         log.info("create installable type {}", dto);
         InstallableTypeEntity entity = mapper.toEntity(dto);
@@ -86,7 +84,6 @@ public class InstallableTypeController {
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
     @SneakyThrows
     public InstallableTypeTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update installable type with id={}", id);
@@ -109,7 +106,6 @@ public class InstallableTypeController {
     @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable UUID id) {
         log.info("delete installable type {}", id);
         service.delete(id);

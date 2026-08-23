@@ -17,7 +17,6 @@ import net.switchscope.service.component.ComponentStatusService;
 import net.switchscope.to.component.catalog.ComponentStatusTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,7 +71,6 @@ public class ComponentStatusController {
     @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
     public ComponentStatusTo create(@Valid @RequestBody ComponentStatusTo dto) {
         log.info("create component status {}", dto);
         ComponentStatusEntity entity = mapper.toEntity(dto);
@@ -86,7 +84,6 @@ public class ComponentStatusController {
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
     @SneakyThrows
     public ComponentStatusTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component status with id={}", id);
@@ -107,7 +104,6 @@ public class ComponentStatusController {
     @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable UUID id) {
         log.info("delete component status {}", id);
         service.delete(id);

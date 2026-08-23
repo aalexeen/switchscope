@@ -129,6 +129,20 @@ class PermissionEnforcementTest extends AbstractContextTest {
     }
 
     @Test
+    @DisplayName("a catalog write is open to the permission holder, with no role at all")
+    @WithMockUser(authorities = "catalog.component-type:delete")
+    void catalogWriteIsOpenToThePermissionHolder() throws Exception {
+        int status = mockMvc.perform(delete(COMPONENT_TYPES + "/" + ABSENT))
+                .andReturn().getResponse().getStatus();
+        assertThat(status)
+                .as("this principal holds no ROLE_ADMIN, and until the catalog domain was promoted"
+                        + " a hasRole('ADMIN') on this method would have refused it. That the"
+                        + " permission alone now suffices is the whole point of the promotion:"
+                        + " role_permissions decides, and it is a table rather than a rebuild")
+                .isNotEqualTo(403);
+    }
+
+    @Test
     @DisplayName("holding every other permission is not holding this one")
     @WithMockUser(authorities = {"ROLE_ADMIN", "component.rack:read", "component.rack:create",
             "component.rack:update"})
