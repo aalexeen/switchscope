@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.switchscope.model.Role;
 import net.switchscope.model.User;
 import net.switchscope.repository.UserRepository;
+import net.switchscope.service.security.RolePermissionCatalog;
 import net.switchscope.web.AuthUser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,14 +15,19 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Configuration
 @EnableWebSecurity
@@ -33,6 +39,7 @@ public class SecurityConfig {
 
     private final UserRepository userRepository;
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RolePermissionCatalog rolePermissionCatalog;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -44,9 +51,36 @@ public class SecurityConfig {
         return email -> {
             log.debug("Authenticating '{}'", email);
             Optional<User> optionalUser = userRepository.findByEmailIgnoreCase(email);
-            return new AuthUser(optionalUser.orElseThrow(
-                    () -> new UsernameNotFoundException("User '" + email + "' was not found")));
+            User user = optionalUser.orElseThrow(
+                    () -> new UsernameNotFoundException("User '" + email + "' was not found"));
+            return new AuthUser(user, authoritiesOf(user));
         };
+    }
+
+    /**
+     * Roles as {@code ROLE_*}, plus every permission code those roles grant.
+     * <p>
+     * The role half is what {@code /api/admin/**} still checks with {@code hasRole}; the permission
+     * half is what the method-security advisor checks with an exact authority match. The grants
+     * come from {@link RolePermissionCatalog}, which holds them for a minute - without that, the
+     * stateless Basic authentication would read {@code roles} and {@code role_permissions} on every
+     * single request, since there is no session to remember them in.
+     * <p>
+     * The role name is the join key: {@link Role#ADMIN} to the {@code roles} row coded
+     * {@code ADMIN}. That is deliberate duplication for now - the enum column is still the
+     * authoritative one and only stage 4 drops it.
+     */
+    private List<GrantedAuthority> authoritiesOf(User user) {
+        Map<String, Set<String>> grants = rolePermissionCatalog.byRole();
+        List<GrantedAuthority> authorities = new ArrayList<>(user.getRoles());
+        user.getRoles().stream()
+                .map(Role::name)
+                .map(code -> grants.getOrDefault(code, Set.of()))
+                .flatMap(Set::stream)
+                .distinct()
+                .map(SimpleGrantedAuthority::new)
+                .forEach(authorities::add);
+        return authorities;
     }
 
     @Bean

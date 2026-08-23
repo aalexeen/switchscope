@@ -44,6 +44,14 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     clear-checksums: true
 
+  # Named explicitly: see the caffeine dependency in pom.xml. Without this, Boot would pick Redis.
+  # The TTL is what keeps "a row in role_permissions is the configuration" true - a grant takes
+  # effect within a minute rather than at the next restart.
+  cache:
+    type: caffeine
+    caffeine:
+      spec: expireAfterWrite=60s,maximumSize=64
+
 
 logging:
   level:
@@ -70,6 +78,15 @@ management:
   health:
     redis:
       enabled: false
+
+switchscope:
+  security:
+    permission:
+      # AUDIT -> SHADOW -> ENFORCE. SHADOW evaluates every request and logs what it would refuse
+      # without refusing anything; grep the log for PERMISSION-SHADOW-DENY. Promote one domain at a
+      # time through enforce-domains, and roll it back by removing it from the list - no rebuild.
+      mode: SHADOW
+      enforce-domains: []
 
 # Application-specific settings
 app:

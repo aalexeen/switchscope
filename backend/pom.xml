@@ -82,6 +82,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+        <!--
+          The cache provider, and it has to be named. @EnableCaching has been on since before any
+          @Cacheable existed, and Boot picks a provider by the order in CacheType, where REDIS comes
+          before CAFFEINE and SIMPLE. With the redis starter above on the classpath the first
+          @Cacheable would therefore have gone to a RedisCacheManager and failed on connect - Redis
+          is not deployed here, which is why its health check is switched off in application.yaml.
+          Pinning spring.cache.type=caffeine makes the choice explicit rather than incidental.
+        -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>

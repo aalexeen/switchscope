@@ -66,7 +66,8 @@ public class PermissionMatrixController {
                 report.endpoints().stream().map(PermissionMatrixController::toEndpoint).toList(),
                 List.copyOf(report.missingInDatabase()),
                 List.copyOf(report.orphanPermissions()),
-                report.unannotatedEndpoints().stream().map(PermissionMatrixController::toEndpoint).toList());
+                report.unannotatedEndpoints().stream().map(PermissionMatrixController::toEndpoint).toList(),
+                report.unproxyableEndpoints().stream().map(PermissionMatrixController::toEndpoint).toList());
     }
 
     private static PermissionMatrixTo.RoleTo toRole(RoleEntity role) {

@@ -9,7 +9,10 @@ package net.switchscope.security.permission;
  * @param permissionCode the required permission, or {@code null} when the endpoint is exempt or
  *                       unannotated
  * @param status          how the endpoint is classified
- * @param note           the exemption reason for {@link Status#AUTHENTICATED_ONLY}, else {@code null}
+ * @param note           for {@link Status#AUTHENTICATED_ONLY}, the reason it is exempt; for
+ *                       {@link Status#GUARDED}, why Spring AOP cannot advise it, which means the
+ *                       declared permission would never be checked; {@code null} when there is
+ *                       nothing to say
  */
 public record EndpointPermission(String httpMethod,
                                  String pattern,

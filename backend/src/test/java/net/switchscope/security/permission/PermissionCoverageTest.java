@@ -68,6 +68,16 @@ class PermissionCoverageTest extends AbstractContextTest {
     }
 
     @Test
+    @DisplayName("every declared permission can actually be enforced")
+    void noUnproxyableEndpoints() {
+        assertThat(registry.getReport().unproxyableEndpoints())
+                .as("guarded endpoints Spring AOP cannot advise - a final class, or a final or"
+                        + " non-public method. The annotation reads as protection and there is none,"
+                        + " which is the same silence the registry exists to break")
+                .isEmpty();
+    }
+
+    @Test
     @DisplayName("the scan found the application's endpoints at all")
     void reportIsPopulated() {
         assertThat(registry.getReport().endpoints())

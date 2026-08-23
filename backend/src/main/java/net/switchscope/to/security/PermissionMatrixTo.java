@@ -17,6 +17,7 @@ import java.util.List;
  * @param missingInDatabase    required by code, absent from the table - ungrantable operations
  * @param orphanPermissions    in the table, required by nothing - dead configuration
  * @param unannotatedEndpoints endpoints declaring neither a permission nor an exemption
+ * @param unproxyableEndpoints endpoints whose declared permission Spring AOP cannot enforce
  */
 public record PermissionMatrixTo(String mode,
                                  List<RoleTo> roles,
@@ -25,7 +26,8 @@ public record PermissionMatrixTo(String mode,
                                  List<EndpointTo> endpoints,
                                  List<String> missingInDatabase,
                                  List<String> orphanPermissions,
-                                 List<EndpointTo> unannotatedEndpoints) {
+                                 List<EndpointTo> unannotatedEndpoints,
+                                 List<EndpointTo> unproxyableEndpoints) {
 
     public record RoleTo(String code, String displayName, String description, boolean systemRole,
                          boolean active, int permissionCount) {
