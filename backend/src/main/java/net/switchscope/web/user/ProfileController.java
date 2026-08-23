@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import net.switchscope.mapper.UserMapper;
 import net.switchscope.model.User;
+import net.switchscope.security.permission.AuthenticatedOnly;
 import net.switchscope.service.UserService;
 import net.switchscope.to.UserTo;
 import net.switchscope.web.AuthUser;
@@ -24,6 +25,8 @@ import static net.switchscope.validation.ValidationUtil.checkNew;
 @RequestMapping(value = ProfileController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 @RequiredArgsConstructor
+@AuthenticatedOnly(reason = "profile self-service: a user reading, updating or deleting their own "
+        + "account is not exercising a grantable permission")
 public class ProfileController extends AbstractUserController {
     static final String REST_URL = "/api/profile";
 

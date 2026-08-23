@@ -8,6 +8,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.installation.catalog.InstallationStatusMapper;
 import net.switchscope.model.installation.catalog.InstallationStatusEntity;
+import net.switchscope.security.permission.PermissionResource;
+import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.security.policy.UpdatePolicy;
 import net.switchscope.security.policy.UpdatePolicyResolver;
 import net.switchscope.security.policy.UpdatePolicyValidator;
@@ -40,6 +42,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = InstallationStatusController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("catalog.installation-status")
 public class InstallationStatusController {
 
     static final String REST_URL = "/api/catalogs/installation-statuses";
@@ -52,18 +55,21 @@ public class InstallationStatusController {
     private final UpdatePolicyResolver policyResolver;
     private final UpdatePolicyValidator policyValidator;
 
+    @RequiresPermission("read")
     @GetMapping
     public List<InstallationStatusTo> getAll() {
         log.info("getAll installation statuses");
         return mapper.toToList(service.getAll());
     }
 
+    @RequiresPermission("read")
     @GetMapping("/{id}")
     public InstallationStatusTo get(@PathVariable UUID id) {
         log.info("get installation status {}", id);
         return mapper.toTo(service.getById(id));
     }
 
+    @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
@@ -78,6 +84,7 @@ public class InstallationStatusController {
      * Update installation status with role-based field access validation.
      * Validates field nullification against update policy before applying changes.
      */
+    @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @SneakyThrows
@@ -99,6 +106,7 @@ public class InstallationStatusController {
         return mapper.toTo(updated);
     }
 
+    @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")

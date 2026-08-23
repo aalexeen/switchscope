@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.device.NetworkSwitchMapper;
 import net.switchscope.model.component.device.NetworkSwitch;
+import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.device.NetworkSwitchService;
 import net.switchscope.to.component.device.NetworkSwitchTo;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = NetworkSwitchController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("component.network-switch")
 public class NetworkSwitchController extends AbstractCrudController<NetworkSwitch, NetworkSwitchTo> {
 
     static final String REST_URL = "/api/devices/switches";

@@ -1,0 +1,93 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-permissions
+      author: AALEXEEN
+      comment: >
+        One row per configurable API operation. The code <domain>.<resource>:<action> is the
+        identity and matches @RequiresPermission in the code; domain/resource/action repeat its
+        parts as columns so the admin UI can group and the coverage matrix can pivot on them.
+      changes:
+        - createTable:
+            tableName: permissions
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: display_name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: domain
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: resource
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: permissions
+            columnNames: code
+            constraintName: uk_permissions_code
+        - createIndex:
+            tableName: permissions
+            indexName: idx_permissions_domain_resource
+            columns:
+              - column:
+                  name: domain
+              - column:
+                  name: resource
+        - createIndex:
+            tableName: permissions
+            indexName: idx_permissions_active_sort
+            columns:
+              - column:
+                  name: is_active
+              - column:
+                  name: sort_order

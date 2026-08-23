@@ -48,7 +48,7 @@ spring:
 logging:
   level:
     root: WARN
-    net.switchscope.backend: INFO
+    net.switchscope: INFO
     org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: INFO
     org.springframework.cache: TRACE
     liquibase: INFO

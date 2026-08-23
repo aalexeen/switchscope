@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.BaseMapper;
+import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.BaseTo;
 
@@ -36,6 +37,7 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
 
     protected abstract String getEntityName();
 
+    @RequiresPermission("read")
     @GetMapping
     public List<T> getAll() {
         log.info("getAll {}", getEntityName());
@@ -43,6 +45,7 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
         return getMapper().toToList(entities);
     }
 
+    @RequiresPermission("read")
     @GetMapping("/{id}")
     public T get(@PathVariable UUID id) {
         log.info("get {} {}", getEntityName(), id);
@@ -50,6 +53,7 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
         return getMapper().toTo(entity);
     }
 
+    @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public T create(@Valid @RequestBody T dto) {
@@ -57,12 +61,14 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
         return getService().createFromDto(dto);
     }
 
+    @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public T update(@PathVariable UUID id, @RequestBody T dto) {
         log.info("update {} {} with id={}", getEntityName(), dto, id);
         return getService().updateFromDto(id, dto);
     }
 
+    @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {

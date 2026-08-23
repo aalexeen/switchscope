@@ -3,15 +3,12 @@ package net.switchscope.web.catalog;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import net.switchscope.error.IllegalRequestDataException;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.mapper.component.catalog.connectivity.CableRunModelMapper;
 import net.switchscope.mapper.component.catalog.connectivity.ConnectorModelMapper;
 import net.switchscope.mapper.component.catalog.connectivity.PatchPanelModelMapper;
@@ -27,8 +24,13 @@ import net.switchscope.model.component.catalog.device.AccessPointModel;
 import net.switchscope.model.component.catalog.device.RouterModel;
 import net.switchscope.model.component.catalog.device.SwitchModel;
 import net.switchscope.model.component.catalog.housing.RackModelEntity;
+import net.switchscope.security.permission.PermissionResource;
+import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.component.catalog.ComponentModelService;
 import net.switchscope.to.component.catalog.ComponentModelTo;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,6 +48,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = ComponentModelController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("catalog.component-model")
 public class ComponentModelController {
 
     static final String REST_URL = "/api/catalogs/component-models";
@@ -62,6 +65,7 @@ public class ComponentModelController {
     private final PatchPanelModelMapper patchPanelModelMapper;
     private final RackModelMapper rackModelMapper;
 
+    @RequiresPermission("read")
     @GetMapping
     public List<ComponentModelTo> getAll() {
         log.info("getAll component models");
@@ -70,12 +74,14 @@ public class ComponentModelController {
                 .collect(Collectors.toList());
     }
 
+    @RequiresPermission("read")
     @GetMapping("/{id}")
     public ComponentModelTo get(@PathVariable UUID id) {
         log.info("get component model {}", id);
         return mapToDto(service.getById(id));
     }
 
+    @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ComponentModelTo create(@Valid @RequestBody ComponentModelTo to) {
@@ -91,6 +97,7 @@ public class ComponentModelController {
      * This avoids Jackson polymorphic deserialization issues with abstract ComponentModelTo.
      * Validates field nullification against role-based update policy.
      */
+    @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @SneakyThrows
     public ComponentModelTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
@@ -141,6 +148,7 @@ public class ComponentModelController {
         return fields;
     }
 
+    @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {

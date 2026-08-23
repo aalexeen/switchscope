@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-role-permissions-admin
+      author: AALEXEEN
+      comment: >
+        ADMIN keeps everything, which is what hasRole('ADMIN') already meant.
+      changes:
+        - sql:
+            splitStatements: false
+            sql: >
+              INSERT INTO role_permissions (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r CROSS JOIN permissions p WHERE r.code = 'ADMIN';
+      rollback:
+        - sql:
+            sql: DELETE FROM role_permissions WHERE role_id IN (SELECT id FROM roles WHERE code = 'ADMIN');
+
+  - changeSet:
+      id: fill-role-permissions-user
+      author: AALEXEEN
+      comment: >
+        USER is seeded with exactly what a USER can reach today, so that switching enforcement on is
+        a faithful snapshot rather than a silent policy change: read everywhere, write everywhere
+        except the catalogs, which @PreAuthorize("hasRole('ADMIN')") already restricts. The system
+        domain is excluded because /api/admin/** is ADMIN-only at the request level.
+        Narrowing this is a configuration change - an UPDATE, not a release.
+      changes:
+        - sql:
+            splitStatements: false
+            sql: >
+              INSERT INTO role_permissions (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r JOIN permissions p
+              ON (p.action = 'read' OR p.domain <> 'catalog')
+              WHERE r.code = 'USER' AND p.domain <> 'system';
+      rollback:
+        - sql:
+            sql: DELETE FROM role_permissions WHERE role_id IN (SELECT id FROM roles WHERE code = 'USER');

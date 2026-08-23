@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.device.RouterMapper;
 import net.switchscope.model.component.device.Router;
+import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.device.RouterService;
 import net.switchscope.to.component.device.RouterTo;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = RouterController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("component.router")
 public class RouterController extends AbstractCrudController<Router, RouterTo> {
 
     static final String REST_URL = "/api/devices/routers";

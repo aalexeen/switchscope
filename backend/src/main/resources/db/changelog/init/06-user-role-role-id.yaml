@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-user-role-role-id
+      author: AALEXEEN
+      comment: >
+        Additive half of the user_role migration: the FK to roles is created and populated while the
+        old VARCHAR role column stays in place. The Role enum is still referenced by SecurityConfig,
+        User and LoginResponseTo, so dropping the column here would break the running application;
+        the drop belongs with the stage that removes the enum.
+      changes:
+        - addColumn:
+            tableName: user_role
+            columns:
+              - column:
+                  name: role_id
+                  type: UUID
+        - addForeignKeyConstraint:
+            baseTableName: user_role
+            baseColumnNames: role_id
+            constraintName: fk_user_role_role
+            referencedTableName: roles
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - createIndex:
+            tableName: user_role
+            indexName: idx_user_role_role_id
+            columns:
+              - column:
+                  name: role_id

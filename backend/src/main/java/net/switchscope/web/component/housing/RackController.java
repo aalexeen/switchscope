@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.housing.RackMapper;
 import net.switchscope.model.component.housing.Rack;
+import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.housing.RackService;
 import net.switchscope.to.component.housing.RackTo;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = RackController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("component.rack")
 public class RackController extends AbstractCrudController<Rack, RackTo> {
 
     static final String REST_URL = "/api/housing/racks";

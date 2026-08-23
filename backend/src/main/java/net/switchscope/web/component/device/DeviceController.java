@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.error.IllegalRequestDataException;
-import net.switchscope.web.component.ComponentPayloadReader;
 import net.switchscope.mapper.component.device.AccessPointMapper;
 import net.switchscope.mapper.component.device.NetworkSwitchMapper;
 import net.switchscope.mapper.component.device.RouterMapper;
@@ -16,6 +15,8 @@ import net.switchscope.model.component.device.AccessPoint;
 import net.switchscope.model.component.device.Device;
 import net.switchscope.model.component.device.NetworkSwitch;
 import net.switchscope.model.component.device.Router;
+import net.switchscope.security.permission.PermissionResource;
+import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.component.ComponentService;
 import net.switchscope.service.component.device.DeviceService;
 import net.switchscope.to.component.ComponentTo;
@@ -23,6 +24,7 @@ import net.switchscope.to.component.device.AccessPointTo;
 import net.switchscope.to.component.device.DeviceTo;
 import net.switchscope.to.component.device.NetworkSwitchTo;
 import net.switchscope.to.component.device.RouterTo;
+import net.switchscope.web.component.ComponentPayloadReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = DeviceController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("component.device")
 public class DeviceController {
 
     static final String REST_URL = "/api/devices";
@@ -50,6 +53,7 @@ public class DeviceController {
     private final RouterMapper routerMapper;
     private final AccessPointMapper accessPointMapper;
 
+    @RequiresPermission("read")
     @GetMapping
     public List<DeviceTo> getAll() {
         log.info("getAll devices");
@@ -58,6 +62,7 @@ public class DeviceController {
                 .collect(Collectors.toList());
     }
 
+    @RequiresPermission("read")
     @GetMapping("/{id}")
     public DeviceTo get(@PathVariable UUID id) {
         log.info("get device {}", id);
@@ -72,6 +77,7 @@ public class DeviceController {
      * here is rejected with 422. Creation itself is delegated to {@link ComponentService}, which
      * resolves the foreign keys the mappers ignore and maps the result back inside the transaction.
      */
+    @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public DeviceTo create(@RequestBody String jsonPayload) {
@@ -86,6 +92,7 @@ public class DeviceController {
      * Reads raw JSON and pins {@code componentClass} to the stored entity's type, so a client cannot
      * change the type of an existing row and a payload that omits the discriminator still binds.
      */
+    @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @SneakyThrows
     public DeviceTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
@@ -98,6 +105,7 @@ public class DeviceController {
         return asDeviceTo(componentService.updateFromDto(id, to));
     }
 
+    @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {

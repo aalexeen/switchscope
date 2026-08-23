@@ -7,6 +7,18 @@ databaseChangeLog:
       file: init/02-user-roles.yaml
       relativeToChangelogFile: true
   - include:
+      file: init/03-roles.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: init/04-permissions.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: init/05-role-permissions.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: init/06-user-role-role-id.yaml
+      relativeToChangelogFile: true
+  - include:
       file: init/10-component-categories-catalog.yaml
       relativeToChangelogFile: true
   - include:
@@ -112,6 +124,18 @@ databaseChangeLog:
       relativeToChangelogFile: true
   - include:
       file: fill/02-fill-user-roles.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: fill/03-fill-roles.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: fill/04-fill-permissions.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: fill/05-fill-role-permissions.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: fill/06-fill-user-role-role-id.yaml
       relativeToChangelogFile: true
   - include:
       file: fill/10-fill-component-categories-catalog.yaml

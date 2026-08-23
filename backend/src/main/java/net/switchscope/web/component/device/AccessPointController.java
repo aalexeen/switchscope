@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.device.AccessPointMapper;
 import net.switchscope.model.component.device.AccessPoint;
+import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.device.AccessPointService;
 import net.switchscope.to.component.device.AccessPointTo;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = AccessPointController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("component.access-point")
 public class AccessPointController extends AbstractCrudController<AccessPoint, AccessPointTo> {
 
     static final String REST_URL = "/api/devices/access-points";

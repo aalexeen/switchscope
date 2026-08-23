@@ -13,6 +13,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.model.port.Port;
+import net.switchscope.security.permission.PermissionResource;
+import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.port.PortService;
 import net.switchscope.to.port.EthernetPortTo;
 import net.switchscope.to.port.FiberPortTo;
@@ -25,6 +27,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = PortController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("port")
 public class PortController {
 
     static final String REST_URL = "/api/ports";
@@ -32,12 +35,14 @@ public class PortController {
     private final PortService service;
     private final ObjectMapper objectMapper;
 
+    @RequiresPermission("read")
     @GetMapping
     public List<PortTo> getAll() {
         log.info("getAll ports");
         return service.getAllAsDto();
     }
 
+    @RequiresPermission("read")
     @GetMapping("/{id}")
     public PortTo get(@PathVariable UUID id) {
         log.info("get port {}", id);
@@ -50,6 +55,7 @@ public class PortController {
      * {@link PortTo} is abstract, so the payload must carry the {@code portType} discriminator
      * (ETHERNET or FIBER); Jackson uses it to pick the concrete DTO.
      */
+    @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public PortTo create(@Valid @RequestBody PortTo to) {
@@ -63,6 +69,7 @@ public class PortController {
      * Reads raw JSON and pins {@code portType} to the stored entity's type, so a client cannot
      * change the type of an existing row and a payload that omits the discriminator still binds.
      */
+    @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @SneakyThrows
     public PortTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
@@ -81,6 +88,7 @@ public class PortController {
         return service.updateFromDto(id, to);
     }
 
+    @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {

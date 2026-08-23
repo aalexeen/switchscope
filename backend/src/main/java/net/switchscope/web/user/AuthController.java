@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import net.switchscope.model.User;
+import net.switchscope.security.permission.AuthenticatedOnly;
 import net.switchscope.to.LoginResponseTo;
 import net.switchscope.web.AuthUser;
 
@@ -12,6 +13,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = AuthController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
+@AuthenticatedOnly(reason = "authentication self-service: the caller must be able to ask who they are "
+        + "and what they may do before any permission can be evaluated")
 public class AuthController extends AbstractUserController {
 
     static final String REST_URL = "/api/auth";

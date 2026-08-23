@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-user-role-role-id
+      author: AALEXEEN
+      comment: >
+        Point the new FK at the role whose code equals the string already stored. The old column is
+        left in place and authoritative until the Role enum goes away.
+      changes:
+        - sql:
+            splitStatements: false
+            sql: >
+              UPDATE user_role ur SET role_id = r.id FROM roles r WHERE r.code = ur.role;
+      rollback:
+        - sql:
+            sql: UPDATE user_role SET role_id = NULL;

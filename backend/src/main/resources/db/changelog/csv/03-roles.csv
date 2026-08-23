@@ -1,0 +1,3 @@
+id;name;description;code;display_name;is_active;sort_order;system_role
+'01932f00-0091-7000-8000-000000000001';'Administrator';'Full access to every configurable operation.';'ADMIN';'Administrator';true;1;true
+'01932f00-0091-7000-8000-000000000002';'User';'Day-to-day inventory work; catalogs are read-only.';'USER';'User';true;2;true

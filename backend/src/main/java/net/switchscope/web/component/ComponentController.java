@@ -23,6 +23,8 @@ import net.switchscope.model.component.device.AccessPoint;
 import net.switchscope.model.component.device.NetworkSwitch;
 import net.switchscope.model.component.device.Router;
 import net.switchscope.model.component.housing.Rack;
+import net.switchscope.security.permission.PermissionResource;
+import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.component.ComponentService;
 import net.switchscope.to.component.ComponentTo;
 import net.switchscope.to.component.connectivity.CableRunTo;
@@ -46,6 +48,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = ComponentController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("component")
 public class ComponentController {
 
     static final String REST_URL = "/api/components";
@@ -62,12 +65,14 @@ public class ComponentController {
     private final PatchPanelMapper patchPanelMapper;
     private final RackMapper rackMapper;
 
+    @RequiresPermission("read")
     @GetMapping
     public List<ComponentTo> getAll() {
         log.info("getAll components");
         return service.getAllAsDto();
     }
 
+    @RequiresPermission("read")
     @GetMapping("/{id}")
     public ComponentTo get(@PathVariable UUID id) {
         log.info("get component {}", id);
@@ -80,6 +85,7 @@ public class ComponentController {
      * The concrete type is derived from {@code componentTypeId} - see {@link ComponentPayloadReader}.
      * The client sends no discriminator; if it sends one anyway it is checked, not trusted.
      */
+    @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ComponentTo create(@RequestBody String jsonPayload) {
@@ -95,6 +101,7 @@ public class ComponentController {
      * change the type of an existing row - and a payload that omits {@code componentClass} still binds.
      * Validates field nullification against role-based update policy.
      */
+    @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @SneakyThrows
     public ComponentTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
@@ -144,6 +151,7 @@ public class ComponentController {
         }
     }
 
+    @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {

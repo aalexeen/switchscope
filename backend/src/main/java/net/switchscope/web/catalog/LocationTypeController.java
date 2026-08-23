@@ -8,6 +8,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.location.catalog.LocationTypeMapper;
 import net.switchscope.model.location.catalog.LocationTypeEntity;
+import net.switchscope.security.permission.PermissionResource;
+import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.security.policy.UpdatePolicy;
 import net.switchscope.security.policy.UpdatePolicyResolver;
 import net.switchscope.security.policy.UpdatePolicyValidator;
@@ -40,6 +42,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = LocationTypeController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("catalog.location-type")
 public class LocationTypeController {
 
     static final String REST_URL = "/api/catalogs/location-types";
@@ -52,18 +55,21 @@ public class LocationTypeController {
     private final UpdatePolicyResolver policyResolver;
     private final UpdatePolicyValidator policyValidator;
 
+    @RequiresPermission("read")
     @GetMapping
     public List<LocationTypeTo> getAll() {
         log.info("getAll location types");
         return service.getAllAsDto();
     }
 
+    @RequiresPermission("read")
     @GetMapping("/{id}")
     public LocationTypeTo get(@PathVariable UUID id) {
         log.info("get location type {}", id);
         return service.getByIdAsDto(id);
     }
 
+    @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
@@ -77,6 +83,7 @@ public class LocationTypeController {
      * Update location type with role-based field access validation.
      * Validates field nullification against update policy before applying changes.
      */
+    @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @SneakyThrows
@@ -96,6 +103,7 @@ public class LocationTypeController {
         return service.updateAndMapToDto(id, dto);
     }
 
+    @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")

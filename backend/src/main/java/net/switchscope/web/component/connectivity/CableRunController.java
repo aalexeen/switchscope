@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.connectivity.CableRunMapper;
 import net.switchscope.model.component.connectivity.CableRun;
+import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.connectivity.CableRunService;
 import net.switchscope.to.component.connectivity.CableRunTo;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = CableRunController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("component.cable-run")
 public class CableRunController extends AbstractCrudController<CableRun, CableRunTo> {
 
     static final String REST_URL = "/api/connectivity/cable-runs";

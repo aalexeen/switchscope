@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.connectivity.ConnectorMapper;
 import net.switchscope.model.component.connectivity.Connector;
+import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.connectivity.ConnectorService;
 import net.switchscope.to.component.connectivity.ConnectorTo;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = ConnectorController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("component.connector")
 public class ConnectorController extends AbstractCrudController<Connector, ConnectorTo> {
 
     static final String REST_URL = "/api/connectivity/connectors";

@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.connectivity.PatchPanelMapper;
 import net.switchscope.model.component.connectivity.PatchPanel;
+import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.connectivity.PatchPanelService;
 import net.switchscope.to.component.connectivity.PatchPanelTo;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = PatchPanelController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("component.patch-panel")
 public class PatchPanelController extends AbstractCrudController<PatchPanel, PatchPanelTo> {
 
     static final String REST_URL = "/api/connectivity/patch-panels";

@@ -4,7 +4,9 @@
 2. Конфигурируемые права доступа (концепт)
 3. Обнуление полей через PUT: практика и решение
 
-Части 2 и 3 — проектные, кода не написано. Часть 1 доведена до реализации (коммит `2d14ec3`).
+Часть 1 доведена до реализации. По части 2 реализован Этап 1 — схема, seed, аннотации и
+`PermissionRegistry` в режиме audit-only; принуждения ещё нет, состав работ и что именно
+сделано — в `TODO.md`, раздел 1.1. Часть 3 остаётся проектной.
 Источники: OpenAPI/AsyncAPI discriminator,
 Microsoft REST API Guidelines (PR #433 «Add guidelines for polymorphism»), Google AIP-133,
 RFC 7386 (JSON Merge Patch), документация Spring Security (Authorization Architecture,

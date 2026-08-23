@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-role-permissions
+      author: AALEXEEN
+      comment: >
+        This table is the configuration. A row means the role may perform the operation, no row
+        means it may not, and nothing else decides. Changing it needs no redeploy.
+      changes:
+        - createTable:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: permission_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: role_permissions
+            columnNames: role_id, permission_id
+            constraintName: uk_role_permissions
+        - addForeignKeyConstraint:
+            baseTableName: role_permissions
+            baseColumnNames: role_id
+            constraintName: fk_role_permissions_role
+            referencedTableName: roles
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: role_permissions
+            baseColumnNames: permission_id
+            constraintName: fk_role_permissions_permission
+            referencedTableName: permissions
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - createIndex:
+            tableName: role_permissions
+            indexName: idx_role_permissions_permission
+            columns:
+              - column:
+                  name: permission_id

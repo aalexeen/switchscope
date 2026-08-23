@@ -8,6 +8,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.component.catalog.ComponentStatusMapper;
 import net.switchscope.model.component.ComponentStatusEntity;
+import net.switchscope.security.permission.PermissionResource;
+import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.security.policy.UpdatePolicy;
 import net.switchscope.security.policy.UpdatePolicyResolver;
 import net.switchscope.security.policy.UpdatePolicyValidator;
@@ -40,6 +42,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = ComponentStatusController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("catalog.component-status")
 public class ComponentStatusController {
 
     static final String REST_URL = "/api/catalogs/component-statuses";
@@ -52,18 +55,21 @@ public class ComponentStatusController {
     private final UpdatePolicyResolver policyResolver;
     private final UpdatePolicyValidator policyValidator;
 
+    @RequiresPermission("read")
     @GetMapping
     public List<ComponentStatusTo> getAll() {
         log.info("getAll component statuses");
         return mapper.toToList(service.getAll());
     }
 
+    @RequiresPermission("read")
     @GetMapping("/{id}")
     public ComponentStatusTo get(@PathVariable UUID id) {
         log.info("get component status {}", id);
         return mapper.toTo(service.getById(id));
     }
 
+    @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
@@ -78,6 +84,7 @@ public class ComponentStatusController {
      * Update component status with role-based field access validation.
      * Validates field nullification against update policy before applying changes.
      */
+    @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @SneakyThrows
@@ -97,6 +104,7 @@ public class ComponentStatusController {
         return service.updateAndMapToDto(id, dto);
     }
 
+    @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")

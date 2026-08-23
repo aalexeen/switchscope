@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.location.LocationMapper;
 import net.switchscope.model.location.Location;
+import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.location.LocationService;
 import net.switchscope.to.location.LocationTo;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = LocationController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("location")
 public class LocationController extends AbstractCrudController<Location, LocationTo> {
 
     static final String REST_URL = "/api/locations";

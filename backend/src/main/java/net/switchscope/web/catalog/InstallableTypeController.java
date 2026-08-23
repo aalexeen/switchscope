@@ -8,6 +8,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.installation.catalog.InstallableTypeMapper;
 import net.switchscope.model.installation.catalog.InstallableTypeEntity;
+import net.switchscope.security.permission.PermissionResource;
+import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.security.policy.UpdatePolicy;
 import net.switchscope.security.policy.UpdatePolicyResolver;
 import net.switchscope.security.policy.UpdatePolicyValidator;
@@ -40,6 +42,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = InstallableTypeController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@PermissionResource("catalog.installable-type")
 public class InstallableTypeController {
 
     static final String REST_URL = "/api/catalogs/installable-types";
@@ -52,18 +55,21 @@ public class InstallableTypeController {
     private final UpdatePolicyResolver policyResolver;
     private final UpdatePolicyValidator policyValidator;
 
+    @RequiresPermission("read")
     @GetMapping
     public List<InstallableTypeTo> getAll() {
         log.info("getAll installable types");
         return mapper.toToList(service.getAll());
     }
 
+    @RequiresPermission("read")
     @GetMapping("/{id}")
     public InstallableTypeTo get(@PathVariable UUID id) {
         log.info("get installable type {}", id);
         return mapper.toTo(service.getById(id));
     }
 
+    @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
@@ -78,6 +84,7 @@ public class InstallableTypeController {
      * Update installable type with role-based field access validation.
      * Validates field nullification against update policy before applying changes.
      */
+    @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @SneakyThrows
@@ -99,6 +106,7 @@ public class InstallableTypeController {
         return mapper.toTo(updated);
     }
 
+    @RequiresPermission("delete")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
