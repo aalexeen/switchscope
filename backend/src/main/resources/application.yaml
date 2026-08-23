@@ -91,13 +91,19 @@ switchscope:
       # the rollback is "stop refusing", not "restore the old rule".
       #
       # catalog also gave up a hasRole('ADMIN') when it was promoted, and so changed who may write.
-      # The other three never had one: promoting them takes routes that any authenticated caller
-      # could reach and makes them require a permission. Both roles hold all of location, installation
-      # and port, so no caller loses anything today - what changes is that the decision is real.
+      # The other four never had one: promoting them takes routes that any authenticated caller
+      # could reach and makes them require a permission. Both roles hold all of location,
+      # installation, port and component, so no caller loses anything today - what changes is that
+      # the decision is real.
       #
-      # component is deliberately not here yet: one word would promote ComponentController and all
-      # nine AbstractCrudController subclasses at once, which is 36 of the 81 permissions.
-      enforce-domains: [catalog, location, installation, port]
+      # component came last because one word covers nine controllers at once - ComponentController,
+      # DeviceController and seven of the nine AbstractCrudController subclasses (the other two are
+      # location and installation) - which is 36 of the 81 permissions, and every route the
+      # bridge-method trap lives on (see PermissionEnforcementTest).
+      #
+      # system is the one domain still outside this list: a single permission on /api/admin/**,
+      # which SecurityConfig already gates by role. It is covered when mode itself moves to ENFORCE.
+      enforce-domains: [catalog, location, installation, port, component]
 
 # Application-specific settings
 app:

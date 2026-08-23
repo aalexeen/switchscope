@@ -49,7 +49,10 @@ class PermissionShadowModeTest extends AbstractContextTest {
         int status = mockMvc.perform(delete("/api/housing/racks/" + ABSENT))
                 .andReturn().getResponse().getStatus();
         assertThat(status)
-                .as("component is not in enforce-domains, so the decision is only recorded")
+                .as("this fixture pins enforce-domains to catalog alone, so component stays in"
+                        + " shadow here and the decision is only recorded - the shipped"
+                        + " configuration promotes it, which is exactly why the fixture pins its"
+                        + " own list instead of inheriting application.yaml")
                 .isNotEqualTo(403);
     }
 
