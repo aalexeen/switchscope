@@ -55,6 +55,8 @@ class CrudSmokeControllerTest {
     private net.switchscope.mapper.component.connectivity.PatchPanelMapper patchPanelMapper;
     @org.springframework.boot.test.mock.mockito.MockBean
     private net.switchscope.mapper.component.housing.RackMapper rackMapper;
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private net.switchscope.web.component.ComponentPayloadReader payloadReader;
 
     @Test
     @DisplayName("GET /api/components requires authentication (401 when unauthenticated)")

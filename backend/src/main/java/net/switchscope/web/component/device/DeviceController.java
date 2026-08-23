@@ -1,9 +1,5 @@
 package net.switchscope.web.component.device;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.error.IllegalRequestDataException;
+import net.switchscope.web.component.ComponentPayloadReader;
 import net.switchscope.mapper.component.device.AccessPointMapper;
 import net.switchscope.mapper.component.device.NetworkSwitchMapper;
 import net.switchscope.mapper.component.device.RouterMapper;
@@ -46,7 +43,7 @@ public class DeviceController {
 
     private final DeviceService service;
     private final ComponentService componentService;
-    private final ObjectMapper objectMapper;
+    private final ComponentPayloadReader payloadReader;
 
     // Polymorphic mappers for different device types
     private final NetworkSwitchMapper networkSwitchMapper;
@@ -70,17 +67,17 @@ public class DeviceController {
     /**
      * Create a device of any type.
      * <p>
-     * {@link DeviceTo} is abstract, so the payload must carry the {@code componentClass}
-     * discriminator (NETWORK_SWITCH, ROUTER or ACCESS_POINT); Jackson uses it to pick the concrete
-     * DTO. Creation itself is delegated to {@link ComponentService}, which resolves the foreign keys
-     * the mappers ignore and maps the result back inside the transaction.
+     * The concrete type is derived from {@code componentTypeId} - see {@link ComponentPayloadReader} -
+     * and must denote a device (NETWORK_SWITCH, ROUTER or ACCESS_POINT); a rack or a cable run posted
+     * here is rejected with 422. Creation itself is delegated to {@link ComponentService}, which
+     * resolves the foreign keys the mappers ignore and maps the result back inside the transaction.
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public DeviceTo create(@Valid @RequestBody DeviceTo to) {
+    public DeviceTo create(@RequestBody String jsonPayload) {
+        DeviceTo to = payloadReader.readForCreate(jsonPayload, DeviceTo.class);
         log.info("create device {}", to);
-        ComponentTo created = componentService.createFromDto(to);
-        return asDeviceTo(created);
+        return asDeviceTo(componentService.createFromDto(to));
     }
 
     /**
@@ -96,13 +93,7 @@ public class DeviceController {
 
         Device existing = service.getById(id);
         Class<? extends DeviceTo> dtoClass = getDtoClassForEntity(existing);
-
-        JsonNode root = objectMapper.readTree(jsonPayload);
-        if (!(root instanceof ObjectNode objectNode)) {
-            throw new IllegalRequestDataException("Request body must be a JSON object");
-        }
-        objectNode.put("componentClass", existing.getDiscriminatorValue());
-        DeviceTo to = objectMapper.treeToValue(objectNode, dtoClass);
+        DeviceTo to = payloadReader.readForUpdate(jsonPayload, existing.getDiscriminatorValue(), dtoClass);
 
         return asDeviceTo(componentService.updateFromDto(id, to));
     }

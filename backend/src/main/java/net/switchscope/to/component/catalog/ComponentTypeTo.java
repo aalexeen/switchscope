@@ -27,6 +27,18 @@ public class ComponentTypeTo extends UIStyledTo {
     @FieldAccess(FieldAccessLevel.REQUIRED)
     private UUID categoryId;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY,
+            description = "Discriminator of the Component subclass this type instantiates, equal to"
+                    + " the type code. Null when the catalog entry has no implementation yet.")
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
+    private String componentClass;
+
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY,
+            description = "Whether a component of this type can be created. The catalog is richer"
+                    + " than the domain model - some types exist as classifications only.")
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
+    private Boolean implemented;
+
     @Schema(accessMode = Schema.AccessMode.READ_ONLY, description = "Category code")
     @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String categoryCode;

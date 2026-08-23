@@ -1,9 +1,6 @@
 package net.switchscope.web.component;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.mapper.component.connectivity.CableRunMapper;
 import net.switchscope.mapper.component.connectivity.ConnectorMapper;
 import net.switchscope.mapper.component.connectivity.PatchPanelMapper;
@@ -37,8 +33,6 @@ import net.switchscope.to.component.device.NetworkSwitchTo;
 import net.switchscope.to.component.device.RouterTo;
 import net.switchscope.to.component.housing.RackTo;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -57,7 +51,7 @@ public class ComponentController {
     static final String REST_URL = "/api/components";
 
     private final ComponentService service;
-    private final ObjectMapper objectMapper;
+    private final ComponentPayloadReader payloadReader;
 
     // Polymorphic mappers for different component types
     private final NetworkSwitchMapper networkSwitchMapper;
@@ -83,12 +77,13 @@ public class ComponentController {
     /**
      * Create a component of any type.
      * <p>
-     * {@link ComponentTo} is abstract, so the payload must carry the {@code componentClass}
-     * discriminator (NETWORK_SWITCH, ROUTER, ...); Jackson uses it to pick the concrete DTO.
+     * The concrete type is derived from {@code componentTypeId} - see {@link ComponentPayloadReader}.
+     * The client sends no discriminator; if it sends one anyway it is checked, not trusted.
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ComponentTo create(@Valid @RequestBody ComponentTo to) {
+    public ComponentTo create(@RequestBody String jsonPayload) {
+        ComponentTo to = payloadReader.readForCreate(jsonPayload, ComponentTo.class);
         log.info("create component {}", to);
         return service.createFromDto(to);
     }
@@ -111,12 +106,10 @@ public class ComponentController {
         log.debug("Entity type: {}, DTO class: {}", existing.getClass().getSimpleName(), dtoClass.getSimpleName());
 
         // 2. Deserialize JSON to concrete DTO type, pinning the discriminator to the stored type
-        ObjectNode root = readObject(jsonPayload);
-        root.put("componentClass", existing.getDiscriminatorValue());
-        ComponentTo dto = objectMapper.treeToValue(root, dtoClass);
+        ComponentTo dto = payloadReader.readForUpdate(jsonPayload, existing.getDiscriminatorValue(), dtoClass);
 
         // 3. Extract present fields for policy validation
-        Map<String, JsonNode> presentFields = extractPresentFields(root);
+        Map<String, JsonNode> presentFields = payloadReader.presentFields(jsonPayload);
 
         // 4. Delegate to service (handles validation, FK changes, mapping, save, and DTO conversion in transaction)
         return service.updateWithPolicyValidationAndReturnDto(
@@ -126,29 +119,6 @@ public class ComponentController {
                 presentFields,
                 this::updateFromDto
         );
-    }
-
-    @SneakyThrows
-    private ObjectNode readObject(String jsonPayload) {
-        JsonNode root = objectMapper.readTree(jsonPayload);
-        if (!(root instanceof ObjectNode objectNode)) {
-            throw new IllegalRequestDataException("Request body must be a JSON object");
-        }
-        return objectNode;
-    }
-
-    /**
-     * Extracts all fields present in JSON payload with their values.
-     * Used to detect explicitly set null values vs absent fields.
-     */
-    private Map<String, JsonNode> extractPresentFields(ObjectNode root) {
-        Map<String, JsonNode> fields = new HashMap<>();
-        Iterator<String> fieldNames = root.fieldNames();
-        while (fieldNames.hasNext()) {
-            String fieldName = fieldNames.next();
-            fields.put(fieldName, root.get(fieldName));
-        }
-        return fields;
     }
 
     /**

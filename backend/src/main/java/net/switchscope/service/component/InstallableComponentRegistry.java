@@ -63,6 +63,16 @@ public class InstallableComponentRegistry {
         return Optional.ofNullable(categoryByCode.get(code));
     }
 
+    /**
+     * Codes that have a concrete Java class, sorted - used in error messages and to tell the UI
+     * which catalog entries can actually be instantiated.
+     *
+     * @return implemented component codes
+     */
+    public java.util.SortedSet<String> getImplementedCodes() {
+        return new java.util.TreeSet<>(classByCode.keySet());
+    }
+
     public boolean isImplemented(String code) {
         return code != null && classByCode.containsKey(code);
     }

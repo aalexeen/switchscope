@@ -12,6 +12,7 @@ import net.switchscope.security.policy.UpdatePolicy;
 import net.switchscope.security.policy.UpdatePolicyResolver;
 import net.switchscope.security.policy.UpdatePolicyValidator;
 import net.switchscope.service.component.ComponentTypeService;
+import net.switchscope.service.component.InstallableComponentRegistry;
 import net.switchscope.to.component.catalog.ComponentTypeTo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,6 +48,7 @@ public class ComponentTypeController {
     private final ComponentTypeService service;
     private final ComponentTypeMapper mapper;
     private final ObjectMapper objectMapper;
+    private final InstallableComponentRegistry registry;
 
     // Policy validation
     private final UpdatePolicyResolver policyResolver;
@@ -55,13 +57,28 @@ public class ComponentTypeController {
     @GetMapping
     public List<ComponentTypeTo> getAll() {
         log.info("getAll component types");
-        return mapper.toToList(service.getAll());
+        List<ComponentTypeTo> tos = mapper.toToList(service.getAll());
+        tos.forEach(this::markImplementation);
+        return tos;
     }
 
     @GetMapping("/{id}")
     public ComponentTypeTo get(@PathVariable UUID id) {
         log.info("get component type {}", id);
-        return mapper.toTo(service.getById(id));
+        return markImplementation(mapper.toTo(service.getById(id)));
+    }
+
+    /**
+     * Tells the client which catalog entries can actually be instantiated, and under which
+     * discriminator. The UI needs this to decide whether to offer a "create" action for a type and
+     * which type-specific form to render; the same mapping is what the server uses to derive the
+     * discriminator on POST, so the two cannot drift apart.
+     */
+    private ComponentTypeTo markImplementation(ComponentTypeTo to) {
+        boolean implemented = registry.isImplemented(to.getCode());
+        to.setImplemented(implemented);
+        to.setComponentClass(implemented ? to.getCode() : null);
+        return to;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
