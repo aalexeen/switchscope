@@ -41,10 +41,12 @@ public interface RackMapper extends ComponentMapper<Rack, RackTo> {
     @Mapping(target = "wallMountable", expression = "java(entity.isWallMountable())")
     @Mapping(target = "outdoorRated", expression = "java(entity.isOutdoorRated())")
     @Mapping(target = "environmentalMonitoring", expression = "java(entity.hasEnvironmentalMonitoring())")
+    @Mapping(target = "componentClass", expression = "java(entity.getDiscriminatorValue())")
     @Override
     RackTo toTo(Rack entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentStatus", ignore = true)
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "componentNature", ignore = true)

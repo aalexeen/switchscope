@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.component.device.RouterMapper;
 import net.switchscope.model.component.device.Router;
 import net.switchscope.repository.component.device.DeviceRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.component.ComponentReferenceResolver;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.device.RouterTo;
 
 import java.util.List;
@@ -17,10 +18,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RouterService implements CrudService<Router> {
+public class RouterService implements DtoCrudService<Router, RouterTo> {
 
     private final DeviceRepository repository;
     private final RouterMapper mapper;
+    private final ComponentReferenceResolver resolver;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -61,46 +63,57 @@ public class RouterService implements CrudService<Router> {
         return mapper.toTo(router);
     }
 
-    /**
-     * Create router and return as DTO within transaction.
-     *
-     * @param entity router entity to create
-     * @return created router as DTO
-     */
-    @Transactional
-    public RouterTo createAndReturnDto(Router entity) {
-        Router saved = repository.save(entity);
-        return mapper.toTo(saved);
-    }
+
 
     /**
-     * Update router and return as DTO within transaction.
-     *
-     * @param id router ID
-     * @param entity router entity with updates
-     * @return updated router as DTO
+     * Create a router from its DTO, resolving foreign-key ids into managed references first.
+     * Mapping back happens inside the transaction so lazy associations are still reachable.
      */
-    @Transactional
-    public RouterTo updateAndReturnDto(UUID id, Router entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        Router saved = repository.save(entity);
-        return mapper.toTo(saved);
-    }
-
     @Override
     @Transactional
+    public RouterTo createFromDto(RouterTo dto) {
+        Router entity = mapper.toEntity(dto);
+        applyReferences(entity, dto);
+        return mapper.toTo(repository.save(entity));
+    }
+
+    /**
+     * Apply the DTO onto the stored router.
+     * The entity is loaded first: merging the detached instance produced by the mapper would null
+     * every association the mapper ignores, starting with the NOT NULL component type and status.
+     */
+    @Override
+    @Transactional
+    public RouterTo updateFromDto(UUID id, RouterTo dto) {
+        Router existing = getById(id);
+        mapper.updateFromTo(existing, dto);
+        applyReferences(existing, dto);
+        return mapper.toTo(repository.save(existing));
+    }
+
+    private void applyReferences(Router entity, RouterTo dto) {
+        resolver.applyCommonReferences(entity, dto);
+    }
+
+    /**
+     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
+     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
+     */
+    @Override
+    @Deprecated
     public Router create(Router entity) {
-        // TODO: implement validation
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use createFromDto(dto)");
     }
 
+    /**
+     * @deprecated saving the detached entity built by the mapper merges nulls over every
+     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
+     * {@code CrudService}.
+     */
     @Override
-    @Transactional
+    @Deprecated
     public Router update(UUID id, Router entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

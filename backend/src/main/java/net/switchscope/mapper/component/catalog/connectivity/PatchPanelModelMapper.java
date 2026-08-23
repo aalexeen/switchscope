@@ -31,10 +31,12 @@ public interface PatchPanelModelMapper extends ComponentModelMapper<PatchPanelMo
     @Mapping(target = "fiberPanel", expression = "java(entity.isFiberPanel())")
     @Mapping(target = "copperPanel", expression = "java(entity.isCopperPanel())")
     @Mapping(target = "highDensity", expression = "java(entity.isHighDensity())")
+    @Mapping(target = "discriminatorType", expression = "java(entity.getDiscriminatorValue())")
     @Override
     PatchPanelModelTo toTo(PatchPanelModel entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

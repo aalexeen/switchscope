@@ -4,9 +4,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import net.switchscope.error.IllegalRequestDataException;
+import net.switchscope.error.NotFoundException;
+import net.switchscope.mapper.installation.InstallationMapper;
 import net.switchscope.model.installation.Installation;
+import net.switchscope.repository.component.ComponentRepository;
+import net.switchscope.repository.installation.InstallableTypeRepository;
 import net.switchscope.repository.installation.InstallationRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.repository.installation.InstallationStatusRepository;
+import net.switchscope.repository.location.LocationRepository;
+import net.switchscope.service.DtoCrudService;
+import net.switchscope.to.installation.InstallationTo;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,9 +22,14 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class InstallationService implements CrudService<Installation> {
+public class InstallationService implements DtoCrudService<Installation, InstallationTo> {
 
     private final InstallationRepository repository;
+    private final InstallationMapper mapper;
+    private final LocationRepository locationRepository;
+    private final InstallableTypeRepository installableTypeRepository;
+    private final InstallationStatusRepository installationStatusRepository;
+    private final ComponentRepository componentRepository;
 
     @Override
     public List<Installation> getAll() {
@@ -29,24 +42,107 @@ public class InstallationService implements CrudService<Installation> {
     @Override
     public Installation getById(UUID id) {
         Installation installation = repository.findByIdWithRelationships(id)
-                .orElseThrow(() -> new IllegalArgumentException("Installation not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Installation with id=" + id + " not found"));
         initializeForMapping(installation);
         return installation;
     }
 
+    /**
+     * Create an installation from its DTO, resolving foreign-key ids into managed references first.
+     * All four of location, installable type, status and installed item are NOT NULL in the schema,
+     * and the mapper ignores every one of them, so without this step the insert cannot succeed.
+     */
     @Override
     @Transactional
-    public Installation create(Installation entity) {
-        // TODO: implement validation
-        return repository.save(entity);
+    public InstallationTo createFromDto(InstallationTo dto) {
+        Installation entity = mapper.toEntity(dto);
+        applyReferences(entity, dto);
+        Installation saved = repository.save(entity);
+        initializeForMapping(saved);
+        return mapper.toTo(saved);
     }
 
+    /**
+     * Apply the DTO onto the stored installation.
+     * The entity is loaded first: merging the detached instance produced by the mapper would null
+     * the location, installable type and status columns.
+     */
     @Override
     @Transactional
+    public InstallationTo updateFromDto(UUID id, InstallationTo dto) {
+        Installation existing = repository.findByIdWithRelationships(id)
+                .orElseThrow(() -> new NotFoundException("Installation with id=" + id + " not found"));
+        mapper.updateFromTo(existing, dto);
+        applyReferences(existing, dto);
+        Installation saved = repository.save(existing);
+        initializeForMapping(saved);
+        return mapper.toTo(saved);
+    }
+
+    /**
+     * Resolves the DTO's foreign-key ids. An id present in the DTO replaces the current reference,
+     * an absent one leaves it untouched, so a partial update does not clear associations the caller
+     * did not mention. The mandatory references are checked afterwards, turning an incomplete create
+     * into a 422 rather than a constraint violation.
+     */
+    private void applyReferences(Installation entity, InstallationTo dto) {
+        if (dto.getLocationId() != null) {
+            entity.setLocation(locationRepository.findById(dto.getLocationId())
+                    .orElseThrow(() -> new NotFoundException(
+                            "Location with id=" + dto.getLocationId() + " not found")));
+        }
+        if (dto.getInstalledItemTypeId() != null) {
+            entity.setInstalledItemType(installableTypeRepository.findById(dto.getInstalledItemTypeId())
+                    .orElseThrow(() -> new NotFoundException(
+                            "Installable type with id=" + dto.getInstalledItemTypeId() + " not found")));
+        }
+        if (dto.getStatusId() != null) {
+            entity.setStatus(installationStatusRepository.findById(dto.getStatusId())
+                    .orElseThrow(() -> new NotFoundException(
+                            "Installation status with id=" + dto.getStatusId() + " not found")));
+        }
+        if (dto.getComponentId() != null) {
+            entity.setComponent(componentRepository.findById(dto.getComponentId())
+                    .orElseThrow(() -> new NotFoundException(
+                            "Housing component with id=" + dto.getComponentId() + " not found")));
+        }
+        if (dto.getInstalledItemId() != null) {
+            entity.setInstalledItemId(dto.getInstalledItemId());
+        }
+
+        if (entity.getLocation() == null) {
+            throw new IllegalRequestDataException("locationId is required");
+        }
+        if (entity.getInstalledItemType() == null) {
+            throw new IllegalRequestDataException("installedItemTypeId is required");
+        }
+        if (entity.getStatus() == null) {
+            throw new IllegalRequestDataException("statusId is required");
+        }
+        if (entity.getInstalledItemId() == null) {
+            throw new IllegalRequestDataException("installedItemId is required");
+        }
+    }
+
+    /**
+     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
+     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
+     */
+    @Override
+    @Deprecated
+    public Installation create(Installation entity) {
+        throw new UnsupportedOperationException("Use createFromDto(dto)");
+    }
+
+    /**
+     * @deprecated saving the detached entity built by the mapper merges nulls over every
+     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
+     * {@code CrudService}.
+     */
+    @Override
+    @Deprecated
     public Installation update(UUID id, Installation entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

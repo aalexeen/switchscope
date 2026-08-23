@@ -11,16 +11,19 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.component.connectivity.PatchPanelMapper;
 import net.switchscope.model.component.connectivity.PatchPanel;
 import net.switchscope.repository.component.connectivity.ConnectivityRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.model.component.catalog.connectiviy.PatchPanelModel;
+import net.switchscope.service.component.ComponentReferenceResolver;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.connectivity.PatchPanelTo;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PatchPanelService implements CrudService<PatchPanel> {
+public class PatchPanelService implements DtoCrudService<PatchPanel, PatchPanelTo> {
 
     private final ConnectivityRepository repository;
     private final PatchPanelMapper mapper;
+    private final ComponentReferenceResolver resolver;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -65,46 +68,59 @@ public class PatchPanelService implements CrudService<PatchPanel> {
         return mapper.toTo(patchPanel);
     }
 
-    /**
-     * Create patch panel and return as DTO within transaction.
-     *
-     * @param entity patch panel entity to create
-     * @return created patch panel as DTO
-     */
-    @Transactional
-    public PatchPanelTo createAndReturnDto(PatchPanel entity) {
-        PatchPanel saved = repository.save(entity);
-        return mapper.toTo(saved);
-    }
+
 
     /**
-     * Update patch panel and return as DTO within transaction.
-     *
-     * @param id patch panel ID
-     * @param entity patch panel entity with updates
-     * @return updated patch panel as DTO
+     * Create a patch panel from its DTO, resolving foreign-key ids into managed references first.
+     * Mapping back happens inside the transaction so lazy associations are still reachable.
      */
-    @Transactional
-    public PatchPanelTo updateAndReturnDto(UUID id, PatchPanel entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        PatchPanel saved = repository.save(entity);
-        return mapper.toTo(saved);
-    }
-
     @Override
     @Transactional
+    public PatchPanelTo createFromDto(PatchPanelTo dto) {
+        PatchPanel entity = mapper.toEntity(dto);
+        applyReferences(entity, dto);
+        return mapper.toTo(repository.save(entity));
+    }
+
+    /**
+     * Apply the DTO onto the stored patch panel.
+     * The entity is loaded first: merging the detached instance produced by the mapper would null
+     * every association the mapper ignores, starting with the NOT NULL component type and status.
+     */
+    @Override
+    @Transactional
+    public PatchPanelTo updateFromDto(UUID id, PatchPanelTo dto) {
+        PatchPanel existing = getById(id);
+        mapper.updateFromTo(existing, dto);
+        applyReferences(existing, dto);
+        return mapper.toTo(repository.save(existing));
+    }
+
+    private void applyReferences(PatchPanel entity, PatchPanelTo dto) {
+        resolver.applyCommonReferences(entity, dto);
+        resolver.applyModelReference(dto.getPatchPanelModelId(), PatchPanelModel.class,
+                entity::setPatchPanelModel, "patchPanelModelId");
+    }
+
+    /**
+     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
+     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
+     */
+    @Override
+    @Deprecated
     public PatchPanel create(PatchPanel entity) {
-        // TODO: implement validation
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use createFromDto(dto)");
     }
 
+    /**
+     * @deprecated saving the detached entity built by the mapper merges nulls over every
+     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
+     * {@code CrudService}.
+     */
     @Override
-    @Transactional
+    @Deprecated
     public PatchPanel update(UUID id, PatchPanel entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

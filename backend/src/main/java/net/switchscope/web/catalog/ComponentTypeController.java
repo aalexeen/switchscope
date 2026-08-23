@@ -2,6 +2,7 @@ package net.switchscope.web.catalog;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -66,10 +67,11 @@ public class ComponentTypeController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public ComponentTypeTo create(@RequestBody ComponentTypeTo dto) {
+    public ComponentTypeTo create(@Valid @RequestBody ComponentTypeTo dto) {
         log.info("create component type {}", dto);
         ComponentTypeEntity entity = mapper.toEntity(dto);
-        ComponentTypeEntity created = service.create(entity);
+        // categoryId is a NOT NULL FK the mapper ignores; the service resolves it before saving
+        ComponentTypeEntity created = service.createFromDto(entity, dto);
         return mapper.toTo(created);
     }
 

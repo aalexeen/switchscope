@@ -38,6 +38,7 @@ public interface AccessPointMapper extends DeviceMapper<AccessPoint, AccessPoint
     @Mapping(target = "wifi6", expression = "java(entity.isWiFi6())")
     @Mapping(target = "modernSecurity", expression = "java(entity.hasModernSecurity())")
     @Mapping(target = "ssidCount", expression = "java(entity.getSsids() != null ? entity.getSsids().size() : 0)")
+    @Mapping(target = "componentClass", expression = "java(entity.getDiscriminatorValue())")
     @Override
     AccessPointTo toTo(AccessPoint entity);
 
@@ -51,7 +52,8 @@ public interface AccessPointMapper extends DeviceMapper<AccessPoint, AccessPoint
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "ports", ignore = true)
-    //@Mapping(target = "maxThroughputMbps", ignore = true)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
+    //    @Mapping(target = "maxThroughputMbps", ignore = true)
     @Override
     AccessPoint toEntity(AccessPointTo to);
 

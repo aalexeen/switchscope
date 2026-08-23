@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.error.NotFoundException;
 import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.model.component.catalog.ComponentModel;
@@ -43,19 +44,48 @@ public class ComponentModelService implements CrudService<ComponentModel> {
         return repository.getExisted(id);
     }
 
-    @Override
+    /**
+     * Persist a model whose {@code componentType} has been resolved from the DTO.
+     * {@code component_type_id} is NOT NULL and the mappers ignore the association, so the caller
+     * must go through here rather than building the entity and calling {@code save} directly.
+     *
+     * @param entity the mapped, not yet referenced entity
+     * @param dto    the DTO carrying {@code componentTypeId}
+     * @return the saved model
+     */
     @Transactional
-    public ComponentModel create(ComponentModel entity) {
-        // TODO: implement validation
+    public ComponentModel createFromDto(ComponentModel entity, ComponentModelTo dto) {
+        if (dto.getComponentTypeId() == null) {
+            throw new IllegalRequestDataException("componentTypeId is required");
+        }
+        entity.setComponentType(getComponentType(dto.getComponentTypeId()));
         return repository.save(entity);
     }
 
+    /**
+     * @deprecated cannot resolve {@code componentTypeId}; use {@link #createFromDto}.
+     * Kept only to satisfy {@code CrudService}.
+     */
     @Override
-    @Transactional
+    @Deprecated
+    public ComponentModel create(ComponentModel entity) {
+        throw new UnsupportedOperationException("Use createFromDto(entity, dto)");
+    }
+
+    /**
+     * @deprecated saving the detached entity built by the mapper merges nulls over the component
+     * type link; use {@link #updateWithPolicyValidation}. Kept only to satisfy {@code CrudService}.
+     */
+    @Override
+    @Deprecated
     public ComponentModel update(UUID id, ComponentModel entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use updateWithPolicyValidation(...)");
+    }
+
+    private ComponentTypeEntity getComponentType(UUID componentTypeId) {
+        return componentTypeRepository.findById(componentTypeId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Component type with id=" + componentTypeId + " not found"));
     }
 
     @Override

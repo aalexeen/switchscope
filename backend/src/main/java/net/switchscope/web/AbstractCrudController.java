@@ -1,12 +1,13 @@
 package net.switchscope.web;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.BaseMapper;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.BaseTo;
 
 import java.util.List;
@@ -17,6 +18,11 @@ import java.util.UUID;
  * Provides standard REST endpoints for entities.
  * Uses DTOs for API contract while working with Entities internally.
  * Transaction management is delegated to service layer.
+ * <p>
+ * Writes go through {@link DtoCrudService}, which resolves the DTO's foreign-key ids and applies
+ * updates onto the stored entity. The controller must not build an entity with the mapper and hand
+ * it to the service: the mapper ignores associations, so saving that detached instance would null
+ * the corresponding columns.
  *
  * @param <E> the entity type
  * @param <T> the DTO (Transfer Object) type
@@ -24,7 +30,7 @@ import java.util.UUID;
 @Slf4j
 public abstract class AbstractCrudController<E, T extends BaseTo> {
 
-    protected abstract CrudService<E> getService();
+    protected abstract DtoCrudService<E, T> getService();
 
     protected abstract BaseMapper<E, T> getMapper();
 
@@ -46,19 +52,15 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public T create(@RequestBody T dto) {
+    public T create(@Valid @RequestBody T dto) {
         log.info("create {} {}", getEntityName(), dto);
-        E entity = getMapper().toEntity(dto);
-        E created = getService().create(entity);
-        return getMapper().toTo(created);
+        return getService().createFromDto(dto);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public T update(@PathVariable UUID id, @RequestBody T dto) {
         log.info("update {} {} with id={}", getEntityName(), dto, id);
-        E entity = getMapper().toEntity(dto);
-        E updated = getService().update(id, entity);
-        return getMapper().toTo(updated);
+        return getService().updateFromDto(id, dto);
     }
 
     @DeleteMapping("/{id}")
@@ -68,4 +70,3 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
         getService().delete(id);
     }
 }
-

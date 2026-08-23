@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.housing.RackMapper;
 import net.switchscope.model.component.housing.Rack;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.housing.RackService;
 import net.switchscope.to.component.housing.RackTo;
 import net.switchscope.web.AbstractCrudController;
@@ -36,7 +36,7 @@ public class RackController extends AbstractCrudController<Rack, RackTo> {
     private final RackMapper mapper;
 
     @Override
-    protected CrudService<Rack> getService() {
+    protected DtoCrudService<Rack, RackTo> getService() {
         return service;
     }
 
@@ -70,26 +70,5 @@ public class RackController extends AbstractCrudController<Rack, RackTo> {
         return service.getByIdAsDto(id);
     }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public RackTo create(@RequestBody RackTo dto) {
-        log.info("create {} {}", getEntityName(), dto);
-        Rack entity = mapper.toEntity(dto);
-        return service.createAndReturnDto(entity);
-    }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public RackTo update(@PathVariable UUID id, @RequestBody RackTo dto) {
-        log.info("update {} {} with id={}", getEntityName(), dto, id);
-        Rack entity = mapper.toEntity(dto);
-        return service.updateAndReturnDto(id, entity);
-    }
 }

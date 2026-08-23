@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.installation.InstallationMapper;
 import net.switchscope.model.installation.Installation;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.installation.InstallationService;
 import net.switchscope.to.installation.InstallationTo;
 import net.switchscope.web.AbstractCrudController;
@@ -24,7 +24,7 @@ public class InstallationController extends AbstractCrudController<Installation,
     private final InstallationMapper mapper;
 
     @Override
-    protected CrudService<Installation> getService() {
+    protected DtoCrudService<Installation, InstallationTo> getService() {
         return service;
     }
 

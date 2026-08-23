@@ -1,5 +1,7 @@
 package net.switchscope.to.port;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
@@ -17,8 +19,21 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Base DTO for Port entity
+ * Base DTO for Port entity.
+ * <p>
+ * Polymorphic over the existing {@code portType} property, whose values mirror the JPA
+ * {@code @DiscriminatorValue} of {@link net.switchscope.model.port.EthernetPort} and
+ * {@link net.switchscope.model.port.FiberPort}.
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "portType",
+        visible = true)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = EthernetPortTo.class, name = "ETHERNET"),
+        @JsonSubTypes.Type(value = FiberPortTo.class, name = "FIBER")
+})
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor

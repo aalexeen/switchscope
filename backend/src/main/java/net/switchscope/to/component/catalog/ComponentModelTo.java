@@ -1,5 +1,14 @@
 package net.switchscope.to.component.catalog;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import net.switchscope.to.component.catalog.connectivity.CableRunModelTo;
+import net.switchscope.to.component.catalog.connectivity.ConnectorModelTo;
+import net.switchscope.to.component.catalog.connectivity.PatchPanelModelTo;
+import net.switchscope.to.component.catalog.device.AccessPointModelTo;
+import net.switchscope.to.component.catalog.device.RouterModelTo;
+import net.switchscope.to.component.catalog.device.SwitchModelTo;
+import net.switchscope.to.component.catalog.housing.RackModelTo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -20,6 +29,20 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "discriminatorType",
+        visible = true)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = SwitchModelTo.class, name = "SWITCH_MODEL"),
+        @JsonSubTypes.Type(value = RouterModelTo.class, name = "ROUTER_MODEL"),
+        @JsonSubTypes.Type(value = AccessPointModelTo.class, name = "ACCESS_POINT_MODEL"),
+        @JsonSubTypes.Type(value = PatchPanelModelTo.class, name = "PATCH_PANEL_MODEL"),
+        @JsonSubTypes.Type(value = RackModelTo.class, name = "RACK_MODEL"),
+        @JsonSubTypes.Type(value = ConnectorModelTo.class, name = "CONNECTOR_MODEL"),
+        @JsonSubTypes.Type(value = CableRunModelTo.class, name = "CABLE_RUN_MODEL")
+})
 public abstract class ComponentModelTo extends NamedTo {
 
     // Basic model identification

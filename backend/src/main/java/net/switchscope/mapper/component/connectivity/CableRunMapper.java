@@ -53,10 +53,12 @@ public interface CableRunMapper extends ComponentMapper<CableRun, CableRunTo> {
     @Mapping(target = "multiPoint", expression = "java(entity.isMultiPoint())")
     @Mapping(target = "orderedLocationPath", expression = "java(entity.getOrderedLocationPath())")
     @Mapping(target = "connectorCount", expression = "java(entity.getConnectors() != null ? entity.getConnectors().size() : 0)")
+    @Mapping(target = "componentClass", expression = "java(entity.getDiscriminatorValue())")
     @Override
     CableRunTo toTo(CableRun entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentStatus", ignore = true)
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "componentNature", ignore = true)

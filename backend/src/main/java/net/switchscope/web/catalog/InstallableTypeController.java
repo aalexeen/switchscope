@@ -1,5 +1,6 @@
 package net.switchscope.web.catalog;
 
+import jakarta.validation.Valid;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class InstallableTypeController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public InstallableTypeTo create(@RequestBody InstallableTypeTo dto) {
+    public InstallableTypeTo create(@Valid @RequestBody InstallableTypeTo dto) {
         log.info("create installable type {}", dto);
         InstallableTypeEntity entity = mapper.toEntity(dto);
         InstallableTypeEntity created = service.create(entity);

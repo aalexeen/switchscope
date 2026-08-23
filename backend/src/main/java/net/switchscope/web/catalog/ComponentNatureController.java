@@ -1,5 +1,6 @@
 package net.switchscope.web.catalog;
 
+import jakarta.validation.Valid;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class ComponentNatureController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public ComponentNatureTo create(@RequestBody ComponentNatureTo dto) {
+    public ComponentNatureTo create(@Valid @RequestBody ComponentNatureTo dto) {
         log.info("create component nature {}", dto);
         ComponentNatureEntity entity = mapper.toEntity(dto);
         ComponentNatureEntity created = service.create(entity);

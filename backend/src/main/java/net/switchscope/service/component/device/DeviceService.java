@@ -45,19 +45,24 @@ public class DeviceService implements CrudService<Device> {
         return device;
     }
 
+    /**
+     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use ComponentService.createFromDto(dto).
+     * Kept only to satisfy {@code CrudService}.
+     */
     @Override
-    @Transactional
+    @Deprecated
     public Device create(Device entity) {
-        // TODO: implement validation
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use ComponentService.createFromDto(dto)");
     }
 
+    /**
+     * @deprecated saving the detached entity built by the mapper merges nulls over every
+     * association the mapper ignores; use ComponentService.updateFromDto(id, dto). Kept only to satisfy {@code CrudService}.
+     */
     @Override
-    @Transactional
+    @Deprecated
     public Device update(UUID id, Device entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use ComponentService.updateFromDto(id, dto)");
     }
 
     @Override

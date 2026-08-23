@@ -19,6 +19,7 @@ public interface ComponentStatusMapper extends BaseMapper<ComponentStatusEntity,
     @Override
     ComponentStatusTo toTo(ComponentStatusEntity entity);
 
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "nextPossibleStatusCodes", ignore = true)
     @Mapping(target = "properties", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

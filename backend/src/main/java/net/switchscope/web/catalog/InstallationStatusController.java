@@ -1,5 +1,6 @@
 package net.switchscope.web.catalog;
 
+import jakarta.validation.Valid;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class InstallationStatusController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public InstallationStatusTo create(@RequestBody InstallationStatusTo dto) {
+    public InstallationStatusTo create(@Valid @RequestBody InstallationStatusTo dto) {
         log.info("create installation status {}", dto);
         InstallationStatusEntity entity = mapper.toEntity(dto);
         InstallationStatusEntity created = service.create(entity);

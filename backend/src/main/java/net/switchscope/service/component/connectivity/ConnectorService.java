@@ -8,7 +8,11 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.component.connectivity.ConnectorMapper;
 import net.switchscope.model.component.connectivity.Connector;
 import net.switchscope.repository.component.connectivity.ConnectivityRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.model.component.catalog.connectiviy.ConnectorModel;
+import net.switchscope.model.component.connectivity.CableRun;
+import net.switchscope.repository.port.PortRepository;
+import net.switchscope.service.component.ComponentReferenceResolver;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.connectivity.ConnectorTo;
 
 import java.util.List;
@@ -17,10 +21,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ConnectorService implements CrudService<Connector> {
+public class ConnectorService implements DtoCrudService<Connector, ConnectorTo> {
 
     private final ConnectivityRepository repository;
     private final ConnectorMapper mapper;
+    private final ComponentReferenceResolver resolver;
+    private final PortRepository portRepository;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -62,46 +68,63 @@ public class ConnectorService implements CrudService<Connector> {
         return mapper.toTo(connector);
     }
 
-    /**
-     * Create connector and return as DTO within transaction.
-     *
-     * @param entity connector entity to create
-     * @return created connector as DTO
-     */
-    @Transactional
-    public ConnectorTo createAndReturnDto(Connector entity) {
-        Connector saved = repository.save(entity);
-        return mapper.toTo(saved);
-    }
+
 
     /**
-     * Update connector and return as DTO within transaction.
-     *
-     * @param id connector ID
-     * @param entity connector entity with updates
-     * @return updated connector as DTO
+     * Create a connector from its DTO, resolving foreign-key ids into managed references first.
+     * Mapping back happens inside the transaction so lazy associations are still reachable.
      */
-    @Transactional
-    public ConnectorTo updateAndReturnDto(UUID id, Connector entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        Connector saved = repository.save(entity);
-        return mapper.toTo(saved);
-    }
-
     @Override
     @Transactional
+    public ConnectorTo createFromDto(ConnectorTo dto) {
+        Connector entity = mapper.toEntity(dto);
+        applyReferences(entity, dto);
+        return mapper.toTo(repository.save(entity));
+    }
+
+    /**
+     * Apply the DTO onto the stored connector.
+     * The entity is loaded first: merging the detached instance produced by the mapper would null
+     * every association the mapper ignores, starting with the NOT NULL component type and status.
+     */
+    @Override
+    @Transactional
+    public ConnectorTo updateFromDto(UUID id, ConnectorTo dto) {
+        Connector existing = getById(id);
+        mapper.updateFromTo(existing, dto);
+        applyReferences(existing, dto);
+        return mapper.toTo(repository.save(existing));
+    }
+
+    private void applyReferences(Connector entity, ConnectorTo dto) {
+        resolver.applyCommonReferences(entity, dto);
+        resolver.applyModelReference(dto.getConnectorModelId(), ConnectorModel.class,
+                entity::setConnectorModel, "connectorModelId");
+        resolver.applyComponentReference(dto.getCableRunId(), CableRun.class,
+                entity::setCableRun, "cableRunId");
+        resolver.applyReference(dto.getPortId(), portRepository::findById,
+                entity::setPort, "portId");
+    }
+
+    /**
+     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
+     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
+     */
+    @Override
+    @Deprecated
     public Connector create(Connector entity) {
-        // TODO: implement validation
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use createFromDto(dto)");
     }
 
+    /**
+     * @deprecated saving the detached entity built by the mapper merges nulls over every
+     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
+     * {@code CrudService}.
+     */
     @Override
-    @Transactional
+    @Deprecated
     public Connector update(UUID id, Connector entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

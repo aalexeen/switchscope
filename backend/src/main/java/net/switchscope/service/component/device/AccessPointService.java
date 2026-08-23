@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.component.device.AccessPointMapper;
 import net.switchscope.model.component.device.AccessPoint;
 import net.switchscope.repository.component.device.DeviceRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.component.ComponentReferenceResolver;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.device.AccessPointTo;
 
 import java.util.List;
@@ -17,10 +18,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AccessPointService implements CrudService<AccessPoint> {
+public class AccessPointService implements DtoCrudService<AccessPoint, AccessPointTo> {
 
     private final DeviceRepository repository;
     private final AccessPointMapper mapper;
+    private final ComponentReferenceResolver resolver;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -66,46 +68,57 @@ public class AccessPointService implements CrudService<AccessPoint> {
         return mapper.toTo(ap);
     }
 
-    /**
-     * Create access point and return as DTO within transaction.
-     *
-     * @param entity access point entity to create
-     * @return created access point as DTO
-     */
-    @Transactional
-    public AccessPointTo createAndReturnDto(AccessPoint entity) {
-        AccessPoint saved = repository.save(entity);
-        return mapper.toTo(saved);
-    }
+
 
     /**
-     * Update access point and return as DTO within transaction.
-     *
-     * @param id access point ID
-     * @param entity access point entity with updates
-     * @return updated access point as DTO
+     * Create a access point from its DTO, resolving foreign-key ids into managed references first.
+     * Mapping back happens inside the transaction so lazy associations are still reachable.
      */
-    @Transactional
-    public AccessPointTo updateAndReturnDto(UUID id, AccessPoint entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        AccessPoint saved = repository.save(entity);
-        return mapper.toTo(saved);
-    }
-
     @Override
     @Transactional
+    public AccessPointTo createFromDto(AccessPointTo dto) {
+        AccessPoint entity = mapper.toEntity(dto);
+        applyReferences(entity, dto);
+        return mapper.toTo(repository.save(entity));
+    }
+
+    /**
+     * Apply the DTO onto the stored access point.
+     * The entity is loaded first: merging the detached instance produced by the mapper would null
+     * every association the mapper ignores, starting with the NOT NULL component type and status.
+     */
+    @Override
+    @Transactional
+    public AccessPointTo updateFromDto(UUID id, AccessPointTo dto) {
+        AccessPoint existing = getById(id);
+        mapper.updateFromTo(existing, dto);
+        applyReferences(existing, dto);
+        return mapper.toTo(repository.save(existing));
+    }
+
+    private void applyReferences(AccessPoint entity, AccessPointTo dto) {
+        resolver.applyCommonReferences(entity, dto);
+    }
+
+    /**
+     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
+     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
+     */
+    @Override
+    @Deprecated
     public AccessPoint create(AccessPoint entity) {
-        // TODO: implement validation
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use createFromDto(dto)");
     }
 
+    /**
+     * @deprecated saving the detached entity built by the mapper merges nulls over every
+     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
+     * {@code CrudService}.
+     */
     @Override
-    @Transactional
+    @Deprecated
     public AccessPoint update(UUID id, AccessPoint entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

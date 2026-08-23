@@ -58,6 +58,7 @@ public interface InstallationMapper extends BaseMapper<Installation, Installatio
     @Mapping(target = "component", ignore = true) // Set via service
     @Mapping(target = "installedItemType", ignore = true) // Set via service
     @Mapping(target = "status", ignore = true) // Set via service
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "lastStatusChange", ignore = true)
     @Mapping(target = "statusChangedBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

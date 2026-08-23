@@ -4,11 +4,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.error.NotFoundException;
 import net.switchscope.mapper.location.LocationMapper;
 import net.switchscope.model.location.Location;
+import net.switchscope.model.location.catalog.LocationTypeEntity;
 import net.switchscope.repository.location.LocationRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.repository.location.LocationTypeRepository;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.location.LocationTo;
 
 import java.util.List;
@@ -17,9 +20,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class LocationService implements CrudService<Location> {
+public class LocationService implements DtoCrudService<Location, LocationTo> {
 
     private final LocationRepository repository;
+    private final LocationTypeRepository locationTypeRepository;
     private final LocationMapper mapper;
 
     @Override
@@ -57,45 +61,90 @@ public class LocationService implements CrudService<Location> {
     }
 
     /**
-     * Create location and return as DTO within transaction.
+     * Create a location from its DTO and return the result as a DTO, all within one transaction.
+     * <p>
+     * The mapper deliberately ignores {@code type} and {@code parentLocation} (they are ids in the
+     * DTO, entities in the model), so this method resolves them before saving - otherwise
+     * {@code location_type_id} would be null and the insert would violate its NOT NULL constraint.
      *
-     * @param entity location entity to create
+     * @param dto location to create
      * @return created location as DTO
      */
+    @Override
     @Transactional
-    public LocationTo createAndReturnDto(Location entity) {
-        Location saved = repository.save(entity);
-        return mapper.toTo(saved);
+    public LocationTo createFromDto(LocationTo dto) {
+        Location entity = mapper.toEntity(dto);
+        applyReferences(entity, dto);
+        return mapper.toTo(repository.save(entity));
     }
 
     /**
-     * Update location and return as DTO within transaction.
+     * Update a location from its DTO and return the result as a DTO, all within one transaction.
+     * <p>
+     * Loads the managed entity first and applies the DTO onto it, so that associations and fields
+     * the DTO does not carry are preserved. Merging a detached instance built by the mapper would
+     * wipe them.
      *
-     * @param id location ID
-     * @param entity location entity with updates
+     * @param id  location ID
+     * @param dto location values to apply
      * @return updated location as DTO
      */
-    @Transactional
-    public LocationTo updateAndReturnDto(UUID id, Location entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        Location saved = repository.save(entity);
-        return mapper.toTo(saved);
-    }
-
     @Override
     @Transactional
+    public LocationTo updateFromDto(UUID id, LocationTo dto) {
+        Location existing = repository.findByIdWithAllRelationships(id)
+                .orElseThrow(() -> new NotFoundException("Location with id=" + id + " not found"));
+        mapper.updateFromTo(existing, dto);
+        applyReferences(existing, dto);
+        return mapper.toTo(repository.save(existing));
+    }
+
+    /**
+     * Resolves the DTO's foreign-key ids into entity references.
+     * {@code typeId} is mandatory on create and, when present, replaces the current type on update;
+     * {@code parentLocationId} is optional and only applied when the DTO carries it.
+     */
+    private void applyReferences(Location entity, LocationTo dto) {
+        if (dto.getTypeId() != null) {
+            entity.setType(getLocationType(dto.getTypeId()));
+        } else if (entity.getType() == null) {
+            throw new IllegalRequestDataException("typeId is required to create a location");
+        }
+
+        if (dto.getParentLocationId() != null) {
+            if (dto.getParentLocationId().equals(entity.getId())) {
+                throw new IllegalRequestDataException("Location cannot be its own parent");
+            }
+            entity.setParentLocation(repository.findById(dto.getParentLocationId())
+                    .orElseThrow(() -> new NotFoundException(
+                            "Parent location with id=" + dto.getParentLocationId() + " not found")));
+        }
+    }
+
+    private LocationTypeEntity getLocationType(UUID typeId) {
+        return locationTypeRepository.findById(typeId)
+                .orElseThrow(() -> new NotFoundException("Location type with id=" + typeId + " not found"));
+    }
+
+    /**
+     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
+     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
+     */
+    @Override
+    @Deprecated
     public Location create(Location entity) {
-        // TODO: implement validation
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use createFromDto(dto)");
     }
 
+    /**
+     * @deprecated saving the detached entity built by the mapper merges nulls over every
+     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
+     * {@code CrudService}.
+     */
     @Override
-    @Transactional
+    @Deprecated
     public Location update(UUID id, Location entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

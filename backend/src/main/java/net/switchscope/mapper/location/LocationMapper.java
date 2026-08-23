@@ -53,6 +53,7 @@ public interface LocationMapper extends BaseMapper<Location, LocationTo> {
     // TO -> Entity (create)
     @Mapping(target = "type", ignore = true) // Set via service
     @Mapping(target = "parentLocation", ignore = true) // Set via service
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "childLocations", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

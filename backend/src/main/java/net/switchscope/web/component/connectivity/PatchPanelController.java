@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.connectivity.PatchPanelMapper;
 import net.switchscope.model.component.connectivity.PatchPanel;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.connectivity.PatchPanelService;
 import net.switchscope.to.component.connectivity.PatchPanelTo;
 import net.switchscope.web.AbstractCrudController;
@@ -36,7 +36,7 @@ public class PatchPanelController extends AbstractCrudController<PatchPanel, Pat
     private final PatchPanelMapper mapper;
 
     @Override
-    protected CrudService<PatchPanel> getService() {
+    protected DtoCrudService<PatchPanel, PatchPanelTo> getService() {
         return service;
     }
 
@@ -70,26 +70,5 @@ public class PatchPanelController extends AbstractCrudController<PatchPanel, Pat
         return service.getByIdAsDto(id);
     }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public PatchPanelTo create(@RequestBody PatchPanelTo dto) {
-        log.info("create {} {}", getEntityName(), dto);
-        PatchPanel entity = mapper.toEntity(dto);
-        return service.createAndReturnDto(entity);
-    }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public PatchPanelTo update(@PathVariable UUID id, @RequestBody PatchPanelTo dto) {
-        log.info("update {} {} with id={}", getEntityName(), dto, id);
-        PatchPanel entity = mapper.toEntity(dto);
-        return service.updateAndReturnDto(id, entity);
-    }
 }

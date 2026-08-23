@@ -1,5 +1,6 @@
 package net.switchscope.web.catalog;
 
+import jakarta.validation.Valid;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class LocationTypeController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public LocationTypeTo create(@RequestBody LocationTypeTo dto) {
+    public LocationTypeTo create(@Valid @RequestBody LocationTypeTo dto) {
         log.info("create location type {}", dto);
         LocationTypeEntity entity = mapper.toEntity(dto);
         return service.createAndReturnDto(entity);

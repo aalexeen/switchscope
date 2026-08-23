@@ -33,10 +33,12 @@ public interface RouterModelMapper extends DeviceModelMapper<RouterModel, Router
     @Mapping(target = "hasAdvancedRouting", expression = "java(entity.hasAdvancedRouting())")
     @Mapping(target = "hasVpnCapability", expression = "java(entity.hasVpnCapability())")
     @Mapping(target = "powerEfficiency", expression = "java(entity.getPowerEfficiency())")
+    @Mapping(target = "discriminatorType", expression = "java(entity.getDiscriminatorValue())")
     @Override
     RouterModelTo toTo(RouterModel entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

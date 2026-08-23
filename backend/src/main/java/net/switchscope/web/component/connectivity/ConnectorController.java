@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.connectivity.ConnectorMapper;
 import net.switchscope.model.component.connectivity.Connector;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.connectivity.ConnectorService;
 import net.switchscope.to.component.connectivity.ConnectorTo;
 import net.switchscope.web.AbstractCrudController;
@@ -36,7 +36,7 @@ public class ConnectorController extends AbstractCrudController<Connector, Conne
     private final ConnectorMapper mapper;
 
     @Override
-    protected CrudService<Connector> getService() {
+    protected DtoCrudService<Connector, ConnectorTo> getService() {
         return service;
     }
 
@@ -70,26 +70,5 @@ public class ConnectorController extends AbstractCrudController<Connector, Conne
         return service.getByIdAsDto(id);
     }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ConnectorTo create(@RequestBody ConnectorTo dto) {
-        log.info("create {} {}", getEntityName(), dto);
-        Connector entity = mapper.toEntity(dto);
-        return service.createAndReturnDto(entity);
-    }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ConnectorTo update(@PathVariable UUID id, @RequestBody ConnectorTo dto) {
-        log.info("update {} {} with id={}", getEntityName(), dto, id);
-        Connector entity = mapper.toEntity(dto);
-        return service.updateAndReturnDto(id, entity);
-    }
 }

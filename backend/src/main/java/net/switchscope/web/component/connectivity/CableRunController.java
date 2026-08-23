@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.connectivity.CableRunMapper;
 import net.switchscope.model.component.connectivity.CableRun;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.connectivity.CableRunService;
 import net.switchscope.to.component.connectivity.CableRunTo;
 import net.switchscope.web.AbstractCrudController;
@@ -36,7 +36,7 @@ public class CableRunController extends AbstractCrudController<CableRun, CableRu
     private final CableRunMapper mapper;
 
     @Override
-    protected CrudService<CableRun> getService() {
+    protected DtoCrudService<CableRun, CableRunTo> getService() {
         return service;
     }
 
@@ -70,26 +70,5 @@ public class CableRunController extends AbstractCrudController<CableRun, CableRu
         return service.getByIdAsDto(id);
     }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public CableRunTo create(@RequestBody CableRunTo dto) {
-        log.info("create {} {}", getEntityName(), dto);
-        CableRun entity = mapper.toEntity(dto);
-        return service.createAndReturnDto(entity);
-    }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public CableRunTo update(@PathVariable UUID id, @RequestBody CableRunTo dto) {
-        log.info("update {} {} with id={}", getEntityName(), dto, id);
-        CableRun entity = mapper.toEntity(dto);
-        return service.updateAndReturnDto(id, entity);
-    }
 }

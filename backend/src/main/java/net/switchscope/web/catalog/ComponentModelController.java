@@ -2,6 +2,9 @@ package net.switchscope.web.catalog;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import net.switchscope.error.IllegalRequestDataException;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -75,10 +78,11 @@ public class ComponentModelController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ComponentModelTo create(@RequestBody ComponentModelTo to) {
+    public ComponentModelTo create(@Valid @RequestBody ComponentModelTo to) {
         log.info("create component model {}", to);
         ComponentModel entity = mapToEntity(to);
-        return mapToDto(service.create(entity));
+        // componentTypeId is a NOT NULL FK the mapper ignores; the service resolves it before saving
+        return mapToDto(service.createFromDto(entity, to));
     }
 
     /**
@@ -97,8 +101,14 @@ public class ComponentModelController {
         Class<? extends ComponentModelTo> dtoClass = getDtoClassForEntity(existing);
         log.debug("Entity type: {}, DTO class: {}", existing.getClass().getSimpleName(), dtoClass.getSimpleName());
 
-        // 2. Deserialize JSON to concrete DTO type
-        ComponentModelTo dto = objectMapper.readValue(jsonPayload, dtoClass);
+        // 2. Deserialize JSON to concrete DTO type, pinning the discriminator to the stored type
+        //    so a client cannot switch the model class and payloads may omit discriminatorType
+        JsonNode root = objectMapper.readTree(jsonPayload);
+        if (!(root instanceof ObjectNode objectNode)) {
+            throw new IllegalRequestDataException("Request body must be a JSON object");
+        }
+        objectNode.put("discriminatorType", existing.getDiscriminatorValue());
+        ComponentModelTo dto = objectMapper.treeToValue(objectNode, dtoClass);
 
         // 3. Extract present fields for policy validation
         Map<String, JsonNode> presentFields = extractPresentFields(jsonPayload);

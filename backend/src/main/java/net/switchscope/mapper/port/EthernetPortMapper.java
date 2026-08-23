@@ -45,6 +45,7 @@ public interface EthernetPortMapper extends PortMapper<EthernetPort, EthernetPor
     EthernetPortTo toTo(EthernetPort entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "device", ignore = true)
     @Mapping(target = "connector", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

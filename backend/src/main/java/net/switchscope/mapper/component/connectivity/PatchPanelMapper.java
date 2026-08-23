@@ -45,10 +45,12 @@ public interface PatchPanelMapper extends ComponentMapper<PatchPanel, PatchPanel
     @Mapping(target = "highDensity", expression = "java(entity.isHighDensity())")
     @Mapping(target = "portDensityInfo", expression = "java(entity.getPortDensityInfo())")
     @Mapping(target = "cableRunCount", expression = "java(entity.getCableRuns() != null ? entity.getCableRuns().size() : 0)")
+    @Mapping(target = "componentClass", expression = "java(entity.getDiscriminatorValue())")
     @Override
     PatchPanelTo toTo(PatchPanel entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentStatus", ignore = true)
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "componentNature", ignore = true)

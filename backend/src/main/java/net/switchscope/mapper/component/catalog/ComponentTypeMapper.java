@@ -30,6 +30,7 @@ public interface ComponentTypeMapper extends BaseMapper<ComponentTypeEntity, Com
     @Override
     ComponentTypeTo toTo(ComponentTypeEntity entity);
 
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "properties", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

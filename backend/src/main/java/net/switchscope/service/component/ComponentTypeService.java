@@ -1,6 +1,7 @@
 package net.switchscope.service.component;
 
 import lombok.RequiredArgsConstructor;
+import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.error.NotFoundException;
 import net.switchscope.mapper.component.catalog.ComponentTypeMapper;
 import net.switchscope.model.component.ComponentCategoryEntity;
@@ -40,11 +41,34 @@ public class ComponentTypeService implements UpdatableCrudService<ComponentTypeE
                 .orElseThrow(() -> new NotFoundException("Component type with id=" + id + " not found"));
     }
 
-    @Override
+    /**
+     * Persist a component type whose {@code category} has been resolved from the DTO.
+     * {@code category_id} is NOT NULL and the mapper ignores the association, so the caller must go
+     * through here rather than saving the mapped entity directly.
+     *
+     * @param entity the mapped, not yet referenced entity
+     * @param dto    the DTO carrying {@code categoryId}
+     * @return the saved component type
+     */
     @Transactional
-    public ComponentTypeEntity create(ComponentTypeEntity entity) {
-        // TODO: implement validation
+    public ComponentTypeEntity createFromDto(ComponentTypeEntity entity, ComponentTypeTo dto) {
+        if (dto.getCategoryId() == null) {
+            throw new IllegalRequestDataException("categoryId is required");
+        }
+        entity.setCategory(categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new NotFoundException(
+                        "Component category with id=" + dto.getCategoryId() + " not found")));
         return repository.save(entity);
+    }
+
+    /**
+     * @deprecated cannot resolve {@code categoryId}; use {@link #createFromDto}.
+     * Kept only to satisfy {@code CrudService}.
+     */
+    @Override
+    @Deprecated
+    public ComponentTypeEntity create(ComponentTypeEntity entity) {
+        throw new UnsupportedOperationException("Use createFromDto(entity, dto)");
     }
 
     /**
@@ -107,7 +131,7 @@ public class ComponentTypeService implements UpdatableCrudService<ComponentTypeE
 
         // 2. Handle category change (FK relation not handled by mapper)
         if (dto.getCategoryId() != null &&
-                !Objects.equals(dto.getCategoryId(), existing.getCategory().getId())) {
+                (existing.getCategory() == null || !Objects.equals(dto.getCategoryId(), existing.getCategory().getId()))) {
             ComponentCategoryEntity newCategory = categoryRepository.findById(dto.getCategoryId())
                     .orElseThrow(() -> new NotFoundException("Component category with id=" + dto.getCategoryId() + " not found"));
             existing.setCategory(newCategory);

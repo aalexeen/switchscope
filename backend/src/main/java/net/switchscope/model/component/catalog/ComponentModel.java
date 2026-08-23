@@ -242,6 +242,16 @@ public abstract class ComponentModel extends NamedEntity {
                (discontinueDate != null && discontinueDate.isBefore(LocalDateTime.now()));
     }
 
+    /**
+     * The JPA discriminator of this concrete model class, used as the polymorphic type id of
+     * {@code ComponentModelTo}.
+     */
+    @Transient
+    public String getDiscriminatorValue() {
+        DiscriminatorValue discriminator = this.getClass().getAnnotation(DiscriminatorValue.class);
+        return discriminator != null ? discriminator.value() : this.getClass().getSimpleName();
+    }
+
     public String getModelDesignation() {
         return manufacturer + " " + modelNumber;
     }

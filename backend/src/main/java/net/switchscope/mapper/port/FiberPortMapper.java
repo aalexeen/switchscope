@@ -47,6 +47,7 @@ public interface FiberPortMapper extends PortMapper<FiberPort, FiberPortTo> {
     FiberPortTo toTo(FiberPort entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "device", ignore = true)
     @Mapping(target = "connector", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

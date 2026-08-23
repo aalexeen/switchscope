@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.location.LocationMapper;
 import net.switchscope.model.location.Location;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.location.LocationService;
 import net.switchscope.to.location.LocationTo;
 import net.switchscope.web.AbstractCrudController;
@@ -36,7 +36,7 @@ public class LocationController extends AbstractCrudController<Location, Locatio
     private final LocationMapper mapper;
 
     @Override
-    protected CrudService<Location> getService() {
+    protected DtoCrudService<Location, LocationTo> getService() {
         return service;
     }
 
@@ -70,26 +70,5 @@ public class LocationController extends AbstractCrudController<Location, Locatio
         return service.getByIdAsDto(id);
     }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public LocationTo create(@RequestBody LocationTo dto) {
-        log.info("create {} {}", getEntityName(), dto);
-        Location entity = mapper.toEntity(dto);
-        return service.createAndReturnDto(entity);
-    }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public LocationTo update(@PathVariable UUID id, @RequestBody LocationTo dto) {
-        log.info("update {} {} with id={}", getEntityName(), dto, id);
-        Location entity = mapper.toEntity(dto);
-        return service.updateAndReturnDto(id, entity);
-    }
 }

@@ -9,6 +9,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(config = MapStructConfig.class)
 public interface UserMapper extends BaseMapper<User, UserTo> {
 
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "email", expression = "java(to.getEmail().toLowerCase())")
     @Mapping(target = "roles", expression = "java({Role.USER})")
     @Override

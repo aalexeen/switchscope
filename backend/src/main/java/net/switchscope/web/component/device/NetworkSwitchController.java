@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.device.NetworkSwitchMapper;
 import net.switchscope.model.component.device.NetworkSwitch;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.device.NetworkSwitchService;
 import net.switchscope.to.component.device.NetworkSwitchTo;
 import net.switchscope.web.AbstractCrudController;
@@ -36,7 +36,7 @@ public class NetworkSwitchController extends AbstractCrudController<NetworkSwitc
     private final NetworkSwitchMapper mapper;
 
     @Override
-    protected CrudService<NetworkSwitch> getService() {
+    protected DtoCrudService<NetworkSwitch, NetworkSwitchTo> getService() {
         return service;
     }
 
@@ -70,26 +70,5 @@ public class NetworkSwitchController extends AbstractCrudController<NetworkSwitc
         return service.getByIdAsDto(id);
     }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public NetworkSwitchTo create(@RequestBody NetworkSwitchTo dto) {
-        log.info("create {} {}", getEntityName(), dto);
-        NetworkSwitch entity = mapper.toEntity(dto);
-        return service.createAndReturnDto(entity);
-    }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public NetworkSwitchTo update(@PathVariable UUID id, @RequestBody NetworkSwitchTo dto) {
-        log.info("update {} {} with id={}", getEntityName(), dto, id);
-        NetworkSwitch entity = mapper.toEntity(dto);
-        return service.updateAndReturnDto(id, entity);
-    }
 }

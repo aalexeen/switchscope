@@ -42,10 +42,12 @@ public interface NetworkSwitchMapper extends DeviceMapper<NetworkSwitch, Network
     @Mapping(target = "stackable", expression = "java(entity.isStackable())")
     @Mapping(target = "inStack", expression = "java(entity.isInStack())")
     @Mapping(target = "stackMaster", expression = "java(entity.isStackMaster())")
+    @Mapping(target = "componentClass", expression = "java(entity.getDiscriminatorValue())")
     @Override
     NetworkSwitchTo toTo(NetworkSwitch entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentStatus", ignore = true)
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "componentNature", ignore = true)

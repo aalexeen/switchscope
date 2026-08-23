@@ -37,10 +37,12 @@ public interface RouterMapper extends DeviceMapper<Router, RouterTo> {
     // Router-specific mappings
     @Mapping(target = "enterpriseRouter", expression = "java(entity.isEnterpriseRouter())")
     @Mapping(target = "vpnCapability", expression = "java(entity.hasVpnCapability())")
+    @Mapping(target = "componentClass", expression = "java(entity.getDiscriminatorValue())")
     @Override
     RouterTo toTo(Router entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentStatus", ignore = true)
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "componentNature", ignore = true)

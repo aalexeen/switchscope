@@ -43,10 +43,12 @@ public interface ConnectorMapper extends ComponentMapper<Connector, ConnectorTo>
     @Mapping(target = "needsRework", expression = "java(entity.needsRework())")
     @Mapping(target = "goodQuality", expression = "java(entity.isGoodQuality())")
     @Mapping(target = "connectedToPort", expression = "java(entity.getPort() != null)")
+    @Mapping(target = "componentClass", expression = "java(entity.getDiscriminatorValue())")
     @Override
     ConnectorTo toTo(Connector entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentStatus", ignore = true)
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "componentNature", ignore = true)

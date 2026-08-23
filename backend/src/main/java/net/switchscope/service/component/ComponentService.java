@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.error.NotFoundException;
 import net.switchscope.mapper.component.connectivity.CableRunMapper;
 import net.switchscope.mapper.component.connectivity.ConnectorMapper;
@@ -25,6 +26,11 @@ import net.switchscope.model.component.connectivity.PatchPanel;
 import net.switchscope.model.component.device.AccessPoint;
 import net.switchscope.model.component.device.NetworkSwitch;
 import net.switchscope.model.component.device.Router;
+import net.switchscope.model.component.catalog.connectiviy.CableRunModel;
+import net.switchscope.model.component.catalog.connectiviy.ConnectorModel;
+import net.switchscope.model.component.catalog.connectiviy.PatchPanelModel;
+import net.switchscope.model.component.catalog.device.SwitchModel;
+import net.switchscope.model.component.catalog.housing.RackModelEntity;
 import net.switchscope.model.component.housing.Rack;
 import net.switchscope.repository.component.ComponentNatureRepository;
 import net.switchscope.repository.component.ComponentRepository;
@@ -60,6 +66,7 @@ public class ComponentService implements CrudService<Component> {
     private final ComponentTypeRepository componentTypeRepository;
     private final ComponentStatusRepository componentStatusRepository;
     private final ComponentNatureRepository componentNatureRepository;
+    private final ComponentReferenceResolver referenceResolver;
     private final UpdatePolicyResolver policyResolver;
     private final UpdatePolicyValidator policyValidator;
 
@@ -110,19 +117,24 @@ public class ComponentService implements CrudService<Component> {
         return mapToDto(component);
     }
 
+    /**
+     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use createFromDto(dto).
+     * Kept only to satisfy {@code CrudService}.
+     */
     @Override
-    @Transactional
+    @Deprecated
     public Component create(Component entity) {
-        // TODO: implement validation
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use createFromDto(dto)");
     }
 
+    /**
+     * @deprecated saving the detached entity built by the mapper merges nulls over every
+     * association the mapper ignores; use updateFromDto(id, dto). Kept only to satisfy {@code CrudService}.
+     */
     @Override
-    @Transactional
+    @Deprecated
     public Component update(UUID id, Component entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
+        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override
@@ -159,7 +171,7 @@ public class ComponentService implements CrudService<Component> {
         policyValidator.validate(dtoClass, presentFields, policy);
 
         // 3. Handle FK relationship changes
-        handleFkChanges(entity, dto);
+        applyReferences(entity, dto);
 
         // 4. Apply field updates via mapper
         mapperFunction.accept(entity, dto);
@@ -192,12 +204,18 @@ public class ComponentService implements CrudService<Component> {
     }
 
     /**
-     * Create component and return as DTO within transaction.
+     * Create a component from its polymorphic DTO and return it as a DTO.
+     * <p>
+     * The concrete type comes from the DTO's runtime class, which Jackson resolves from the
+     * {@code componentClass} discriminator. Foreign keys are resolved here because the mappers
+     * ignore every association - {@code component_type_id} and {@code component_status_id} are both
+     * NOT NULL, so an unresolved entity cannot be inserted.
      */
     @Transactional
-    public ComponentTo createAndReturnDto(Component entity) {
-        Component saved = repository.save(entity);
-        return mapToDto(saved);
+    public ComponentTo createFromDto(ComponentTo dto) {
+        Component entity = mapToEntity(dto);
+        applyReferences(entity, dto);
+        return mapToDto(repository.save(entity));
     }
 
     /**
@@ -257,35 +275,91 @@ public class ComponentService implements CrudService<Component> {
     }
 
     /**
-     * Handle FK relationship changes that mappers ignore.
+     * Apply a polymorphic DTO onto the stored component and return it as a DTO.
+     * <p>
+     * The entity is loaded first, so associations the mapper ignores survive the update; merging a
+     * detached instance would null them, starting with the NOT NULL component type and status.
      */
-    private void handleFkChanges(Component entity, ComponentTo dto) {
-        // Handle componentTypeId change
-        if (dto.getComponentTypeId() != null &&
-                (entity.getComponentType() == null ||
-                 !Objects.equals(dto.getComponentTypeId(), entity.getComponentType().getId()))) {
-            ComponentTypeEntity newType = componentTypeRepository.findById(dto.getComponentTypeId())
-                    .orElseThrow(() -> new NotFoundException("Component type with id=" + dto.getComponentTypeId() + " not found"));
-            entity.setComponentType(newType);
-        }
+    @Transactional
+    public ComponentTo updateFromDto(UUID id, ComponentTo dto) {
+        Component existing = repository.findByIdWithAssociations(id)
+                .orElseThrow(() -> new NotFoundException("Component with id=" + id + " not found"));
+        initializeLazyAssociations(existing);
+        updateFromDto(existing, dto);
+        applyReferences(existing, dto);
+        return mapToDto(repository.save(existing));
+    }
 
-        // Handle componentStatusId change
-        if (dto.getComponentStatusId() != null &&
-                (entity.getComponentStatus() == null ||
-                 !Objects.equals(dto.getComponentStatusId(), entity.getComponentStatus().getId()))) {
-            ComponentStatusEntity newStatus = componentStatusRepository.findById(dto.getComponentStatusId())
-                    .orElseThrow(() -> new NotFoundException("Component status with id=" + dto.getComponentStatusId() + " not found"));
-            entity.setComponentStatus(newStatus);
+    /**
+     * Applies the DTO onto the entity with the mapper of the matching concrete type.
+     */
+    private void updateFromDto(Component component, ComponentTo dto) {
+        if (component instanceof NetworkSwitch entity && dto instanceof NetworkSwitchTo to) {
+            networkSwitchMapper.updateFromTo(entity, to);
+        } else if (component instanceof Router entity && dto instanceof RouterTo to) {
+            routerMapper.updateFromTo(entity, to);
+        } else if (component instanceof AccessPoint entity && dto instanceof AccessPointTo to) {
+            accessPointMapper.updateFromTo(entity, to);
+        } else if (component instanceof CableRun entity && dto instanceof CableRunTo to) {
+            cableRunMapper.updateFromTo(entity, to);
+        } else if (component instanceof Connector entity && dto instanceof ConnectorTo to) {
+            connectorMapper.updateFromTo(entity, to);
+        } else if (component instanceof PatchPanel entity && dto instanceof PatchPanelTo to) {
+            patchPanelMapper.updateFromTo(entity, to);
+        } else if (component instanceof Rack entity && dto instanceof RackTo to) {
+            rackMapper.updateFromTo(entity, to);
+        } else {
+            throw new IllegalRequestDataException("Component type mismatch: entity="
+                    + component.getClass().getSimpleName() + ", to=" + dto.getClass().getSimpleName());
         }
+    }
 
-        // Handle componentNatureId change (optional field, can be null)
-        if (dto.getComponentNatureId() != null) {
-            if (entity.getComponentNature() == null ||
-                    !Objects.equals(dto.getComponentNatureId(), entity.getComponentNature().getId())) {
-                ComponentNatureEntity newNature = componentNatureRepository.findById(dto.getComponentNatureId())
-                        .orElseThrow(() -> new NotFoundException("Component nature with id=" + dto.getComponentNatureId() + " not found"));
-                entity.setComponentNature(newNature);
-            }
+    /**
+     * Resolves every foreign key the mappers ignore: the ones shared by all components, plus the
+     * catalog model link of the concrete type. An id present in the DTO replaces the current
+     * reference, an absent one leaves it untouched.
+     */
+    private void applyReferences(Component entity, ComponentTo dto) {
+        referenceResolver.applyCommonReferences(entity, dto);
+
+        if (entity instanceof NetworkSwitch sw && dto instanceof NetworkSwitchTo swTo) {
+            referenceResolver.applyModelReference(swTo.getSwitchModelId(), SwitchModel.class,
+                    sw::setSwitchModel, "switchModelId");
+        } else if (entity instanceof Rack rack && dto instanceof RackTo rackTo) {
+            referenceResolver.applyModelReference(rackTo.getRackTypeId(), RackModelEntity.class,
+                    rack::setRackType, "rackTypeId");
+        } else if (entity instanceof CableRun cableRun && dto instanceof CableRunTo cableRunTo) {
+            referenceResolver.applyModelReference(cableRunTo.getCableModelId(), CableRunModel.class,
+                    cableRun::setCableModel, "cableModelId");
+        } else if (entity instanceof Connector connector && dto instanceof ConnectorTo connectorTo) {
+            referenceResolver.applyModelReference(connectorTo.getConnectorModelId(), ConnectorModel.class,
+                    connector::setConnectorModel, "connectorModelId");
+        } else if (entity instanceof PatchPanel patchPanel && dto instanceof PatchPanelTo patchPanelTo) {
+            referenceResolver.applyModelReference(patchPanelTo.getPatchPanelModelId(), PatchPanelModel.class,
+                    patchPanel::setPatchPanelModel, "patchPanelModelId");
         }
+        // Router and AccessPoint have no catalog model link of their own.
+    }
+
+    /**
+     * Maps a polymorphic DTO to its entity using the mapper of the DTO's concrete type.
+     */
+    private Component mapToEntity(ComponentTo dto) {
+        if (dto instanceof NetworkSwitchTo to) {
+            return networkSwitchMapper.toEntity(to);
+        } else if (dto instanceof RouterTo to) {
+            return routerMapper.toEntity(to);
+        } else if (dto instanceof AccessPointTo to) {
+            return accessPointMapper.toEntity(to);
+        } else if (dto instanceof CableRunTo to) {
+            return cableRunMapper.toEntity(to);
+        } else if (dto instanceof ConnectorTo to) {
+            return connectorMapper.toEntity(to);
+        } else if (dto instanceof PatchPanelTo to) {
+            return patchPanelMapper.toEntity(to);
+        } else if (dto instanceof RackTo to) {
+            return rackMapper.toEntity(to);
+        }
+        throw new IllegalRequestDataException("Unsupported component DTO: " + dto.getClass().getSimpleName());
     }
 }

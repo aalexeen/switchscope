@@ -33,10 +33,12 @@ public interface AccessPointModelMapper extends DeviceModelMapper<AccessPointMod
     @Mapping(target = "enterprise", expression = "java(entity.isEnterprise())")
     @Mapping(target = "hasAdvancedFeatures", expression = "java(entity.hasAdvancedFeatures())")
     @Mapping(target = "powerEfficiency", expression = "java(entity.getPowerEfficiency())")
+    @Mapping(target = "discriminatorType", expression = "java(entity.getDiscriminatorValue())")
     @Override
     AccessPointModelTo toTo(AccessPointModel entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

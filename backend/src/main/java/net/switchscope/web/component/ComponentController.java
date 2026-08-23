@@ -2,6 +2,8 @@ package net.switchscope.web.component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.mapper.component.connectivity.CableRunMapper;
 import net.switchscope.mapper.component.connectivity.ConnectorMapper;
 import net.switchscope.mapper.component.connectivity.PatchPanelMapper;
@@ -39,7 +42,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Controller for Component entities.
@@ -78,18 +80,24 @@ public class ComponentController {
         return service.getByIdAsDto(id);
     }
 
+    /**
+     * Create a component of any type.
+     * <p>
+     * {@link ComponentTo} is abstract, so the payload must carry the {@code componentClass}
+     * discriminator (NETWORK_SWITCH, ROUTER, ...); Jackson uses it to pick the concrete DTO.
+     */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ComponentTo create(@RequestBody ComponentTo to) {
+    public ComponentTo create(@Valid @RequestBody ComponentTo to) {
         log.info("create component {}", to);
-        Component entity = mapToEntity(to);
-        return service.createAndReturnDto(entity);
+        return service.createFromDto(to);
     }
 
     /**
      * Update component.
      * Accepts raw JSON and determines concrete DTO type from existing entity in DB.
-     * This avoids Jackson polymorphic deserialization issues with abstract ComponentTo.
+     * The discriminator is taken from the stored entity rather than the payload, so a client cannot
+     * change the type of an existing row - and a payload that omits {@code componentClass} still binds.
      * Validates field nullification against role-based update policy.
      */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -102,11 +110,13 @@ public class ComponentController {
         Class<? extends ComponentTo> dtoClass = getDtoClassForEntity(existing);
         log.debug("Entity type: {}, DTO class: {}", existing.getClass().getSimpleName(), dtoClass.getSimpleName());
 
-        // 2. Deserialize JSON to concrete DTO type
-        ComponentTo dto = objectMapper.readValue(jsonPayload, dtoClass);
+        // 2. Deserialize JSON to concrete DTO type, pinning the discriminator to the stored type
+        ObjectNode root = readObject(jsonPayload);
+        root.put("componentClass", existing.getDiscriminatorValue());
+        ComponentTo dto = objectMapper.treeToValue(root, dtoClass);
 
         // 3. Extract present fields for policy validation
-        Map<String, JsonNode> presentFields = extractPresentFields(jsonPayload);
+        Map<String, JsonNode> presentFields = extractPresentFields(root);
 
         // 4. Delegate to service (handles validation, FK changes, mapping, save, and DTO conversion in transaction)
         return service.updateWithPolicyValidationAndReturnDto(
@@ -118,14 +128,21 @@ public class ComponentController {
         );
     }
 
+    @SneakyThrows
+    private ObjectNode readObject(String jsonPayload) {
+        JsonNode root = objectMapper.readTree(jsonPayload);
+        if (!(root instanceof ObjectNode objectNode)) {
+            throw new IllegalRequestDataException("Request body must be a JSON object");
+        }
+        return objectNode;
+    }
+
     /**
      * Extracts all fields present in JSON payload with their values.
      * Used to detect explicitly set null values vs absent fields.
      */
-    @SneakyThrows
-    private Map<String, JsonNode> extractPresentFields(String jsonPayload) {
+    private Map<String, JsonNode> extractPresentFields(ObjectNode root) {
         Map<String, JsonNode> fields = new HashMap<>();
-        JsonNode root = objectMapper.readTree(jsonPayload);
         Iterator<String> fieldNames = root.fieldNames();
         while (fieldNames.hasNext()) {
             String fieldName = fieldNames.next();
@@ -164,48 +181,24 @@ public class ComponentController {
         service.delete(id);
     }
 
-    // Helper methods for polymorphic mapping
-    @SuppressWarnings("unchecked")
-    private Component mapToEntity(ComponentTo to) {
-        // Determine component type from TO class name or discriminator field
-        String className = to.getClass().getSimpleName();
-        if (className.contains("NetworkSwitch")) {
-            return networkSwitchMapper.toEntity((net.switchscope.to.component.device.NetworkSwitchTo) to);
-        } else if (className.contains("Router")) {
-            return routerMapper.toEntity((net.switchscope.to.component.device.RouterTo) to);
-        } else if (className.contains("AccessPoint")) {
-            return accessPointMapper.toEntity((net.switchscope.to.component.device.AccessPointTo) to);
-        } else if (className.contains("CableRun")) {
-            return cableRunMapper.toEntity((net.switchscope.to.component.connectivity.CableRunTo) to);
-        } else if (className.contains("Connector")) {
-            return connectorMapper.toEntity((net.switchscope.to.component.connectivity.ConnectorTo) to);
-        } else if (className.contains("PatchPanel")) {
-            return patchPanelMapper.toEntity((net.switchscope.to.component.connectivity.PatchPanelTo) to);
-        } else if (className.contains("Rack")) {
-            return rackMapper.toEntity((net.switchscope.to.component.housing.RackTo) to);
-        } else {
-            throw new IllegalArgumentException("Unknown component TO type: " + className);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
     private void updateFromDto(Component component, ComponentTo to) {
-        if (component instanceof NetworkSwitch && to instanceof net.switchscope.to.component.device.NetworkSwitchTo) {
-            networkSwitchMapper.updateFromTo((NetworkSwitch) component, (net.switchscope.to.component.device.NetworkSwitchTo) to);
-        } else if (component instanceof Router && to instanceof net.switchscope.to.component.device.RouterTo) {
-            routerMapper.updateFromTo((Router) component, (net.switchscope.to.component.device.RouterTo) to);
-        } else if (component instanceof AccessPoint && to instanceof net.switchscope.to.component.device.AccessPointTo) {
-            accessPointMapper.updateFromTo((AccessPoint) component, (net.switchscope.to.component.device.AccessPointTo) to);
-        } else if (component instanceof CableRun && to instanceof net.switchscope.to.component.connectivity.CableRunTo) {
-            cableRunMapper.updateFromTo((CableRun) component, (net.switchscope.to.component.connectivity.CableRunTo) to);
-        } else if (component instanceof Connector && to instanceof net.switchscope.to.component.connectivity.ConnectorTo) {
-            connectorMapper.updateFromTo((Connector) component, (net.switchscope.to.component.connectivity.ConnectorTo) to);
-        } else if (component instanceof PatchPanel && to instanceof net.switchscope.to.component.connectivity.PatchPanelTo) {
-            patchPanelMapper.updateFromTo((PatchPanel) component, (net.switchscope.to.component.connectivity.PatchPanelTo) to);
-        } else if (component instanceof Rack && to instanceof net.switchscope.to.component.housing.RackTo) {
-            rackMapper.updateFromTo((Rack) component, (net.switchscope.to.component.housing.RackTo) to);
+        if (component instanceof NetworkSwitch entity && to instanceof NetworkSwitchTo dto) {
+            networkSwitchMapper.updateFromTo(entity, dto);
+        } else if (component instanceof Router entity && to instanceof RouterTo dto) {
+            routerMapper.updateFromTo(entity, dto);
+        } else if (component instanceof AccessPoint entity && to instanceof AccessPointTo dto) {
+            accessPointMapper.updateFromTo(entity, dto);
+        } else if (component instanceof CableRun entity && to instanceof CableRunTo dto) {
+            cableRunMapper.updateFromTo(entity, dto);
+        } else if (component instanceof Connector entity && to instanceof ConnectorTo dto) {
+            connectorMapper.updateFromTo(entity, dto);
+        } else if (component instanceof PatchPanel entity && to instanceof PatchPanelTo dto) {
+            patchPanelMapper.updateFromTo(entity, dto);
+        } else if (component instanceof Rack entity && to instanceof RackTo dto) {
+            rackMapper.updateFromTo(entity, dto);
         } else {
-            throw new IllegalArgumentException("Component type mismatch: entity=" + component.getClass().getName() + ", to=" + to.getClass().getName());
+            throw new IllegalArgumentException("Component type mismatch: entity=" + component.getClass().getName()
+                    + ", to=" + to.getClass().getName());
         }
     }
 }

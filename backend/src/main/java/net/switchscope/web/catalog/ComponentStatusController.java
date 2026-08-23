@@ -1,5 +1,6 @@
 package net.switchscope.web.catalog;
 
+import jakarta.validation.Valid;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class ComponentStatusController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public ComponentStatusTo create(@RequestBody ComponentStatusTo dto) {
+    public ComponentStatusTo create(@Valid @RequestBody ComponentStatusTo dto) {
         log.info("create component status {}", dto);
         ComponentStatusEntity entity = mapper.toEntity(dto);
         ComponentStatusEntity created = service.create(entity);

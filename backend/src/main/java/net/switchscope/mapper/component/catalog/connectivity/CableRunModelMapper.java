@@ -33,10 +33,12 @@ public interface CableRunModelMapper extends ComponentModelMapper<CableRunModel,
     // Map cable-specific temperature fields
     @Mapping(target = "cableOperatingTemperatureMin", source = "operatingTemperatureMin")
     @Mapping(target = "cableOperatingTemperatureMax", source = "operatingTemperatureMax")
+    @Mapping(target = "discriminatorType", expression = "java(entity.getDiscriminatorValue())")
     @Override
     CableRunModelTo toTo(CableRunModel entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

@@ -31,6 +31,7 @@ public interface InstallableTypeMapper extends BaseMapper<InstallableTypeEntity,
     InstallableTypeTo toTo(InstallableTypeEntity entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Override

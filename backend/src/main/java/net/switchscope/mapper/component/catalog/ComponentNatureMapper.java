@@ -18,6 +18,7 @@ public interface ComponentNatureMapper extends BaseMapper<ComponentNatureEntity,
     @Override
     ComponentNatureTo toTo(ComponentNatureEntity entity);
 
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "properties", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

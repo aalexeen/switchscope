@@ -33,10 +33,12 @@ public interface ConnectorModelMapper extends ComponentModelMapper<ConnectorMode
     // Map connector-specific temperature fields
     @Mapping(target = "connectorOperatingTemperatureMin", source = "operatingTemperatureMin")
     @Mapping(target = "connectorOperatingTemperatureMax", source = "operatingTemperatureMax")
+    @Mapping(target = "discriminatorType", expression = "java(entity.getDiscriminatorValue())")
     @Override
     ConnectorModelTo toTo(ConnectorModel entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

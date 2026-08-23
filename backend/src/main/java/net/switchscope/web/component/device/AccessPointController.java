@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.device.AccessPointMapper;
 import net.switchscope.model.component.device.AccessPoint;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.device.AccessPointService;
 import net.switchscope.to.component.device.AccessPointTo;
 import net.switchscope.web.AbstractCrudController;
@@ -36,7 +36,7 @@ public class AccessPointController extends AbstractCrudController<AccessPoint, A
     private final AccessPointMapper mapper;
 
     @Override
-    protected CrudService<AccessPoint> getService() {
+    protected DtoCrudService<AccessPoint, AccessPointTo> getService() {
         return service;
     }
 
@@ -70,26 +70,5 @@ public class AccessPointController extends AbstractCrudController<AccessPoint, A
         return service.getByIdAsDto(id);
     }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public AccessPointTo create(@RequestBody AccessPointTo dto) {
-        log.info("create {} {}", getEntityName(), dto);
-        AccessPoint entity = mapper.toEntity(dto);
-        return service.createAndReturnDto(entity);
-    }
 
-    /**
-     * Override to use service DTO method for lazy-safe mapping.
-     */
-    @Override
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public AccessPointTo update(@PathVariable UUID id, @RequestBody AccessPointTo dto) {
-        log.info("update {} {} with id={}", getEntityName(), dto, id);
-        AccessPoint entity = mapper.toEntity(dto);
-        return service.updateAndReturnDto(id, entity);
-    }
 }

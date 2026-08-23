@@ -1,5 +1,6 @@
 package net.switchscope.web;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.service.CrudService;
@@ -53,7 +54,7 @@ public abstract class AbstractCatalogController<E, T extends BaseTo> {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public T create(@RequestBody T dto) {
+    public T create(@Valid @RequestBody T dto) {
         log.info("create {} {}", getEntityName(), dto);
         E entity = getMapper().toEntity(dto);
         E created = getService().create(entity);

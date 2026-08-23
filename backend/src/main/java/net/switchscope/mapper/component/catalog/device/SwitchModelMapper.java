@@ -34,10 +34,12 @@ public interface SwitchModelMapper extends DeviceModelMapper<SwitchModel, Switch
     @Mapping(target = "hasPoePlus", expression = "java(entity.hasPoePlus())")
     @Mapping(target = "supportsHighSpeed", expression = "java(entity.supportsHighSpeed())")
     @Mapping(target = "powerEfficiency", expression = "java(entity.getPowerEfficiency())")
+    @Mapping(target = "discriminatorType", expression = "java(entity.getDiscriminatorValue())")
     @Override
     SwitchModelTo toTo(SwitchModel entity);
 
     // TO -> Entity (create)
+    @Mapping(target = "id", ignore = true) // id is server-generated; never taken from the request
     @Mapping(target = "componentType", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
