@@ -86,11 +86,18 @@ switchscope:
       # without refusing anything; grep the log for PERMISSION-SHADOW-DENY. Promote one domain at a
       # time through enforce-domains, and roll it back by removing it from the list - no rebuild.
       mode: SHADOW
-      # catalog is promoted: role_permissions is the only gate on /api/catalogs/**, and the
-      # hasRole('ADMIN') that used to sit alongside it is gone. Removing the domain from this list
-      # drops it back to shadow with no rebuild - but the routes then have no other check, so the
-      # rollback is "stop refusing", not "restore the old rule".
-      enforce-domains: [catalog]
+      # Promoted domains. role_permissions is the only gate on their routes; removing a domain from
+      # this list drops it back to shadow with no rebuild - but nothing else guards those routes, so
+      # the rollback is "stop refusing", not "restore the old rule".
+      #
+      # catalog also gave up a hasRole('ADMIN') when it was promoted, and so changed who may write.
+      # The other three never had one: promoting them takes routes that any authenticated caller
+      # could reach and makes them require a permission. Both roles hold all of location, installation
+      # and port, so no caller loses anything today - what changes is that the decision is real.
+      #
+      # component is deliberately not here yet: one word would promote ComponentController and all
+      # nine AbstractCrudController subclasses at once, which is 36 of the 81 permissions.
+      enforce-domains: [catalog, location, installation, port]
 
 # Application-specific settings
 app:
