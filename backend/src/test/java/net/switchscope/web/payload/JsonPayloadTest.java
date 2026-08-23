@@ -2,11 +2,15 @@ package net.switchscope.web.payload;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.switchscope.error.IllegalRequestDataException;
+import net.switchscope.mapper.component.device.AccessPointMapper;
+import net.switchscope.model.component.device.AccessPoint;
+import net.switchscope.to.component.device.AccessPointTo;
 import net.switchscope.to.component.ComponentTo;
 import net.switchscope.to.component.housing.RackTo;
 import net.switchscope.to.location.LocationTo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -80,6 +84,52 @@ class JsonPayloadTest {
 
         assertThat(fields).containsOnlyKeys("address", "floorNumber");
         assertThat(fields.get("address").isNull()).isTrue();
+    }
+
+    @Test
+    @DisplayName("a collection the payload never mentioned is not emptied by the update mapper")
+    void absentCollectionSurvivesTheMapper() {
+        AccessPoint stored = new AccessPoint();
+        stored.getSsids().addAll(java.util.List.of("Corporate-WiFi", "Guest-WiFi"));
+
+        Mappers.getMapper(AccessPointMapper.class)
+                .updateFromTo(stored, read("{\"description\": \"a partial update\"}", AccessPointTo.class));
+
+        assertThat(stored.getSsids())
+                .as("AccessPointTo.ssids is declared = new HashSet<>(), so before blanking it"
+                        + " reached the mapper as an empty set and the generated update cleared the"
+                        + " stored SSIDs and added nothing back - measured on a live PUT, not"
+                        + " theorised")
+                .containsExactlyInAnyOrder("Corporate-WiFi", "Guest-WiFi");
+        assertThat(stored.getDescription()).isEqualTo("a partial update");
+    }
+
+    @Test
+    @DisplayName("an explicitly empty collection still empties it - the caller asked for that")
+    void explicitlyEmptyCollectionIsApplied() {
+        AccessPoint stored = new AccessPoint();
+        stored.getSsids().addAll(java.util.List.of("Corporate-WiFi"));
+
+        Mappers.getMapper(AccessPointMapper.class)
+                .updateFromTo(stored, read("{\"ssids\": []}", AccessPointTo.class));
+
+        assertThat(stored.getSsids())
+                .as("blanking restores what absence means; it must not swallow a value the payload"
+                        + " actually carried")
+                .isEmpty();
+    }
+
+    /**
+     * The reading a PUT handler does, minus the policy: pin the type, note what came, bind, and put
+     * back the absence that the DTO's field initialisers hid.
+     */
+    private <T> T read(String body, Class<T> dtoClass) {
+        var root = json.asObject(body);
+        json.pinDiscriminator(root, dtoClass);
+        var present = json.presentFields(root);
+        T dto = json.bind(root, dtoClass);
+        json.blankAbsentProperties(dto, present.keySet());
+        return dto;
     }
 
     @Test

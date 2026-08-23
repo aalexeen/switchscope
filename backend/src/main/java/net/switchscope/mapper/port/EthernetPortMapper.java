@@ -50,6 +50,11 @@ public interface EthernetPortMapper extends PortMapper<EthernetPort, EthernetPor
     @Mapping(target = "connector", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    // specifications is computed from the port's own columns and returns a fresh map.
+    // MapStruct treats a read-only collection getter as a target it may fill and generates
+    // clear()/putAll() onto that throwaway map: harmless today only because the map happens
+    // to be mutable, which is exactly how the same shape on Installation became a 500.
+    @Mapping(target = "specifications", ignore = true)
     @Override
     EthernetPort toEntity(EthernetPortTo to);
 
@@ -59,6 +64,11 @@ public interface EthernetPortMapper extends PortMapper<EthernetPort, EthernetPor
     @Mapping(target = "connector", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    // specifications is computed from the port's own columns and returns a fresh map.
+    // MapStruct treats a read-only collection getter as a target it may fill and generates
+    // clear()/putAll() onto that throwaway map: harmless today only because the map happens
+    // to be mutable, which is exactly how the same shape on Installation became a 500.
+    @Mapping(target = "specifications", ignore = true)
     @Override
     EthernetPort updateFromTo(@MappingTarget EthernetPort entity, EthernetPortTo to);
 }

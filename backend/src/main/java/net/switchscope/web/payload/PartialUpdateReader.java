@@ -52,8 +52,13 @@ public class PartialUpdateReader {
      * @return the validated update
      */
     public <T> PartialUpdate<T> read(ObjectNode root, Class<T> dtoClass) {
+        // Before the fields are counted, so that a discriminator the target type supplies counts as
+        // one the request carried - otherwise the next line would blank it straight back out.
+        json.pinDiscriminator(root, dtoClass);
+
         Map<String, JsonNode> presentFields = json.presentFields(root);
         T dto = json.bind(root, dtoClass);
+        json.blankAbsentProperties(dto, presentFields.keySet());
 
         UpdatePolicy policy = policyResolver.resolve();
         log.debug("Reading update for {} under policy {}", dtoClass.getSimpleName(), policy.getPolicyName());

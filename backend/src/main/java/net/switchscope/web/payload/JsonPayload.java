@@ -9,10 +9,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import net.switchscope.error.IllegalRequestDataException;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.stereotype.Component;
 
+import java.beans.PropertyDescriptor;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Reading a request body as a tree before binding it.
@@ -72,6 +76,45 @@ public class JsonPayload {
     }
 
     /**
+     * Empties every property of a bound DTO that the payload did not mention.
+     *
+     * <h2>Why binding alone is not enough</h2>
+     * The update mappers run with {@code NullValuePropertyMappingStrategy.IGNORE}, which asks the
+     * DTO one question: is this property null? A DTO with field initialisers answers wrongly.
+     * {@code AccessPointTo.ssids} is declared {@code = new HashSet<>()}, so a body that never
+     * mentions {@code ssids} still arrives carrying an empty set - and MapStruct's generated update
+     * dutifully clears the stored SSIDs and adds nothing. Measured, not theorised: a
+     * {@code PUT /api/devices/access-points/{id}} of {@code {"description": "probe"}} emptied three
+     * SSIDs. The same shape is waiting in every {@code = new ArrayList<>()} and every
+     * {@code Boolean flag = false} across the DTOs - 126 initialisers in all.
+     * <p>
+     * Rather than strip those initialisers, which other code reads as a promise that a collection
+     * is never null, the DTO is put back into the state binding should have produced: absent means
+     * null. Primitives are left alone, having no way to say absent - which is why the field-access
+     * layer treats a primitive-backed column as unclearable in the first place.
+     *
+     * @param dto           the freshly bound DTO
+     * @param presentFields names of the fields the payload actually carried
+     */
+    public void blankAbsentProperties(Object dto, Set<String> presentFields) {
+        BeanWrapper wrapper = PropertyAccessorFactory.forBeanPropertyAccess(dto);
+        for (PropertyDescriptor property : wrapper.getPropertyDescriptors()) {
+            String name = property.getName();
+            if (presentFields.contains(name) || "class".equals(name)) {
+                continue;
+            }
+            Class<?> type = property.getPropertyType();
+            if (type == null || type.isPrimitive()
+                    || !wrapper.isWritableProperty(name) || !wrapper.isReadableProperty(name)) {
+                continue;
+            }
+            if (wrapper.getPropertyValue(name) != null) {
+                wrapper.setPropertyValue(name, null);
+            }
+        }
+    }
+
+    /**
      * Binds a prepared tree to the target type, pinning the discriminator when the target is one
      * subtype of a polymorphic DTO.
      *
@@ -106,7 +149,7 @@ public class JsonPayload {
      * URL says what kind of thing is being updated, so a client cannot turn a rack into a router by
      * saying so in the body.
      */
-    private static void pinDiscriminator(ObjectNode root, Class<?> targetType) {
+    public void pinDiscriminator(ObjectNode root, Class<?> targetType) {
         JsonTypeInfo typeInfo = org.springframework.core.annotation.AnnotationUtils
                 .findAnnotation(targetType, JsonTypeInfo.class);
         if (typeInfo == null || typeInfo.use() != JsonTypeInfo.Id.NAME) {
