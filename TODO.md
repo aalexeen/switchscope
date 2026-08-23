@@ -1,4 +1,164 @@
-# SwitchScope - Implementation Guide
+# SwitchScope — TODO
+
+> Ниже — приоритетная очередь. Ниже неё, начиная с раздела «Implementation Guide»,
+> лежит прежний справочный материал по editable-view.
+
+---
+
+# ПРИОРИТЕТ 1 — незакрытые концепты бэкенда
+
+Оба концепта спроектированы и обоснованы в **`docs/backend-concepts.md`** (части 2 и 3).
+Кода по ним не написано. Контекст, откуда они взялись: **`docs/backend-audit.md`** (аудит слоёв)
+и **`docs/backend-fixes.md`** (что уже исправлено).
+
+Состояние на входе: коммиты `b43f88c` (шесть критичных дефектов write-path) и
+`2d14ec3` (вывод дискриминатора из `componentTypeId`) в ветке `dev`.
+
+---
+
+## 1.1 Конфигурируемые права доступа
+
+**Задача.** Каждая операция API — отдельный пункт, который в конфигурации либо разрешён, либо
+запрещён, без пересборки. Сейчас гранулярность нулевая: `Role` — enum из `USER`/`ADMIN`, права
+зашиты в `@PreAuthorize("hasRole('ADMIN')")`, единственная «настройка» — выдать ADMIN, то есть всё
+сразу.
+
+**Модель** (детали — `docs/backend-concepts.md`, часть 2):
+
+```
+User ──< user_roles >── RoleEntity ──< role_permissions >── PermissionEntity
+```
+
+- `PermissionEntity` наследует `BaseCodedEntity`; код вида `<домен>.<ресурс>:<действие>`,
+  например `catalog.component-type:update`.
+- `RoleEntity` вместо enum `Role`.
+- **`role_permissions` и есть конфигурация**: строка есть → разрешено, нет → запрещено.
+- Проверка через `hasAuthority(...)`, **не** `hasRole` — `RoleHierarchy` применяется только к
+  `hasRole`, смешение двух стилей даёт трудноуловимые баги.
+
+**Центральная часть — верифицируемость, а не схема.** Таблица прав бесполезна, если нельзя
+проверить покрытие: именно так и вышло с `@PreAuthorize` — аннотации были, механизма не было.
+`PermissionRegistry` по образцу существующего `InstallableComponentRegistry` сканирует
+`@RequiresPermission` на старте и сверяет с БД:
+
+- [ ] код есть, в БД нет → операция неконфигурируема — ERROR
+- [ ] в БД есть, в коде нет → мёртвая строка — WARN
+- [ ] **эндпоинт без аннотации** → ровно та дыра, что жила в проекте — ERROR
+- [ ] `denyAll()` по умолчанию для `/api/**`, чтобы забытая аннотация закрывала, а не открывала
+- [ ] `GET /api/admin/permissions/matrix` — машиночитаемая матрица для CI и диффа между средами
+
+**Обязательно с первого дня:** кэш authorities. Аутентификация stateless HTTP Basic →
+`loadUserByUsername` выполняется на каждый запрос; сейчас это одна таблица, станет три.
+`@EnableCaching` в `AppConfig` уже есть. Кэшировать authorities, не сущность `User`
+(иначе в кэш попадёт пароль и detached-граф Hibernate).
+
+**Порядок работ:**
+
+- [ ] Этап 1 — схема, seed, `@RequiresPermission` на всех эндпоинтах, реестр в режиме
+      **audit-only** (только отчёт, ничего не блокирует). `@PreAuthorize` пока не трогать
+- [ ] Этап 2 — включать принуждение по доменам, начиная с `catalog`
+- [ ] Этап 3 — фронтенд: `/api/auth/check` отдаёт `permissions`; `usePermissions()`;
+      `meta.roles` → `meta.permission` в 46 маршрутах; гейт кнопок в `CellActions.vue`
+- [ ] Этап 4 — удалить enum `Role`, `hasRole` оставить только на `/api/admin/**`, включить `denyAll()`
+
+**Не забыть при этом:**
+
+- [ ] `frontend/src/utils/roles.js` — **удалить**. Никем не импортируется и падает при загрузке
+      (`ROLE_PERMISSIONS` ссылается сам на себя в собственном инициализаторе → `ReferenceError`);
+      список прав в нём про MAC-адреса, наследие другого проекта
+- [ ] `LoginResponseTo` — **добавить** `permissions`, `roles` оставить строками, иначе сломается
+      `useAuth.js` / `services/auth.js` / `UserAccount.vue`
+- [ ] Отдельно решить с ролями сейчас: после `b43f88c` метод-секьюрити включена, и USER,
+      который раньше писал в каталоги, получает 403. Либо выдать ADMIN, либо сузить
+      `roles` во фронтенд-маршрутах
+
+**Осознанно вне объёма:** ABAC / row-level (`PermissionEvaluator`, `hasPermission`),
+внешний движок политик (OPA), `RoleHierarchy`.
+
+---
+
+## 1.2 Обнуление полей через PUT
+
+**Задача.** Сейчас PUT игнорирует и отсутствующее поле, и явный `null`
+(`NullValuePropertyMappingStrategy.IGNORE`, введён в `b43f88c`). Это лучше прежнего затирания,
+но `UpdatePolicyValidator` проверяет право обнулить поле, а применить это некому — слой прав
+повис в воздухе.
+
+**Решение** (детали — `docs/backend-concepts.md`, часть 3): `presentFields` + `NullFieldApplier`.
+Половина уже есть — `UpdatePolicyValidator` и `FieldAccessMetadataCache`.
+
+**Обязательное условие — сначала унифицировать чтение запроса.** Сырой JSON сейчас видят только
+11 контроллеров; девять наследников `AbstractCrudController` принимают типизированный DTO.
+Половинчатая поддержка **хуже** нынешнего единообразного IGNORE: `/api/components/{id}` умел бы
+обнулять, а `/api/devices/switches/{id}` для той же сущности — нет.
+
+- [ ] `AbstractCrudController.update` переводится на чтение сырого тела
+      (шаблон уже написан в `ComponentPayloadReader` — переиспользовать, а не копировать)
+- [ ] `NullFieldApplier` (~40 строк): поле present-and-null, прошедшее политику, обнуляется
+      через `BeanWrapper`
+- [ ] `FieldAccessMetadataCache` расширить отображением «поле DTO → свойство сущности»
+      (имена совпадают, кроме FK `xxxId` → `xxx`)
+- [ ] `resolver.applyReferences` тоже начинает учитывать `presentFields` — чтобы
+      `componentNatureId: null` отвязывал, а отсутствие поля не трогало
+- [ ] Проверить, что `REQUIRED` / `READ_ONLY` и NOT NULL-колонки не обнуляются ни при каких условиях
+
+**Конвейер:**
+
+```
+raw JSON → ObjectNode → пин дискриминатора → treeToValue → presentFields
+  → mapper.updateFromTo   (IGNORE: только non-null)
+  → UpdatePolicyValidator (можно ли обнулять)
+  → NullFieldApplier      (явные null)
+  → resolver.applyReferences
+  → save + mapToDto в той же транзакции
+```
+
+**Оговорка:** null-как-удаление — это PATCH по RFC 7386, а не PUT. Отклонение осознанное;
+если понадобится строгость — добавить `PATCH` с `application/merge-patch+json`, PUT сделать
+полной заменой. Менять глагол сейчас = ломать фронтенд без выгоды.
+
+---
+
+# ПРИОРИТЕТ 2 — хвост аудита
+
+Находки 2.2–3.13 из `docs/backend-audit.md`, не входившие в шестёрку критичных:
+
+- [ ] `RestExceptionHandler:33` — импорт `java.nio.file.AccessDeniedException` вместо
+      `org.springframework.security.access.AccessDeniedException` → 403 отдаётся как 500
+- [ ] `POST /api/profile` недоступен анонимному пользователю — зарегистрироваться может только
+      уже вошедший; плюс регистрация минует `UserService.create` и проверку уникальности e-mail
+- [ ] `ValidationUtil.assureIdConsistent` — `!=` вместо `equals` на UUID → `PUT /api/profile`
+      с непустым `id` всегда 422
+- [ ] Расхождения `@Size` DTO ↔ сущность ↔ DDL (`NamedTo.description` 1024 vs `NamedEntity` 512).
+      Теперь, когда `@Valid` работает, значение 513–1024 пройдёт валидацию и упадёт на flush
+- [ ] Коллекционные ассоциации не разрешаются: `CableRunTo.locationIds` / `connectorIds`,
+      `PatchPanelTo.cableRunIds`, `LocationTypeTo.allowed*TypeIds`, `ComponentCategoryTo.componentTypeIds`
+- [ ] `Installation.isValidLocationInstallation()` → `canContainComponent(null)` всегда false;
+      `fitsInLocation()` — NPE при `rackPosition == null`
+- [ ] `Component.canHoldOtherComponents()` возвращает true когда компонент **не** может содержать
+      другие (дефект именования, оба вызова компенсируют)
+- [ ] Bulk-delete обходит `cascade`/`orphanRemoval`: удаление здания не удалит этажи, а сделает
+      их корневыми (FK `ON DELETE SET NULL`)
+- [ ] Типобезопасность удаления: `ConnectivityRepository`/`HousingRepository` типизированы как
+      `BaseRepository<Component>` → `DELETE /api/racks/{id}` удалит коммутатор по его id
+- [ ] `application.yaml:51` — `net.switchscope.backend: INFO`, а пакет `net.switchscope`;
+      при `root: WARN` весь `log.info` подавлен
+- [ ] `application.yaml:46` — `liquibase.clear-checksums: true` в основном профиле
+- [ ] `AbstractCatalogController` — мёртвый код, ни один контроллер его не наследует
+
+---
+
+# Устаревшее в разделах ниже
+
+- [ ] Раздел «Architecture Summary» описывает ветку `instanceof UpdatableCrudService` с legacy-fallback
+      в `AbstractCatalogController` — этот класс никем не наследуется, а `AbstractCrudController`
+      переписан на `DtoCrudService` (коммит `b43f88c`)
+- [ ] В «Pending» перечислены Location / Installation / Component как невыполненные — их write-path
+      исправлен в `b43f88c`, но editable detail-view для них по-прежнему не сделан
+
+---
+
+# Implementation Guide
 
 ## Entity Relationship Map (FK Dependencies)
 
