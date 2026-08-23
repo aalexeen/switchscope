@@ -57,7 +57,7 @@ SwitchScope is a modern web-based platform designed to provide complete visibili
 - **Java 21** with **Spring Boot 3.x** framework
 - **Spring Security** for authentication and authorization
 - **Spring Data JPA** for database operations
-- **PostgreSQL 13+** database with JSONB support
+- **PostgreSQL 18** database
 - **Liquibase** for database version control
 - **Redis** for caching and session management
 - **SSHJ** for secure device communication
@@ -133,7 +133,7 @@ Location (IT Closets, Floors, Buildings)
 ### Prerequisites
 - **Java 21** or higher (OpenJDK recommended)
 - **Node.js 18+** and **npm 9+**
-- **PostgreSQL 13+** with TimescaleDB extension (optional)
+- **PostgreSQL 18** with TimescaleDB extension (optional)
 - **Redis 6+** for optimal performance (optional for development)
 - **Docker** and **Docker Compose** (recommended)
 

@@ -43,8 +43,8 @@
         <liquibase-maven-plugin.version>4.30.0</liquibase-maven-plugin.version>
         <springdoc.version>2.7.0</springdoc.version>
 
-        <!-- Database properties with defaults (will be overridden by config.properties) -->
-        <database.url>jdbc:postgresql://localhost:5432/switchscope</database.url>
+        <!-- Database defaults (PostgreSQL 18 on port 5433; overridden by backend/.mvn/maven.config) -->
+        <database.url>jdbc:postgresql://localhost:5433/switchscope</database.url>
         <database.username>postgres</database.username>
         <database.password>postgres</database.password>
     </properties>
