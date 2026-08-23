@@ -55,6 +55,19 @@ class PermissionCoverageTest extends AbstractContextTest {
     }
 
     @Test
+    @DisplayName("each guarded endpoint resolves to its own permission")
+    void everyGuardedEndpointIsResolvable() {
+        long guarded = registry.getReport().endpoints().stream()
+                .filter(e -> e.status() == EndpointPermission.Status.GUARDED)
+                .count();
+        assertThat(registry.getResolvableEndpointCount())
+                .as("a smaller number means endpoints share a lookup key - the nine AbstractCrudController"
+                        + " subclasses inherit create/update/delete as the same Method object, so keying"
+                        + " on the method alone would silently collapse them onto one permission")
+                .isEqualTo((int) guarded);
+    }
+
+    @Test
     @DisplayName("the scan found the application's endpoints at all")
     void reportIsPopulated() {
         assertThat(registry.getReport().endpoints())

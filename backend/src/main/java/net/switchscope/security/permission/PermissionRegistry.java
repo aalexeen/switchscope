@@ -68,7 +68,14 @@ public class PermissionRegistry {
     private final RequestMappingHandlerMapping handlerMapping;
     private final Mode mode;
 
-    private final Map<Method, String> codeByMethod = new HashMap<>();
+    /**
+     * Keyed by the concrete controller as well as the method: nine subclasses inherit
+     * {@code create}/{@code update}/{@code delete} from {@link net.switchscope.web.AbstractCrudController}
+     * without overriding them, so the {@code Method} alone is the same object for all nine and would
+     * collapse nine codes into one, with whichever the scan reached last winning. Published as an
+     * immutable snapshot because it is written on startup and read from request threads.
+     */
+    private volatile Map<HandlerKey, String> codeByHandler = Map.of();
     private volatile PermissionAuditReport report =
             new PermissionAuditReport(List.of(), emptySorted(), emptySorted(), emptySorted(), List.of());
 
@@ -108,7 +115,21 @@ public class PermissionRegistry {
      * @return the required permission code, or {@code null} if the endpoint requires none
      */
     public String getRequiredCode(HandlerMethod handlerMethod) {
-        return codeByMethod.get(specificMethod(handlerMethod));
+        return codeByHandler.get(new HandlerKey(handlerMethod.getBeanType(), specificMethod(handlerMethod)));
+    }
+
+    /**
+     * How many endpoints the scan can resolve a permission for. Equals the number of guarded
+     * endpoints; anything less means distinct endpoints are sharing a key.
+     */
+    public int getResolvableEndpointCount() {
+        return codeByHandler.size();
+    }
+
+    /**
+     * The identity of an endpoint for permission lookup: which controller, and which method on it.
+     */
+    private record HandlerKey(Class<?> beanType, Method method) {
     }
 
     public PermissionAuditReport getReport() {
@@ -120,21 +141,23 @@ public class PermissionRegistry {
     }
 
     private List<EndpointPermission> scanEndpoints() {
-        codeByMethod.clear();
+        Map<HandlerKey, String> codes = new HashMap<>();
         List<EndpointPermission> endpoints = new ArrayList<>();
         for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMapping.getHandlerMethods().entrySet()) {
             HandlerMethod handlerMethod = entry.getValue();
             if (!handlerMethod.getBeanType().getName().startsWith(OWN_PACKAGE)) {
                 continue; // springdoc and friends are not ours to gate
             }
-            endpoints.add(describe(entry.getKey(), handlerMethod));
+            endpoints.add(describe(entry.getKey(), handlerMethod, codes));
         }
         endpoints.sort(Comparator.comparing(EndpointPermission::pattern)
                 .thenComparing(EndpointPermission::httpMethod));
+        this.codeByHandler = Map.copyOf(codes);
         return endpoints;
     }
 
-    private EndpointPermission describe(RequestMappingInfo info, HandlerMethod handlerMethod) {
+    private EndpointPermission describe(RequestMappingInfo info, HandlerMethod handlerMethod,
+                                        Map<HandlerKey, String> codes) {
         Method method = specificMethod(handlerMethod);
         Class<?> controller = handlerMethod.getBeanType();
         String handler = controller.getSimpleName() + '#' + method.getName();
@@ -155,7 +178,7 @@ public class PermissionRegistry {
 
         PermissionResource resource = AnnotationUtils.findAnnotation(controller, PermissionResource.class);
         String code = PermissionCode.join(resource == null ? null : resource.value(), required.value());
-        codeByMethod.put(method, code);
+        codes.put(new HandlerKey(controller, method), code);
         return new EndpointPermission(httpMethod, pattern, handler, code,
                 EndpointPermission.Status.GUARDED, null);
     }
