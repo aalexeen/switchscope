@@ -52,6 +52,11 @@ public class AccessPointController extends AbstractCrudController<AccessPoint, A
         return "access point";
     }
 
+    @Override
+    protected Class<AccessPointTo> getDtoClass() {
+        return AccessPointTo.class;
+    }
+
     /**
      * Override to use service DTO method for lazy-safe mapping.
      */

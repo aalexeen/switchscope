@@ -8,6 +8,7 @@ import net.switchscope.model.component.ComponentNatureEntity;
 import net.switchscope.repository.component.ComponentNatureRepository;
 import net.switchscope.service.UpdatableCrudService;
 import net.switchscope.to.component.catalog.ComponentNatureTo;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,9 +48,10 @@ public class ComponentNatureService implements UpdatableCrudService<ComponentNat
 
     @Override
     @Transactional
-    public ComponentNatureEntity updateFromDto(UUID id, ComponentNatureTo dto) {
+    public ComponentNatureEntity updateFromDto(UUID id, PartialUpdate<ComponentNatureTo> update) {
         ComponentNatureEntity existing = repository.getExisted(id);
-        mapper.updateFromTo(existing, dto);
+        mapper.updateFromTo(existing, update.dto());
+        update.applyNulls(existing);
         return repository.save(existing);
     }
 

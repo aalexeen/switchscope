@@ -52,6 +52,11 @@ public class CableRunController extends AbstractCrudController<CableRun, CableRu
         return "cable run";
     }
 
+    @Override
+    protected Class<CableRunTo> getDtoClass() {
+        return CableRunTo.class;
+    }
+
     /**
      * Override to use service DTO method for lazy-safe mapping.
      */

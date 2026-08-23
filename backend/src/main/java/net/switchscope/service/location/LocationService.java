@@ -12,6 +12,7 @@ import net.switchscope.model.location.catalog.LocationTypeEntity;
 import net.switchscope.repository.location.LocationRepository;
 import net.switchscope.repository.location.LocationTypeRepository;
 import net.switchscope.service.DtoCrudService;
+import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.location.LocationTo;
 
 import java.util.List;
@@ -91,11 +92,13 @@ public class LocationService implements DtoCrudService<Location, LocationTo> {
      */
     @Override
     @Transactional
-    public LocationTo updateFromDto(UUID id, LocationTo dto) {
+    public LocationTo updateFromDto(UUID id, PartialUpdate<LocationTo> update) {
+        LocationTo dto = update.dto();
         Location existing = repository.findByIdWithAllRelationships(id)
                 .orElseThrow(() -> new NotFoundException("Location with id=" + id + " not found"));
         mapper.updateFromTo(existing, dto);
         applyReferences(existing, dto);
+        update.applyNulls(existing);
         return mapper.toTo(repository.save(existing));
     }
 

@@ -1,6 +1,7 @@
 package net.switchscope.service;
 
 import net.switchscope.to.BaseTo;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.UUID;
 
@@ -32,11 +33,17 @@ public interface DtoCrudService<E, T extends BaseTo> extends CrudService<E> {
     T createFromDto(T dto);
 
     /**
-     * Apply the DTO onto the stored entity and return it mapped back to a DTO.
+     * Apply an update onto the stored entity and return it mapped back to a DTO.
+     * <p>
+     * The update carries more than the DTO: it also carries which fields the request actually
+     * mentioned, because the mappers run with {@code NullValuePropertyMappingStrategy.IGNORE} and
+     * cannot tell a field left out from one deliberately cleared. Implementations map, resolve
+     * references, then call {@link PartialUpdate#applyNulls} - in that order, on the entity loaded
+     * inside the transaction.
      *
-     * @param id  the entity id
-     * @param dto the values to apply
+     * @param id     the entity id
+     * @param update the values to apply, and which of them the request carried
      * @return the updated entity as a DTO
      */
-    T updateFromDto(UUID id, T dto);
+    T updateFromDto(UUID id, PartialUpdate<T> update);
 }

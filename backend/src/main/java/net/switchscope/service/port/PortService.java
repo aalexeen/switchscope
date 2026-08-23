@@ -21,6 +21,7 @@ import net.switchscope.service.CrudService;
 import net.switchscope.to.port.EthernetPortTo;
 import net.switchscope.to.port.FiberPortTo;
 import net.switchscope.to.port.PortTo;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -80,14 +81,16 @@ public class PortService implements CrudService<Port> {
     }
 
     /**
-     * Apply the DTO onto the stored port.
+     * Apply an update onto the stored port.
      * The entity is loaded first: merging a detached instance would null the device link.
      */
     @Transactional
-    public PortTo updateFromDto(UUID id, PortTo dto) {
+    public PortTo updateFromDto(UUID id, PartialUpdate<? extends PortTo> update) {
+        PortTo dto = update.dto();
         Port existing = getById(id);
         updateFromDto(existing, dto);
         applyReferences(existing, dto);
+        update.applyNulls(existing);
         return mapToDto(repository.save(existing));
     }
 

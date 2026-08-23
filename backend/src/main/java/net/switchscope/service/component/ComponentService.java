@@ -1,6 +1,5 @@
 package net.switchscope.service.component;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +35,6 @@ import net.switchscope.repository.component.ComponentNatureRepository;
 import net.switchscope.repository.component.ComponentRepository;
 import net.switchscope.repository.component.ComponentStatusRepository;
 import net.switchscope.repository.component.ComponentTypeRepository;
-import net.switchscope.security.policy.UpdatePolicy;
-import net.switchscope.security.policy.UpdatePolicyResolver;
-import net.switchscope.security.policy.UpdatePolicyValidator;
 import net.switchscope.service.CrudService;
 import net.switchscope.to.component.ComponentTo;
 import net.switchscope.to.component.connectivity.CableRunTo;
@@ -48,12 +44,11 @@ import net.switchscope.to.component.device.AccessPointTo;
 import net.switchscope.to.component.device.NetworkSwitchTo;
 import net.switchscope.to.component.device.RouterTo;
 import net.switchscope.to.component.housing.RackTo;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,8 +62,6 @@ public class ComponentService implements CrudService<Component> {
     private final ComponentStatusRepository componentStatusRepository;
     private final ComponentNatureRepository componentNatureRepository;
     private final ComponentReferenceResolver referenceResolver;
-    private final UpdatePolicyResolver policyResolver;
-    private final UpdatePolicyValidator policyValidator;
 
     // Polymorphic mappers for different component types
     private final NetworkSwitchMapper networkSwitchMapper;
@@ -144,66 +137,6 @@ public class ComponentService implements CrudService<Component> {
     }
 
     /**
-     * Update component with role-based policy validation.
-     *
-     * @param id            component ID
-     * @param dto           deserialized DTO
-     * @param dtoClass      DTO class for policy lookup
-     * @param presentFields JSON fields present in request (for null detection)
-     * @param mapperFunction function to apply DTO to entity via mapper
-     * @return updated component
-     */
-    @Transactional
-    public Component updateWithPolicyValidation(
-            UUID id,
-            ComponentTo dto,
-            Class<? extends ComponentTo> dtoClass,
-            Map<String, JsonNode> presentFields,
-            BiConsumer<Component, ComponentTo> mapperFunction) {
-
-        // 1. Load existing entity with associations
-        Component entity = repository.findByIdWithAssociations(id)
-                .orElseThrow(() -> new NotFoundException("Component with id=" + id + " not found"));
-
-        // 2. Validate field nullifications against policy
-        UpdatePolicy policy = policyResolver.resolve();
-        log.debug("Applying update policy: {} for component {}", policy.getPolicyName(), id);
-        policyValidator.validate(dtoClass, presentFields, policy);
-
-        // 3. Handle FK relationship changes
-        applyReferences(entity, dto);
-
-        // 4. Apply field updates via mapper
-        mapperFunction.accept(entity, dto);
-
-        // 5. Save and return
-        return repository.save(entity);
-    }
-
-    /**
-     * Update component with role-based policy validation and return as DTO.
-     * Maps result within transaction to avoid LazyInitializationException.
-     *
-     * @param id            component ID
-     * @param dto           deserialized DTO
-     * @param dtoClass      DTO class for policy lookup
-     * @param presentFields JSON fields present in request (for null detection)
-     * @param mapperFunction function to apply DTO to entity via mapper
-     * @return updated component as DTO
-     */
-    @Transactional
-    public ComponentTo updateWithPolicyValidationAndReturnDto(
-            UUID id,
-            ComponentTo dto,
-            Class<? extends ComponentTo> dtoClass,
-            Map<String, JsonNode> presentFields,
-            BiConsumer<Component, ComponentTo> mapperFunction) {
-
-        Component updated = updateWithPolicyValidation(id, dto, dtoClass, presentFields, mapperFunction);
-        return mapToDto(updated);
-    }
-
-    /**
      * Create a component from its polymorphic DTO and return it as a DTO.
      * <p>
      * The concrete type comes from the DTO's runtime class, which Jackson resolves from the
@@ -275,18 +208,25 @@ public class ComponentService implements CrudService<Component> {
     }
 
     /**
-     * Apply a polymorphic DTO onto the stored component and return it as a DTO.
+     * Apply a polymorphic update onto the stored component and return it as a DTO.
      * <p>
      * The entity is loaded first, so associations the mapper ignores survive the update; merging a
      * detached instance would null them, starting with the NOT NULL component type and status.
+     * <p>
+     * One entry point for both {@code /api/components} and {@code /api/devices}: the concrete
+     * mapper is chosen from the entity's runtime type here, so neither controller has to carry its
+     * own copy of that dispatch. The policy check has already happened - a {@link PartialUpdate}
+     * that clears anything can only come from the reader that validates first.
      */
     @Transactional
-    public ComponentTo updateFromDto(UUID id, ComponentTo dto) {
+    public ComponentTo updateFromDto(UUID id, PartialUpdate<? extends ComponentTo> update) {
+        ComponentTo dto = update.dto();
         Component existing = repository.findByIdWithAssociations(id)
                 .orElseThrow(() -> new NotFoundException("Component with id=" + id + " not found"));
         initializeLazyAssociations(existing);
         updateFromDto(existing, dto);
         applyReferences(existing, dto);
+        update.applyNulls(existing);
         return mapToDto(repository.save(existing));
     }
 

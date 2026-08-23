@@ -25,6 +25,7 @@ import net.switchscope.to.component.device.DeviceTo;
 import net.switchscope.to.component.device.NetworkSwitchTo;
 import net.switchscope.to.component.device.RouterTo;
 import net.switchscope.web.component.ComponentPayloadReader;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -100,9 +101,10 @@ public class DeviceController {
 
         Device existing = service.getById(id);
         Class<? extends DeviceTo> dtoClass = getDtoClassForEntity(existing);
-        DeviceTo to = payloadReader.readForUpdate(jsonPayload, existing.getDiscriminatorValue(), dtoClass);
+        PartialUpdate<? extends DeviceTo> update =
+                payloadReader.readForUpdate(jsonPayload, existing.getDiscriminatorValue(), dtoClass);
 
-        return asDeviceTo(componentService.updateFromDto(id, to));
+        return asDeviceTo(componentService.updateFromDto(id, update));
     }
 
     @RequiresPermission("delete")

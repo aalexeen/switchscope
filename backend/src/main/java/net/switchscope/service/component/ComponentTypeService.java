@@ -10,6 +10,7 @@ import net.switchscope.repository.component.ComponentCategoryRepository;
 import net.switchscope.repository.component.ComponentTypeRepository;
 import net.switchscope.service.UpdatableCrudService;
 import net.switchscope.to.component.catalog.ComponentTypeTo;
+import net.switchscope.web.payload.PartialUpdate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,7 +125,9 @@ public class ComponentTypeService implements UpdatableCrudService<ComponentTypeE
      */
     @Override
     @Transactional
-    public ComponentTypeEntity updateFromDto(UUID id, ComponentTypeTo dto) {
+    public ComponentTypeEntity updateFromDto(UUID id, PartialUpdate<ComponentTypeTo> update) {
+        ComponentTypeTo dto = update.dto();
+
         // 1. Load existing entity with all associations
         ComponentTypeEntity existing = repository.findByIdWithCategory(id)
                 .orElseThrow(() -> new NotFoundException("Component type with id=" + id + " not found"));
@@ -140,7 +143,10 @@ public class ComponentTypeService implements UpdatableCrudService<ComponentTypeE
         // 3. Use mapper to update only specified fields (preserves properties)
         mapper.updateFromTo(existing, dto);
 
-        // 4. Save and return
+        // 4. Clear what the request sent as null, which the mapper's IGNORE strategy skipped
+        update.applyNulls(existing);
+
+        // 5. Save and return
         return repository.save(existing);
     }
 

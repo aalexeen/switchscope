@@ -52,6 +52,11 @@ public class ConnectorController extends AbstractCrudController<Connector, Conne
         return "connector";
     }
 
+    @Override
+    protected Class<ConnectorTo> getDtoClass() {
+        return ConnectorTo.class;
+    }
+
     /**
      * Override to use service DTO method for lazy-safe mapping.
      */

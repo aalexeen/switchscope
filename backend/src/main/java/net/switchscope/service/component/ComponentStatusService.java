@@ -8,6 +8,7 @@ import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.repository.component.ComponentStatusRepository;
 import net.switchscope.service.CrudService;
 import net.switchscope.to.component.catalog.ComponentStatusTo;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -55,9 +56,10 @@ public class ComponentStatusService implements CrudService<ComponentStatusEntity
      * Update component status and return DTO (mapping within transaction to avoid LazyInitializationException).
      */
     @Transactional
-    public ComponentStatusTo updateAndMapToDto(UUID id, ComponentStatusTo dto) {
+    public ComponentStatusTo updateAndMapToDto(UUID id, PartialUpdate<ComponentStatusTo> update) {
         ComponentStatusEntity existing = repository.getExisted(id);
-        mapper.updateFromTo(existing, dto);
+        mapper.updateFromTo(existing, update.dto());
+        update.applyNulls(existing);
         ComponentStatusEntity saved = repository.save(existing);
         return mapper.toTo(saved);
     }

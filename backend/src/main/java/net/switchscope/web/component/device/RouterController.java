@@ -52,6 +52,11 @@ public class RouterController extends AbstractCrudController<Router, RouterTo> {
         return "router";
     }
 
+    @Override
+    protected Class<RouterTo> getDtoClass() {
+        return RouterTo.class;
+    }
+
     /**
      * Override to use service DTO method for lazy-safe mapping.
      */

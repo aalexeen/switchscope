@@ -1,20 +1,11 @@
 package net.switchscope.web.component;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.switchscope.mapper.component.connectivity.CableRunMapper;
-import net.switchscope.mapper.component.connectivity.ConnectorMapper;
-import net.switchscope.mapper.component.connectivity.PatchPanelMapper;
-import net.switchscope.mapper.component.device.AccessPointMapper;
-import net.switchscope.mapper.component.device.NetworkSwitchMapper;
-import net.switchscope.mapper.component.device.RouterMapper;
-import net.switchscope.mapper.component.housing.RackMapper;
 import net.switchscope.model.component.Component;
 import net.switchscope.model.component.connectivity.CableRun;
 import net.switchscope.model.component.connectivity.Connector;
@@ -34,9 +25,9 @@ import net.switchscope.to.component.device.AccessPointTo;
 import net.switchscope.to.component.device.NetworkSwitchTo;
 import net.switchscope.to.component.device.RouterTo;
 import net.switchscope.to.component.housing.RackTo;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -56,14 +47,6 @@ public class ComponentController {
     private final ComponentService service;
     private final ComponentPayloadReader payloadReader;
 
-    // Polymorphic mappers for different component types
-    private final NetworkSwitchMapper networkSwitchMapper;
-    private final RouterMapper routerMapper;
-    private final AccessPointMapper accessPointMapper;
-    private final CableRunMapper cableRunMapper;
-    private final ConnectorMapper connectorMapper;
-    private final PatchPanelMapper patchPanelMapper;
-    private final RackMapper rackMapper;
 
     @RequiresPermission("read")
     @GetMapping
@@ -96,36 +79,25 @@ public class ComponentController {
 
     /**
      * Update component.
-     * Accepts raw JSON and determines concrete DTO type from existing entity in DB.
-     * The discriminator is taken from the stored entity rather than the payload, so a client cannot
-     * change the type of an existing row - and a payload that omits {@code componentClass} still binds.
-     * Validates field nullification against role-based update policy.
+     * <p>
+     * Accepts raw JSON so that a field the payload omits and a field it sends as {@code null} stay
+     * distinguishable; the discriminator is taken from the stored entity rather than the payload,
+     * so a client cannot change the type of an existing row and a payload that omits
+     * {@code componentClass} still binds.
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @SneakyThrows
     public ComponentTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component with id={}", id);
 
-        // 1. Get entity type to determine DTO class
         Component existing = service.getById(id);
         Class<? extends ComponentTo> dtoClass = getDtoClassForEntity(existing);
         log.debug("Entity type: {}, DTO class: {}", existing.getClass().getSimpleName(), dtoClass.getSimpleName());
 
-        // 2. Deserialize JSON to concrete DTO type, pinning the discriminator to the stored type
-        ComponentTo dto = payloadReader.readForUpdate(jsonPayload, existing.getDiscriminatorValue(), dtoClass);
+        PartialUpdate<? extends ComponentTo> update =
+                payloadReader.readForUpdate(jsonPayload, existing.getDiscriminatorValue(), dtoClass);
 
-        // 3. Extract present fields for policy validation
-        Map<String, JsonNode> presentFields = payloadReader.presentFields(jsonPayload);
-
-        // 4. Delegate to service (handles validation, FK changes, mapping, save, and DTO conversion in transaction)
-        return service.updateWithPolicyValidationAndReturnDto(
-                id,
-                dto,
-                dtoClass,
-                presentFields,
-                this::updateFromDto
-        );
+        return service.updateFromDto(id, update);
     }
 
     /**
@@ -159,24 +131,4 @@ public class ComponentController {
         service.delete(id);
     }
 
-    private void updateFromDto(Component component, ComponentTo to) {
-        if (component instanceof NetworkSwitch entity && to instanceof NetworkSwitchTo dto) {
-            networkSwitchMapper.updateFromTo(entity, dto);
-        } else if (component instanceof Router entity && to instanceof RouterTo dto) {
-            routerMapper.updateFromTo(entity, dto);
-        } else if (component instanceof AccessPoint entity && to instanceof AccessPointTo dto) {
-            accessPointMapper.updateFromTo(entity, dto);
-        } else if (component instanceof CableRun entity && to instanceof CableRunTo dto) {
-            cableRunMapper.updateFromTo(entity, dto);
-        } else if (component instanceof Connector entity && to instanceof ConnectorTo dto) {
-            connectorMapper.updateFromTo(entity, dto);
-        } else if (component instanceof PatchPanel entity && to instanceof PatchPanelTo dto) {
-            patchPanelMapper.updateFromTo(entity, dto);
-        } else if (component instanceof Rack entity && to instanceof RackTo dto) {
-            rackMapper.updateFromTo(entity, dto);
-        } else {
-            throw new IllegalArgumentException("Component type mismatch: entity=" + component.getClass().getName()
-                    + ", to=" + to.getClass().getName());
-        }
-    }
 }

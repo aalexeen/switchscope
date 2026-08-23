@@ -1,20 +1,16 @@
 package net.switchscope.web.catalog;
 
 import jakarta.validation.Valid;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.component.catalog.ComponentCategoryMapper;
 import net.switchscope.model.component.ComponentCategoryEntity;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
-import net.switchscope.security.policy.UpdatePolicy;
-import net.switchscope.security.policy.UpdatePolicyResolver;
-import net.switchscope.security.policy.UpdatePolicyValidator;
 import net.switchscope.service.component.ComponentCategoryService;
 import net.switchscope.to.component.catalog.ComponentCategoryTo;
+import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.web.payload.PartialUpdateReader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,10 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -48,11 +41,7 @@ public class ComponentCategoryController {
 
     private final ComponentCategoryService service;
     private final ComponentCategoryMapper mapper;
-    private final ObjectMapper objectMapper;
-
-    // Policy validation
-    private final UpdatePolicyResolver policyResolver;
-    private final UpdatePolicyValidator policyValidator;
+    private final PartialUpdateReader partialUpdateReader;
 
     @RequiresPermission("read")
     @GetMapping
@@ -84,22 +73,10 @@ public class ComponentCategoryController {
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @SneakyThrows
     public ComponentCategoryTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component category with id={}", id);
-
-        // 1. Deserialize JSON into DTO
-        ComponentCategoryTo dto = objectMapper.readValue(jsonPayload, ComponentCategoryTo.class);
-
-        // 2. Validate field nullifications against policy
-        Map<String, JsonNode> presentFields = extractPresentFields(jsonPayload);
-        UpdatePolicy policy = policyResolver.resolve();
-        log.debug("Applying update policy: {}", policy.getPolicyName());
-        policyValidator.validate(ComponentCategoryTo.class, presentFields, policy);
-
-        // 3. Delegate to service for actual update (uses updateFromDto pattern)
-        ComponentCategoryEntity updated = service.updateFromDto(id, dto);
-
+        PartialUpdate<ComponentCategoryTo> update = partialUpdateReader.read(jsonPayload, ComponentCategoryTo.class);
+        ComponentCategoryEntity updated = service.updateFromDto(id, update);
         return mapper.toTo(updated);
     }
 
@@ -109,21 +86,5 @@ public class ComponentCategoryController {
     public void delete(@PathVariable UUID id) {
         log.info("delete component category {}", id);
         service.delete(id);
-    }
-
-    /**
-     * Extracts all fields present in JSON payload with their values.
-     * Used to detect explicitly set null values vs absent fields.
-     */
-    @SneakyThrows
-    private Map<String, JsonNode> extractPresentFields(String jsonPayload) {
-        Map<String, JsonNode> fields = new HashMap<>();
-        JsonNode root = objectMapper.readTree(jsonPayload);
-        Iterator<String> fieldNames = root.fieldNames();
-        while (fieldNames.hasNext()) {
-            String fieldName = fieldNames.next();
-            fields.put(fieldName, root.get(fieldName));
-        }
-        return fields;
     }
 }

@@ -12,6 +12,7 @@ import net.switchscope.model.component.catalog.connectiviy.CableRunModel;
 import net.switchscope.repository.location.LocationRepository;
 import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
+import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.connectivity.CableRunTo;
 
 import java.util.List;
@@ -91,10 +92,12 @@ public class CableRunService implements DtoCrudService<CableRun, CableRunTo> {
      */
     @Override
     @Transactional
-    public CableRunTo updateFromDto(UUID id, CableRunTo dto) {
+    public CableRunTo updateFromDto(UUID id, PartialUpdate<CableRunTo> update) {
+        CableRunTo dto = update.dto();
         CableRun existing = getById(id);
         mapper.updateFromTo(existing, dto);
         applyReferences(existing, dto);
+        update.applyNulls(existing);
         return mapper.toTo(repository.save(existing));
     }
 

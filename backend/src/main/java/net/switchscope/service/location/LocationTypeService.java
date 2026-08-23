@@ -10,6 +10,7 @@ import net.switchscope.model.location.catalog.LocationTypeEntity;
 import net.switchscope.repository.location.LocationTypeRepository;
 import net.switchscope.service.UpdatableCrudService;
 import net.switchscope.to.location.catalog.LocationTypeTo;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -87,9 +88,10 @@ public class LocationTypeService implements UpdatableCrudService<LocationTypeEnt
 
     @Override
     @Transactional
-    public LocationTypeEntity updateFromDto(UUID id, LocationTypeTo dto) {
+    public LocationTypeEntity updateFromDto(UUID id, PartialUpdate<LocationTypeTo> update) {
         LocationTypeEntity existing = repository.getExisted(id);
-        mapper.updateFromTo(existing, dto);
+        mapper.updateFromTo(existing, update.dto());
+        update.applyNulls(existing);
         return repository.save(existing);
     }
 
@@ -97,10 +99,8 @@ public class LocationTypeService implements UpdatableCrudService<LocationTypeEnt
      * Update location type and return DTO (mapping within transaction to avoid LazyInitializationException).
      */
     @Transactional
-    public LocationTypeTo updateAndMapToDto(UUID id, LocationTypeTo dto) {
-        LocationTypeEntity existing = repository.getExisted(id);
-        mapper.updateFromTo(existing, dto);
-        LocationTypeEntity saved = repository.save(existing);
+    public LocationTypeTo updateAndMapToDto(UUID id, PartialUpdate<LocationTypeTo> update) {
+        LocationTypeEntity saved = updateFromDto(id, update);
         return mapper.toTo(saved);
     }
 

@@ -63,6 +63,11 @@ public interface InstallationMapper extends BaseMapper<Installation, Installatio
     @Mapping(target = "statusChangedBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    // occupiedRackPositions is computed from rackPosition and rackUnitHeight and returns
+    // List.of() when the installation is not rack-mounted. MapStruct treats a read-only
+    // collection getter as a target it may fill, and its generated code calls clear() on it:
+    // every write to an installation died on UnsupportedOperationException before this line.
+    @Mapping(target = "occupiedRackPositions", ignore = true)
     @Override
     Installation toEntity(InstallationTo to);
 
@@ -76,6 +81,7 @@ public interface InstallationMapper extends BaseMapper<Installation, Installatio
     @Mapping(target = "statusChangedBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "occupiedRackPositions", ignore = true)
     @Override
     Installation updateFromTo(@MappingTarget Installation entity, InstallationTo to);
 }

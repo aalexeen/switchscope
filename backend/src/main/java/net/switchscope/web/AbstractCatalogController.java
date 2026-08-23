@@ -6,6 +6,7 @@ import net.switchscope.mapper.BaseMapper;
 import net.switchscope.service.CrudService;
 import net.switchscope.service.UpdatableCrudService;
 import net.switchscope.to.BaseTo;
+import net.switchscope.web.payload.PartialUpdate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -83,7 +84,10 @@ public abstract class AbstractCatalogController<E, T extends BaseTo> {
         // Use updateFromDto if service supports it (gold standard pattern)
         if (service instanceof UpdatableCrudService) {
             UpdatableCrudService<E, T> updatableService = (UpdatableCrudService<E, T>) service;
-            updated = updatableService.updateFromDto(id, dto);
+            // No raw body here, so absent and explicitly-null are indistinguishable and
+            // nothing can be cleared. This class is dead - only the TestEntityController
+            // fixture extends it - and its removal is already queued in PRIORITY 2.
+            updated = updatableService.updateFromDto(id, PartialUpdate.valuesOnly(dto));
         } else {
             // Fallback to legacy pattern (may lose properties/associations)
             log.warn("Service {} does not implement UpdatableCrudService, using legacy update pattern",

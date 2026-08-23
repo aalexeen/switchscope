@@ -1,18 +1,19 @@
 package net.switchscope.web.component;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.error.NotFoundException;
 import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.repository.component.ComponentTypeRepository;
 import net.switchscope.service.component.InstallableComponentRegistry;
 import net.switchscope.to.component.ComponentTo;
+import net.switchscope.web.payload.JsonPayload;
+import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.web.payload.PartialUpdateReader;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -46,7 +47,8 @@ public class ComponentPayloadReader {
 
     private static final String DISCRIMINATOR = "componentClass";
 
-    private final ObjectMapper objectMapper;
+    private final JsonPayload json;
+    private final PartialUpdateReader partialUpdateReader;
     private final ComponentTypeRepository componentTypeRepository;
     private final InstallableComponentRegistry registry;
     private final Validator validator;
@@ -59,7 +61,7 @@ public class ComponentPayloadReader {
      * @return the bound DTO, already validated
      */
     public <T extends ComponentTo> T readForCreate(String jsonPayload, Class<T> baseType) {
-        ObjectNode root = asObject(jsonPayload);
+        ObjectNode root = json.asObject(jsonPayload);
         String derived = deriveDiscriminator(root);
 
         JsonNode supplied = root.get(DISCRIMINATOR);
@@ -77,37 +79,19 @@ public class ComponentPayloadReader {
 
     /**
      * Binds an update payload onto the type of the stored entity, ignoring any type the payload
-     * claims. Bean validation is not applied: updates are partial by design.
+     * claims, and checks the fields it sends as null against the caller's field-access policy.
+     * Bean validation is not applied: updates are partial by design.
      *
      * @param jsonPayload   the raw request body
      * @param discriminator the stored entity's discriminator
      * @param dtoClass      the concrete DTO class matching the stored entity
-     * @return the bound DTO
+     * @return the bound DTO together with which fields the request carried
      */
-    public <T extends ComponentTo> T readForUpdate(String jsonPayload, String discriminator, Class<T> dtoClass) {
-        ObjectNode root = asObject(jsonPayload);
+    public <T extends ComponentTo> PartialUpdate<T> readForUpdate(
+            String jsonPayload, String discriminator, Class<T> dtoClass) {
+        ObjectNode root = json.asObject(jsonPayload);
         root.put(DISCRIMINATOR, discriminator);
-        return bind(root, dtoClass, discriminator);
-    }
-
-    /**
-     * The field names present at the top level of the payload, used to tell an explicitly null field
-     * from an absent one during policy validation.
-     */
-    public java.util.Map<String, JsonNode> presentFields(String jsonPayload) {
-        ObjectNode root = asObject(jsonPayload);
-        java.util.Map<String, JsonNode> fields = new java.util.HashMap<>();
-        root.fieldNames().forEachRemaining(name -> fields.put(name, root.get(name)));
-        return fields;
-    }
-
-    @SneakyThrows
-    private ObjectNode asObject(String jsonPayload) {
-        JsonNode root = objectMapper.readTree(jsonPayload);
-        if (!(root instanceof ObjectNode objectNode)) {
-            throw new IllegalRequestDataException("Request body must be a JSON object");
-        }
-        return objectNode;
+        return partialUpdateReader.read(root, dtoClass);
     }
 
     /**
@@ -137,9 +121,8 @@ public class ComponentPayloadReader {
         return code;
     }
 
-    @SneakyThrows
     private <T extends ComponentTo> T bind(ObjectNode root, Class<T> targetType, String discriminator) {
-        ComponentTo dto = objectMapper.treeToValue(root, ComponentTo.class);
+        ComponentTo dto = json.bind(root, ComponentTo.class);
         if (!targetType.isInstance(dto)) {
             throw new IllegalRequestDataException("Component type '" + discriminator + "' is not a "
                     + targetType.getSimpleName().replace("To", ""));

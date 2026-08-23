@@ -1,6 +1,7 @@
 package net.switchscope.web;
 
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,8 @@ import net.switchscope.mapper.BaseMapper;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.BaseTo;
+import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.web.payload.PartialUpdateReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +27,13 @@ import java.util.UUID;
  * updates onto the stored entity. The controller must not build an entity with the mapper and hand
  * it to the service: the mapper ignores associations, so saving that detached instance would null
  * the corresponding columns.
+ * <p>
+ * {@code update} takes the body as raw JSON rather than a bound DTO. That is not a style choice:
+ * after deserialisation into a POJO a field the caller omitted and a field the caller set to
+ * {@code null} are the same thing, so a controller holding only the DTO cannot honour a request to
+ * clear a field - and the nine subclasses of this class serve the same objects as the polymorphic
+ * controllers that can. Half the API able to clear a field and half not would be worse than
+ * neither, so the reading happens here, once, for all nine.
  *
  * @param <E> the entity type
  * @param <T> the DTO (Transfer Object) type
@@ -31,11 +41,28 @@ import java.util.UUID;
 @Slf4j
 public abstract class AbstractCrudController<E, T extends BaseTo> {
 
+    /**
+     * Injected on the field because the subclasses are Lombok {@code @RequiredArgsConstructor}
+     * classes: giving this class a constructor parameter would mean writing an explicit
+     * constructor in all nine of them to pass it up.
+     */
+    @Autowired
+    protected PartialUpdateReader partialUpdateReader;
+
     protected abstract DtoCrudService<E, T> getService();
 
     protected abstract BaseMapper<E, T> getMapper();
 
     protected abstract String getEntityName();
+
+    /**
+     * The concrete DTO class, needed to bind a raw body and to look up field-access metadata.
+     * Declared rather than resolved from the type parameter so that a subclass which forgets it
+     * fails to compile instead of failing on its first PUT.
+     *
+     * @return the DTO class this controller serves
+     */
+    protected abstract Class<T> getDtoClass();
 
     @RequiresPermission("read")
     @GetMapping
@@ -61,11 +88,16 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
         return getService().createFromDto(dto);
     }
 
+    /**
+     * Apply a partial update. A field the body omits keeps its stored value; a field the body sends
+     * as {@code null} is cleared, if the caller's policy allows it and the column can hold null.
+     */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public T update(@PathVariable UUID id, @RequestBody T dto) {
-        log.info("update {} {} with id={}", getEntityName(), dto, id);
-        return getService().updateFromDto(id, dto);
+    public T update(@PathVariable UUID id, @RequestBody String jsonPayload) {
+        PartialUpdate<T> update = partialUpdateReader.read(jsonPayload, getDtoClass());
+        log.info("update {} {} with id={}", getEntityName(), update.dto(), id);
+        return getService().updateFromDto(id, update);
     }
 
     @RequiresPermission("delete")

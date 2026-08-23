@@ -1,7 +1,5 @@
 package net.switchscope.web.port;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -9,9 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.model.port.Port;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
@@ -19,6 +15,8 @@ import net.switchscope.service.port.PortService;
 import net.switchscope.to.port.EthernetPortTo;
 import net.switchscope.to.port.FiberPortTo;
 import net.switchscope.to.port.PortTo;
+import net.switchscope.web.payload.JsonPayload;
+import net.switchscope.web.payload.PartialUpdateReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +31,8 @@ public class PortController {
     static final String REST_URL = "/api/ports";
 
     private final PortService service;
-    private final ObjectMapper objectMapper;
+    private final JsonPayload json;
+    private final PartialUpdateReader partialUpdateReader;
 
     @RequiresPermission("read")
     @GetMapping
@@ -71,21 +70,16 @@ public class PortController {
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @SneakyThrows
     public PortTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update port with id={}", id);
 
         Port existing = service.getById(id);
         Class<? extends PortTo> dtoClass = getDtoClassForEntity(existing);
 
-        JsonNode root = objectMapper.readTree(jsonPayload);
-        if (!(root instanceof ObjectNode objectNode)) {
-            throw new IllegalRequestDataException("Request body must be a JSON object");
-        }
-        objectNode.put("portType", existing.getPortType());
-        PortTo to = objectMapper.treeToValue(objectNode, dtoClass);
+        ObjectNode root = json.asObject(jsonPayload);
+        root.put("portType", existing.getPortType());
 
-        return service.updateFromDto(id, to);
+        return service.updateFromDto(id, partialUpdateReader.read(root, dtoClass));
     }
 
     @RequiresPermission("delete")

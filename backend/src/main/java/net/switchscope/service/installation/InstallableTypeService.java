@@ -9,6 +9,7 @@ import net.switchscope.repository.installation.InstallableTypeRepository;
 import net.switchscope.service.UpdatableCrudService;
 import net.switchscope.service.component.InstallableComponentRegistry;
 import net.switchscope.to.installation.catalog.InstallableTypeTo;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -57,9 +58,10 @@ public class InstallableTypeService implements UpdatableCrudService<InstallableT
 
     @Override
     @Transactional
-    public InstallableTypeEntity updateFromDto(UUID id, InstallableTypeTo dto) {
+    public InstallableTypeEntity updateFromDto(UUID id, PartialUpdate<InstallableTypeTo> update) {
         InstallableTypeEntity existing = repository.getExisted(id);
-        mapper.updateFromTo(existing, dto);
+        mapper.updateFromTo(existing, update.dto());
+        update.applyNulls(existing);
         InstallableTypeEntity saved = repository.save(existing);
         saved.setRegistry(registry);
         return saved;

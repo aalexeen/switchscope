@@ -16,6 +16,7 @@ import net.switchscope.security.policy.UpdatePolicyResolver;
 import net.switchscope.security.policy.UpdatePolicyValidator;
 import net.switchscope.service.CrudService;
 import net.switchscope.to.component.catalog.ComponentModelTo;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.List;
 import java.util.Map;
@@ -74,12 +75,12 @@ public class ComponentModelService implements CrudService<ComponentModel> {
 
     /**
      * @deprecated saving the detached entity built by the mapper merges nulls over the component
-     * type link; use {@link #updateWithPolicyValidation}. Kept only to satisfy {@code CrudService}.
+     * type link; use {@link #updateFromDto}. Kept only to satisfy {@code CrudService}.
      */
     @Override
     @Deprecated
     public ComponentModel update(UUID id, ComponentModel entity) {
-        throw new UnsupportedOperationException("Use updateWithPolicyValidation(...)");
+        throw new UnsupportedOperationException("Use updateFromDto(id, update, mapper)");
     }
 
     private ComponentTypeEntity getComponentType(UUID componentTypeId) {
@@ -95,33 +96,30 @@ public class ComponentModelService implements CrudService<ComponentModel> {
     }
 
     /**
-     * Update component model with role-based policy validation.
+     * Apply an update onto the stored component model.
+     * <p>
+     * The policy check has already happened: a {@link PartialUpdate} that clears anything can only
+     * be produced by the reader that validates first, so what arrives here is a decision, not a
+     * request to be re-examined.
      *
-     * @param id            component model ID
-     * @param dto           deserialized DTO
-     * @param dtoClass      DTO class for policy lookup
-     * @param presentFields JSON fields present in request (for null detection)
-     * @param mapperFunction function to apply DTO to entity via mapper
+     * @param id             component model ID
+     * @param update         the bound DTO and the fields the request carried
+     * @param mapperFunction applies the DTO to the entity with the mapper of the concrete type
      * @return updated component model
      */
     @Transactional
-    public ComponentModel updateWithPolicyValidation(
+    public ComponentModel updateFromDto(
             UUID id,
-            ComponentModelTo dto,
-            Class<? extends ComponentModelTo> dtoClass,
-            Map<String, JsonNode> presentFields,
+            PartialUpdate<? extends ComponentModelTo> update,
             BiConsumer<ComponentModel, ComponentModelTo> mapperFunction) {
+
+        ComponentModelTo dto = update.dto();
 
         // 1. Load existing entity with associations
         ComponentModel entity = repository.findByIdWithComponentType(id)
                 .orElseThrow(() -> new NotFoundException("Component model with id=" + id + " not found"));
 
-        // 2. Validate field nullifications against policy
-        UpdatePolicy policy = policyResolver.resolve();
-        log.debug("Applying update policy: {} for component model {}", policy.getPolicyName(), id);
-        policyValidator.validate(dtoClass, presentFields, policy);
-
-        // 3. Handle componentTypeId FK change
+        // 2. Handle componentTypeId FK change
         if (dto.getComponentTypeId() != null &&
                 (entity.getComponentType() == null ||
                  !Objects.equals(dto.getComponentTypeId(), entity.getComponentType().getId()))) {
@@ -130,8 +128,11 @@ public class ComponentModelService implements CrudService<ComponentModel> {
             entity.setComponentType(newComponentType);
         }
 
-        // 4. Apply field updates via mapper
+        // 3. Apply field updates via mapper
         mapperFunction.accept(entity, dto);
+
+        // 4. Clear what the request sent as null, which the mapper's IGNORE strategy skipped
+        update.applyNulls(entity);
 
         // 5. Save and return
         return repository.save(entity);

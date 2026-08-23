@@ -14,6 +14,7 @@ import net.switchscope.repository.installation.InstallationRepository;
 import net.switchscope.repository.installation.InstallationStatusRepository;
 import net.switchscope.repository.location.LocationRepository;
 import net.switchscope.service.DtoCrudService;
+import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.installation.InstallationTo;
 
 import java.util.List;
@@ -69,11 +70,13 @@ public class InstallationService implements DtoCrudService<Installation, Install
      */
     @Override
     @Transactional
-    public InstallationTo updateFromDto(UUID id, InstallationTo dto) {
+    public InstallationTo updateFromDto(UUID id, PartialUpdate<InstallationTo> update) {
+        InstallationTo dto = update.dto();
         Installation existing = repository.findByIdWithRelationships(id)
                 .orElseThrow(() -> new NotFoundException("Installation with id=" + id + " not found"));
         mapper.updateFromTo(existing, dto);
         applyReferences(existing, dto);
+        update.applyNulls(existing);
         Installation saved = repository.save(existing);
         initializeForMapping(saved);
         return mapper.toTo(saved);

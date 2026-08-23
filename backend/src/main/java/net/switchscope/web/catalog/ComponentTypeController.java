@@ -1,21 +1,17 @@
 package net.switchscope.web.catalog;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.component.catalog.ComponentTypeMapper;
 import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
-import net.switchscope.security.policy.UpdatePolicy;
-import net.switchscope.security.policy.UpdatePolicyResolver;
-import net.switchscope.security.policy.UpdatePolicyValidator;
 import net.switchscope.service.component.ComponentTypeService;
 import net.switchscope.service.component.InstallableComponentRegistry;
 import net.switchscope.to.component.catalog.ComponentTypeTo;
+import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.web.payload.PartialUpdateReader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,10 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -49,12 +42,8 @@ public class ComponentTypeController {
 
     private final ComponentTypeService service;
     private final ComponentTypeMapper mapper;
-    private final ObjectMapper objectMapper;
     private final InstallableComponentRegistry registry;
-
-    // Policy validation
-    private final UpdatePolicyResolver policyResolver;
-    private final UpdatePolicyValidator policyValidator;
+    private final PartialUpdateReader partialUpdateReader;
 
     @RequiresPermission("read")
     @GetMapping
@@ -102,22 +91,10 @@ public class ComponentTypeController {
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @SneakyThrows
     public ComponentTypeTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component type with id={}", id);
-
-        // 1. Deserialize JSON into DTO
-        ComponentTypeTo dto = objectMapper.readValue(jsonPayload, ComponentTypeTo.class);
-
-        // 2. Validate field nullifications against policy
-        Map<String, JsonNode> presentFields = extractPresentFields(jsonPayload);
-        UpdatePolicy policy = policyResolver.resolve();
-        log.debug("Applying update policy: {}", policy.getPolicyName());
-        policyValidator.validate(ComponentTypeTo.class, presentFields, policy);
-
-        // 3. Delegate to service for actual update (uses updateFromDto pattern)
-        ComponentTypeEntity updated = service.updateFromDto(id, dto);
-
+        PartialUpdate<ComponentTypeTo> update = partialUpdateReader.read(jsonPayload, ComponentTypeTo.class);
+        ComponentTypeEntity updated = service.updateFromDto(id, update);
         return mapper.toTo(updated);
     }
 
@@ -127,21 +104,5 @@ public class ComponentTypeController {
     public void delete(@PathVariable UUID id) {
         log.info("delete component type {}", id);
         service.delete(id);
-    }
-
-    /**
-     * Extracts all fields present in JSON payload with their values.
-     * Used to detect explicitly set null values vs absent fields.
-     */
-    @SneakyThrows
-    private Map<String, JsonNode> extractPresentFields(String jsonPayload) {
-        Map<String, JsonNode> fields = new HashMap<>();
-        JsonNode root = objectMapper.readTree(jsonPayload);
-        Iterator<String> fieldNames = root.fieldNames();
-        while (fieldNames.hasNext()) {
-            String fieldName = fieldNames.next();
-            fields.put(fieldName, root.get(fieldName));
-        }
-        return fields;
     }
 }

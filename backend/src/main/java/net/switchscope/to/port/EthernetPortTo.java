@@ -9,6 +9,8 @@ import net.switchscope.validation.NoHtml;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import net.switchscope.security.policy.FieldAccess;
+import net.switchscope.security.policy.FieldAccessLevel;
 
 /**
  * DTO for EthernetPort entity
@@ -21,26 +23,33 @@ public class EthernetPortTo extends PortTo {
     // Ethernet-specific fields
     @Size(max = 64)
     @NoHtml
+    @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private String ethernetStandard;
 
     @Size(max = 16)
     @NoHtml
+    @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private String mdiMdixMode;
 
+    @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private Integer cableLengthMeters;
 
     @Size(max = 256)
     @NoHtml
+    @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private String linkPartnerInfo;
 
     // Computed read-only fields
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean gigabitCapable;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private Boolean tenGigabitCapable;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @FieldAccess(FieldAccessLevel.READ_ONLY)
     private String ethernetClass;
 
     public EthernetPortTo(UUID id, OffsetDateTime createdAt, OffsetDateTime updatedAt, String name) {

@@ -52,6 +52,11 @@ public class RackController extends AbstractCrudController<Rack, RackTo> {
         return "rack";
     }
 
+    @Override
+    protected Class<RackTo> getDtoClass() {
+        return RackTo.class;
+    }
+
     /**
      * Override to use service DTO method for lazy-safe mapping.
      */

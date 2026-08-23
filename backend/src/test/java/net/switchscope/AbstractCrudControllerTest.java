@@ -136,11 +136,11 @@ class AbstractCrudControllerTest {
         net.switchscope.model.component.housing.Rack stored = new net.switchscope.model.component.housing.Rack();
         net.switchscope.to.component.housing.RackTo bound = new net.switchscope.to.component.housing.RackTo();
         given(service.getById(id)).willReturn(stored);
+        net.switchscope.web.payload.PartialUpdate<net.switchscope.to.component.housing.RackTo> update =
+                net.switchscope.web.payload.PartialUpdate.valuesOnly(bound);
         given(payloadReader.readForUpdate(anyString(), eq("RACK"), eq(net.switchscope.to.component.housing.RackTo.class)))
-                .willReturn(bound);
-        given(payloadReader.presentFields(anyString())).willReturn(java.util.Map.of());
-        given(service.updateWithPolicyValidationAndReturnDto(eq(id), eq(bound), any(), any(), any()))
-                .willReturn(bound);
+                .willReturn(update);
+        given(service.updateFromDto(eq(id), eq(update))).willReturn(bound);
 
         mockMvc.perform(put(BASE_URL + "/" + id)
                         .with(httpBasic("user", "password"))

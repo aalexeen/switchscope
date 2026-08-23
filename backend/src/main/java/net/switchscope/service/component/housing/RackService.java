@@ -11,6 +11,7 @@ import net.switchscope.repository.component.housing.HousingRepository;
 import net.switchscope.model.component.catalog.housing.RackModelEntity;
 import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
+import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.housing.RackTo;
 
 import java.util.List;
@@ -82,10 +83,12 @@ public class RackService implements DtoCrudService<Rack, RackTo> {
      */
     @Override
     @Transactional
-    public RackTo updateFromDto(UUID id, RackTo dto) {
+    public RackTo updateFromDto(UUID id, PartialUpdate<RackTo> update) {
+        RackTo dto = update.dto();
         Rack existing = getById(id);
         mapper.updateFromTo(existing, dto);
         applyReferences(existing, dto);
+        update.applyNulls(existing);
         return mapper.toTo(repository.save(existing));
     }
 

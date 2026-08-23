@@ -39,4 +39,9 @@ public class InstallationController extends AbstractCrudController<Installation,
     protected String getEntityName() {
         return "installation";
     }
+
+    @Override
+    protected Class<InstallationTo> getDtoClass() {
+        return InstallationTo.class;
+    }
 }

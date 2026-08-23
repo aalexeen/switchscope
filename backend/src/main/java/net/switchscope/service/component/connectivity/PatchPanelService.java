@@ -14,6 +14,7 @@ import net.switchscope.repository.component.connectivity.ConnectivityRepository;
 import net.switchscope.model.component.catalog.connectiviy.PatchPanelModel;
 import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
+import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.connectivity.PatchPanelTo;
 
 @Service
@@ -89,10 +90,12 @@ public class PatchPanelService implements DtoCrudService<PatchPanel, PatchPanelT
      */
     @Override
     @Transactional
-    public PatchPanelTo updateFromDto(UUID id, PatchPanelTo dto) {
+    public PatchPanelTo updateFromDto(UUID id, PartialUpdate<PatchPanelTo> update) {
+        PatchPanelTo dto = update.dto();
         PatchPanel existing = getById(id);
         mapper.updateFromTo(existing, dto);
         applyReferences(existing, dto);
+        update.applyNulls(existing);
         return mapper.toTo(repository.save(existing));
     }
 

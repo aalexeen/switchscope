@@ -8,6 +8,7 @@ import net.switchscope.model.installation.catalog.InstallationStatusEntity;
 import net.switchscope.repository.installation.InstallationStatusRepository;
 import net.switchscope.service.UpdatableCrudService;
 import net.switchscope.to.installation.catalog.InstallationStatusTo;
+import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,9 +48,10 @@ public class InstallationStatusService implements UpdatableCrudService<Installat
 
     @Override
     @Transactional
-    public InstallationStatusEntity updateFromDto(UUID id, InstallationStatusTo dto) {
+    public InstallationStatusEntity updateFromDto(UUID id, PartialUpdate<InstallationStatusTo> update) {
         InstallationStatusEntity existing = repository.getExisted(id);
-        mapper.updateFromTo(existing, dto);
+        mapper.updateFromTo(existing, update.dto());
+        update.applyNulls(existing);
         return repository.save(existing);
     }
 

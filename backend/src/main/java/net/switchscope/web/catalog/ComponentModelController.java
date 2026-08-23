@@ -1,14 +1,10 @@
 package net.switchscope.web.catalog;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.mapper.component.catalog.connectivity.CableRunModelMapper;
 import net.switchscope.mapper.component.catalog.connectivity.ConnectorModelMapper;
 import net.switchscope.mapper.component.catalog.connectivity.PatchPanelModelMapper;
@@ -28,14 +24,14 @@ import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.component.catalog.ComponentModelService;
 import net.switchscope.to.component.catalog.ComponentModelTo;
+import net.switchscope.web.payload.JsonPayload;
+import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.web.payload.PartialUpdateReader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -54,7 +50,8 @@ public class ComponentModelController {
     static final String REST_URL = "/api/catalogs/component-models";
 
     private final ComponentModelService service;
-    private final ObjectMapper objectMapper;
+    private final JsonPayload json;
+    private final PartialUpdateReader partialUpdateReader;
 
     // Polymorphic mappers for different model types
     private final SwitchModelMapper switchModelMapper;
@@ -99,7 +96,6 @@ public class ComponentModelController {
      */
     @RequiresPermission("update")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @SneakyThrows
     public ComponentModelTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component model with id={}", id);
 
@@ -109,43 +105,14 @@ public class ComponentModelController {
         log.debug("Entity type: {}, DTO class: {}", existing.getClass().getSimpleName(), dtoClass.getSimpleName());
 
         // 2. Deserialize JSON to concrete DTO type, pinning the discriminator to the stored type
-        //    so a client cannot switch the model class and payloads may omit discriminatorType
-        JsonNode root = objectMapper.readTree(jsonPayload);
-        if (!(root instanceof ObjectNode objectNode)) {
-            throw new IllegalRequestDataException("Request body must be a JSON object");
-        }
-        objectNode.put("discriminatorType", existing.getDiscriminatorValue());
-        ComponentModelTo dto = objectMapper.treeToValue(objectNode, dtoClass);
+        //    so a client cannot switch the model class and payloads may omit discriminatorType,
+        //    and check the fields it sends as null against the caller's field-access policy
+        ObjectNode root = json.asObject(jsonPayload);
+        root.put("discriminatorType", existing.getDiscriminatorValue());
+        PartialUpdate<? extends ComponentModelTo> update = partialUpdateReader.read(root, dtoClass);
 
-        // 3. Extract present fields for policy validation
-        Map<String, JsonNode> presentFields = extractPresentFields(jsonPayload);
-
-        // 4. Delegate to service (handles validation, FK changes, mapping, save in transaction)
-        ComponentModel updated = service.updateWithPolicyValidation(
-                id,
-                dto,
-                dtoClass,
-                presentFields,
-                this::updateFromDto
-        );
-
-        return mapToDto(updated);
-    }
-
-    /**
-     * Extracts all fields present in JSON payload with their values.
-     * Used to detect explicitly set null values vs absent fields.
-     */
-    @SneakyThrows
-    private Map<String, JsonNode> extractPresentFields(String jsonPayload) {
-        Map<String, JsonNode> fields = new HashMap<>();
-        JsonNode root = objectMapper.readTree(jsonPayload);
-        Iterator<String> fieldNames = root.fieldNames();
-        while (fieldNames.hasNext()) {
-            String fieldName = fieldNames.next();
-            fields.put(fieldName, root.get(fieldName));
-        }
-        return fields;
+        // 3. Delegate to service (handles FK changes, mapping, clearing, save in transaction)
+        return mapToDto(service.updateFromDto(id, update, this::updateFromDto));
     }
 
     @RequiresPermission("delete")

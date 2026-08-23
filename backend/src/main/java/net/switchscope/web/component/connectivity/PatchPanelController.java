@@ -52,6 +52,11 @@ public class PatchPanelController extends AbstractCrudController<PatchPanel, Pat
         return "patch panel";
     }
 
+    @Override
+    protected Class<PatchPanelTo> getDtoClass() {
+        return PatchPanelTo.class;
+    }
+
     /**
      * Override to use service DTO method for lazy-safe mapping.
      */

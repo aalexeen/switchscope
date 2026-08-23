@@ -10,6 +10,7 @@ import net.switchscope.model.component.device.Router;
 import net.switchscope.repository.component.device.DeviceRepository;
 import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
+import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.device.RouterTo;
 
 import java.util.List;
@@ -84,10 +85,12 @@ public class RouterService implements DtoCrudService<Router, RouterTo> {
      */
     @Override
     @Transactional
-    public RouterTo updateFromDto(UUID id, RouterTo dto) {
+    public RouterTo updateFromDto(UUID id, PartialUpdate<RouterTo> update) {
+        RouterTo dto = update.dto();
         Router existing = getById(id);
         mapper.updateFromTo(existing, dto);
         applyReferences(existing, dto);
+        update.applyNulls(existing);
         return mapper.toTo(repository.save(existing));
     }
 

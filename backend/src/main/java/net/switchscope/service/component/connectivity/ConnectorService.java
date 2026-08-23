@@ -13,6 +13,7 @@ import net.switchscope.model.component.connectivity.CableRun;
 import net.switchscope.repository.port.PortRepository;
 import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
+import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.connectivity.ConnectorTo;
 
 import java.util.List;
@@ -89,10 +90,12 @@ public class ConnectorService implements DtoCrudService<Connector, ConnectorTo> 
      */
     @Override
     @Transactional
-    public ConnectorTo updateFromDto(UUID id, ConnectorTo dto) {
+    public ConnectorTo updateFromDto(UUID id, PartialUpdate<ConnectorTo> update) {
+        ConnectorTo dto = update.dto();
         Connector existing = getById(id);
         mapper.updateFromTo(existing, dto);
         applyReferences(existing, dto);
+        update.applyNulls(existing);
         return mapper.toTo(repository.save(existing));
     }
 

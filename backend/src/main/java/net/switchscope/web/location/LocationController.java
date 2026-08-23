@@ -52,6 +52,11 @@ public class LocationController extends AbstractCrudController<Location, Locatio
         return "location";
     }
 
+    @Override
+    protected Class<LocationTo> getDtoClass() {
+        return LocationTo.class;
+    }
+
     /**
      * Override to use service DTO method for lazy-safe mapping.
      */

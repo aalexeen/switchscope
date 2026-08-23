@@ -52,6 +52,11 @@ public class NetworkSwitchController extends AbstractCrudController<NetworkSwitc
         return "network switch";
     }
 
+    @Override
+    protected Class<NetworkSwitchTo> getDtoClass() {
+        return NetworkSwitchTo.class;
+    }
+
     /**
      * Override to use service DTO method for lazy-safe mapping.
      */

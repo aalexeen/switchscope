@@ -10,6 +10,7 @@ import net.switchscope.model.component.device.AccessPoint;
 import net.switchscope.repository.component.device.DeviceRepository;
 import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
+import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.device.AccessPointTo;
 
 import java.util.List;
@@ -89,10 +90,12 @@ public class AccessPointService implements DtoCrudService<AccessPoint, AccessPoi
      */
     @Override
     @Transactional
-    public AccessPointTo updateFromDto(UUID id, AccessPointTo dto) {
+    public AccessPointTo updateFromDto(UUID id, PartialUpdate<AccessPointTo> update) {
+        AccessPointTo dto = update.dto();
         AccessPoint existing = getById(id);
         mapper.updateFromTo(existing, dto);
         applyReferences(existing, dto);
+        update.applyNulls(existing);
         return mapper.toTo(repository.save(existing));
     }
 
