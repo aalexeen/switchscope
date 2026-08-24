@@ -63,26 +63,6 @@ public class ComponentModelService implements CrudService<ComponentModel> {
         return repository.save(entity);
     }
 
-    /**
-     * @deprecated cannot resolve {@code componentTypeId}; use {@link #createFromDto}.
-     * Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public ComponentModel create(ComponentModel entity) {
-        throw new UnsupportedOperationException("Use createFromDto(entity, dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over the component
-     * type link; use {@link #updateFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public ComponentModel update(UUID id, ComponentModel entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, update, mapper)");
-    }
-
     private ComponentTypeEntity getComponentType(UUID componentTypeId) {
         return componentTypeRepository.findById(componentTypeId)
                 .orElseThrow(() -> new NotFoundException(

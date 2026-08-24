@@ -3,7 +3,6 @@ package net.switchscope.web.catalog;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.switchscope.model.location.catalog.LocationTypeEntity;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.location.LocationTypeService;
@@ -72,7 +71,7 @@ public class LocationTypeController {
     public LocationTypeTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update location type with id={}", id);
         PartialUpdate<LocationTypeTo> update = partialUpdateReader.read(jsonPayload, LocationTypeTo.class);
-        return service.updateAndMapToDto(id, update);
+        return service.updateFromDto(id, update);
     }
 
     @RequiresPermission("delete")

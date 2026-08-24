@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.component.catalog.ComponentCategoryMapper;
-import net.switchscope.model.component.ComponentCategoryEntity;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.component.ComponentCategoryService;
@@ -62,9 +61,7 @@ public class ComponentCategoryController {
     @ResponseStatus(HttpStatus.CREATED)
     public ComponentCategoryTo create(@Valid @RequestBody ComponentCategoryTo dto) {
         log.info("create component category {}", dto);
-        ComponentCategoryEntity entity = mapper.toEntity(dto);
-        ComponentCategoryEntity created = service.create(entity);
-        return mapper.toTo(created);
+        return service.createFromDto(dto);
     }
 
     /**
@@ -76,8 +73,7 @@ public class ComponentCategoryController {
     public ComponentCategoryTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component category with id={}", id);
         PartialUpdate<ComponentCategoryTo> update = partialUpdateReader.read(jsonPayload, ComponentCategoryTo.class);
-        ComponentCategoryEntity updated = service.updateFromDto(id, update);
-        return mapper.toTo(updated);
+        return service.updateFromDto(id, update);
     }
 
     @RequiresPermission("delete")

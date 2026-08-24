@@ -83,7 +83,7 @@ public class RackService implements DtoCrudService<Rack, RackTo> {
      */
     @Override
     @Transactional
-    public RackTo updateFromDto(UUID id, PartialUpdate<RackTo> update) {
+    public RackTo updateFromDto(UUID id, PartialUpdate<? extends RackTo> update) {
         RackTo dto = update.dto();
         Rack existing = getById(id);
         mapper.updateFromTo(existing, dto);
@@ -96,27 +96,6 @@ public class RackService implements DtoCrudService<Rack, RackTo> {
         resolver.applyCommonReferences(entity, dto);
         resolver.applyModelReference(dto.getRackTypeId(), RackModelEntity.class,
                 entity::setRackType, "rackTypeId");
-    }
-
-    /**
-     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
-     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Rack create(Rack entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over every
-     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
-     * {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Rack update(UUID id, Rack entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

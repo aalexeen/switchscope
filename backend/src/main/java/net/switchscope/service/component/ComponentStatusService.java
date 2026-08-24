@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import net.switchscope.mapper.component.catalog.ComponentStatusMapper;
 import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.repository.component.ComponentStatusRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.catalog.ComponentStatusTo;
 import net.switchscope.web.payload.PartialUpdate;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ComponentStatusService implements CrudService<ComponentStatusEntity> {
+public class ComponentStatusService implements DtoCrudService<ComponentStatusEntity, ComponentStatusTo> {
 
     private final ComponentStatusRepository repository;
     private final ComponentStatusMapper mapper;
@@ -33,17 +33,8 @@ public class ComponentStatusService implements CrudService<ComponentStatusEntity
 
     @Override
     @Transactional
-    public ComponentStatusEntity create(ComponentStatusEntity entity) {
-        // TODO: implement validation
-        return repository.save(entity);
-    }
-
-    @Override
-    @Transactional
-    public ComponentStatusEntity update(UUID id, ComponentStatusEntity entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
+    public ComponentStatusTo createFromDto(ComponentStatusTo dto) {
+        return mapper.toTo(repository.save(mapper.toEntity(dto)));
     }
 
     @Override
@@ -53,10 +44,11 @@ public class ComponentStatusService implements CrudService<ComponentStatusEntity
     }
 
     /**
-     * Update component status and return DTO (mapping within transaction to avoid LazyInitializationException).
+     * Mapping back happens inside the transaction, so a lazy association is still reachable.
      */
+    @Override
     @Transactional
-    public ComponentStatusTo updateAndMapToDto(UUID id, PartialUpdate<ComponentStatusTo> update) {
+    public ComponentStatusTo updateFromDto(UUID id, PartialUpdate<? extends ComponentStatusTo> update) {
         ComponentStatusEntity existing = repository.getExisted(id);
         mapper.updateFromTo(existing, update.dto());
         update.applyNulls(existing);

@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.component.catalog.ComponentTypeMapper;
-import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.component.ComponentTypeService;
@@ -79,10 +78,7 @@ public class ComponentTypeController {
     @ResponseStatus(HttpStatus.CREATED)
     public ComponentTypeTo create(@Valid @RequestBody ComponentTypeTo dto) {
         log.info("create component type {}", dto);
-        ComponentTypeEntity entity = mapper.toEntity(dto);
-        // categoryId is a NOT NULL FK the mapper ignores; the service resolves it before saving
-        ComponentTypeEntity created = service.createFromDto(entity, dto);
-        return mapper.toTo(created);
+        return service.createFromDto(dto);
     }
 
     /**
@@ -94,8 +90,7 @@ public class ComponentTypeController {
     public ComponentTypeTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component type with id={}", id);
         PartialUpdate<ComponentTypeTo> update = partialUpdateReader.read(jsonPayload, ComponentTypeTo.class);
-        ComponentTypeEntity updated = service.updateFromDto(id, update);
-        return mapper.toTo(updated);
+        return service.updateFromDto(id, update);
     }
 
     @RequiresPermission("delete")

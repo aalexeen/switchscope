@@ -91,7 +91,7 @@ public class PatchPanelService implements DtoCrudService<PatchPanel, PatchPanelT
      */
     @Override
     @Transactional
-    public PatchPanelTo updateFromDto(UUID id, PartialUpdate<PatchPanelTo> update) {
+    public PatchPanelTo updateFromDto(UUID id, PartialUpdate<? extends PatchPanelTo> update) {
         PatchPanelTo dto = update.dto();
         PatchPanel existing = getById(id);
         mapper.updateFromTo(existing, dto);
@@ -107,27 +107,6 @@ public class PatchPanelService implements DtoCrudService<PatchPanel, PatchPanelT
         resolver.applyCollection(dto.getCableRunIds(),
                 id -> repository.findByIdAndType(id, CableRun.class).map(CableRun.class::cast),
                 entity.getCableRuns(), "cableRunIds");
-    }
-
-    /**
-     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
-     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public PatchPanel create(PatchPanel entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over every
-     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
-     * {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public PatchPanel update(UUID id, PatchPanel entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

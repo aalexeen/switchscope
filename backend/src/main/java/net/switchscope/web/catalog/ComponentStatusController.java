@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.component.catalog.ComponentStatusMapper;
-import net.switchscope.model.component.ComponentStatusEntity;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.component.ComponentStatusService;
@@ -62,9 +61,7 @@ public class ComponentStatusController {
     @ResponseStatus(HttpStatus.CREATED)
     public ComponentStatusTo create(@Valid @RequestBody ComponentStatusTo dto) {
         log.info("create component status {}", dto);
-        ComponentStatusEntity entity = mapper.toEntity(dto);
-        ComponentStatusEntity created = service.create(entity);
-        return mapper.toTo(created);
+        return service.createFromDto(dto);
     }
 
     /**
@@ -76,7 +73,7 @@ public class ComponentStatusController {
     public ComponentStatusTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component status with id={}", id);
         PartialUpdate<ComponentStatusTo> update = partialUpdateReader.read(jsonPayload, ComponentStatusTo.class);
-        return service.updateAndMapToDto(id, update);
+        return service.updateFromDto(id, update);
     }
 
     @RequiresPermission("delete")

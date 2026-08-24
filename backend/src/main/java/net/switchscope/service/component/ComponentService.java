@@ -35,7 +35,7 @@ import net.switchscope.repository.component.ComponentNatureRepository;
 import net.switchscope.repository.component.ComponentRepository;
 import net.switchscope.repository.component.ComponentStatusRepository;
 import net.switchscope.repository.component.ComponentTypeRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.ComponentTo;
 import net.switchscope.to.component.connectivity.CableRunTo;
 import net.switchscope.to.component.connectivity.ConnectorTo;
@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ComponentService implements CrudService<Component> {
+public class ComponentService implements DtoCrudService<Component, ComponentTo> {
 
     private final ComponentRepository repository;
     private final ComponentTypeRepository componentTypeRepository;
@@ -108,26 +108,6 @@ public class ComponentService implements CrudService<Component> {
                 .orElseThrow(() -> new NotFoundException("Component with id=" + id + " not found"));
         initializeLazyAssociations(component);
         return mapToDto(component);
-    }
-
-    /**
-     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use createFromDto(dto).
-     * Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Component create(Component entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over every
-     * association the mapper ignores; use updateFromDto(id, dto). Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Component update(UUID id, Component entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

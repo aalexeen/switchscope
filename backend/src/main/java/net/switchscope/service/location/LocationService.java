@@ -92,7 +92,7 @@ public class LocationService implements DtoCrudService<Location, LocationTo> {
      */
     @Override
     @Transactional
-    public LocationTo updateFromDto(UUID id, PartialUpdate<LocationTo> update) {
+    public LocationTo updateFromDto(UUID id, PartialUpdate<? extends LocationTo> update) {
         LocationTo dto = update.dto();
         Location existing = repository.findByIdWithAllRelationships(id)
                 .orElseThrow(() -> new NotFoundException("Location with id=" + id + " not found"));
@@ -127,27 +127,6 @@ public class LocationService implements DtoCrudService<Location, LocationTo> {
     private LocationTypeEntity getLocationType(UUID typeId) {
         return locationTypeRepository.findById(typeId)
                 .orElseThrow(() -> new NotFoundException("Location type with id=" + typeId + " not found"));
-    }
-
-    /**
-     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
-     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Location create(Location entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over every
-     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
-     * {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Location update(UUID id, Location entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

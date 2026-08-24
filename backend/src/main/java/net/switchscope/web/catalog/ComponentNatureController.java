@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.component.catalog.ComponentNatureMapper;
-import net.switchscope.model.component.ComponentNatureEntity;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.component.ComponentNatureService;
@@ -62,9 +61,7 @@ public class ComponentNatureController {
     @ResponseStatus(HttpStatus.CREATED)
     public ComponentNatureTo create(@Valid @RequestBody ComponentNatureTo dto) {
         log.info("create component nature {}", dto);
-        ComponentNatureEntity entity = mapper.toEntity(dto);
-        ComponentNatureEntity created = service.create(entity);
-        return mapper.toTo(created);
+        return service.createFromDto(dto);
     }
 
     /**
@@ -76,8 +73,7 @@ public class ComponentNatureController {
     public ComponentNatureTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update component nature with id={}", id);
         PartialUpdate<ComponentNatureTo> update = partialUpdateReader.read(jsonPayload, ComponentNatureTo.class);
-        ComponentNatureEntity updated = service.updateFromDto(id, update);
-        return mapper.toTo(updated);
+        return service.updateFromDto(id, update);
     }
 
     @RequiresPermission("delete")

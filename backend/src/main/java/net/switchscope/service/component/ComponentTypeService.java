@@ -8,7 +8,7 @@ import net.switchscope.model.component.ComponentCategoryEntity;
 import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.repository.component.ComponentCategoryRepository;
 import net.switchscope.repository.component.ComponentTypeRepository;
-import net.switchscope.service.UpdatableCrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.catalog.ComponentTypeTo;
 import net.switchscope.web.payload.PartialUpdate;
 import org.springframework.stereotype.Service;
@@ -20,12 +20,11 @@ import java.util.UUID;
 
 /**
  * Service for ComponentType operations.
- * Implements UpdatableCrudService for proper partial updates using DTOs.
  */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ComponentTypeService implements UpdatableCrudService<ComponentTypeEntity, ComponentTypeTo> {
+public class ComponentTypeService implements DtoCrudService<ComponentTypeEntity, ComponentTypeTo> {
 
     private final ComponentTypeRepository repository;
     private final ComponentCategoryRepository categoryRepository;
@@ -43,77 +42,24 @@ public class ComponentTypeService implements UpdatableCrudService<ComponentTypeE
     }
 
     /**
-     * Persist a component type whose {@code category} has been resolved from the DTO.
-     * {@code category_id} is NOT NULL and the mapper ignores the association, so the caller must go
-     * through here rather than saving the mapped entity directly.
+     * Persist a component type, resolving its category first. {@code category_id} is NOT NULL and
+     * the mapper ignores the association, so mapping the DTO happens here rather than in the
+     * controller: an entity handed over already mapped could be saved without a category.
      *
-     * @param entity the mapped, not yet referenced entity
-     * @param dto    the DTO carrying {@code categoryId}
-     * @return the saved component type
+     * @param dto the component type to create, carrying {@code categoryId}
+     * @return the stored component type
      */
+    @Override
     @Transactional
-    public ComponentTypeEntity createFromDto(ComponentTypeEntity entity, ComponentTypeTo dto) {
+    public ComponentTypeTo createFromDto(ComponentTypeTo dto) {
+        ComponentTypeEntity entity = mapper.toEntity(dto);
         if (dto.getCategoryId() == null) {
             throw new IllegalRequestDataException("categoryId is required");
         }
         entity.setCategory(categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new NotFoundException(
                         "Component category with id=" + dto.getCategoryId() + " not found")));
-        return repository.save(entity);
-    }
-
-    /**
-     * @deprecated cannot resolve {@code categoryId}; use {@link #createFromDto}.
-     * Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public ComponentTypeEntity create(ComponentTypeEntity entity) {
-        throw new UnsupportedOperationException("Use createFromDto(entity, dto)");
-    }
-
-    /**
-     * @deprecated Use {@link #updateFromDto(UUID, ComponentTypeTo)} instead.
-     * This method exists for backward compatibility with CrudService interface.
-     */
-    @Override
-    @Deprecated
-    @Transactional
-    public ComponentTypeEntity update(UUID id, ComponentTypeEntity entity) {
-        // Fallback: load existing and manually copy fields
-        ComponentTypeEntity existing = repository.findByIdWithCategory(id)
-                .orElseThrow(() -> new NotFoundException("Component type with id=" + id + " not found"));
-
-        // Copy only editable fields, preserving associations
-        existing.setName(entity.getName());
-        existing.setDisplayName(entity.getDisplayName());
-        existing.setDescription(entity.getDescription());
-        existing.setActive(entity.isActive());
-        existing.setSortOrder(entity.getSortOrder());
-        existing.setColorClass(entity.getColorClass());
-        existing.setIconClass(entity.getIconClass());
-        existing.setSystemType(entity.isSystemType());
-        existing.setRequiresRackSpace(entity.isRequiresRackSpace());
-        existing.setTypicalRackUnits(entity.getTypicalRackUnits());
-        existing.setCanContainComponents(entity.isCanContainComponents());
-        existing.setInstallable(entity.isInstallable());
-        existing.setRequiresManagement(entity.isRequiresManagement());
-        existing.setSupportsSnmp(entity.isSupportsSnmp());
-        existing.setHasFirmware(entity.isHasFirmware());
-        existing.setCanHaveIpAddress(entity.isCanHaveIpAddress());
-        existing.setProcessesNetworkTraffic(entity.isProcessesNetworkTraffic());
-        existing.setRequiresPower(entity.isRequiresPower());
-        existing.setTypicalPowerConsumptionWatts(entity.getTypicalPowerConsumptionWatts());
-        existing.setGeneratesHeat(entity.isGeneratesHeat());
-        existing.setNeedsCooling(entity.isNeedsCooling());
-        existing.setRecommendedMaintenanceIntervalMonths(entity.getRecommendedMaintenanceIntervalMonths());
-        existing.setTypicalLifespanYears(entity.getTypicalLifespanYears());
-        existing.setAllowedChildTypeCodes(entity.getAllowedChildTypeCodes());
-        existing.setAllowedChildCategoryCodes(entity.getAllowedChildCategoryCodes());
-        // Note: code is immutable after creation
-        // Note: category and properties are preserved
-
-        return repository.save(existing);
+        return mapper.toTo(repository.save(entity));
     }
 
     /**
@@ -125,7 +71,7 @@ public class ComponentTypeService implements UpdatableCrudService<ComponentTypeE
      */
     @Override
     @Transactional
-    public ComponentTypeEntity updateFromDto(UUID id, PartialUpdate<ComponentTypeTo> update) {
+    public ComponentTypeTo updateFromDto(UUID id, PartialUpdate<? extends ComponentTypeTo> update) {
         ComponentTypeTo dto = update.dto();
 
         // 1. Load existing entity with all associations
@@ -146,8 +92,8 @@ public class ComponentTypeService implements UpdatableCrudService<ComponentTypeE
         // 4. Clear what the request sent as null, which the mapper's IGNORE strategy skipped
         update.applyNulls(existing);
 
-        // 5. Save and return
-        return repository.save(existing);
+        // 5. Save and map back inside the transaction that loaded the associations
+        return mapper.toTo(repository.save(existing));
     }
 
     @Override

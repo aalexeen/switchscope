@@ -88,7 +88,7 @@ public class NetworkSwitchService implements DtoCrudService<NetworkSwitch, Netwo
      */
     @Override
     @Transactional
-    public NetworkSwitchTo updateFromDto(UUID id, PartialUpdate<NetworkSwitchTo> update) {
+    public NetworkSwitchTo updateFromDto(UUID id, PartialUpdate<? extends NetworkSwitchTo> update) {
         NetworkSwitchTo dto = update.dto();
         NetworkSwitch existing = getById(id);
         mapper.updateFromTo(existing, dto);
@@ -101,27 +101,6 @@ public class NetworkSwitchService implements DtoCrudService<NetworkSwitch, Netwo
         resolver.applyCommonReferences(entity, dto);
         resolver.applyModelReference(dto.getSwitchModelId(), SwitchModel.class,
                 entity::setSwitchModel, "switchModelId");
-    }
-
-    /**
-     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
-     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public NetworkSwitch create(NetworkSwitch entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over every
-     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
-     * {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public NetworkSwitch update(UUID id, NetworkSwitch entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

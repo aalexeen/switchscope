@@ -5,7 +5,7 @@ import net.switchscope.error.NotFoundException;
 import net.switchscope.mapper.component.catalog.ComponentCategoryMapper;
 import net.switchscope.model.component.ComponentCategoryEntity;
 import net.switchscope.repository.component.ComponentCategoryRepository;
-import net.switchscope.service.UpdatableCrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.catalog.ComponentCategoryTo;
 import net.switchscope.web.payload.PartialUpdate;
 import org.springframework.stereotype.Service;
@@ -16,12 +16,11 @@ import java.util.UUID;
 
 /**
  * Service for ComponentCategory operations.
- * Implements UpdatableCrudService for proper partial updates using DTOs.
  */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ComponentCategoryService implements UpdatableCrudService<ComponentCategoryEntity, ComponentCategoryTo> {
+public class ComponentCategoryService implements DtoCrudService<ComponentCategoryEntity, ComponentCategoryTo> {
 
     private final ComponentCategoryRepository repository;
     private final ComponentCategoryMapper mapper;
@@ -39,36 +38,8 @@ public class ComponentCategoryService implements UpdatableCrudService<ComponentC
 
     @Override
     @Transactional
-    public ComponentCategoryEntity create(ComponentCategoryEntity entity) {
-        return repository.save(entity);
-    }
-
-    /**
-     * @deprecated Use {@link #updateFromDto(UUID, ComponentCategoryTo)} instead.
-     * This method exists for backward compatibility with CrudService interface.
-     */
-    @Override
-    @Deprecated
-    @Transactional
-    public ComponentCategoryEntity update(UUID id, ComponentCategoryEntity entity) {
-        // Fallback: load existing and manually copy fields
-        ComponentCategoryEntity existing = repository.findByIdWithComponentTypes(id)
-                .orElseThrow(() -> new NotFoundException("Component category with id=" + id + " not found"));
-
-        // Copy only editable fields, preserving associations
-        existing.setName(entity.getName());
-        existing.setDisplayName(entity.getDisplayName());
-        existing.setDescription(entity.getDescription());
-        existing.setActive(entity.isActive());
-        existing.setSortOrder(entity.getSortOrder());
-        existing.setColorClass(entity.getColorClass());
-        existing.setIconClass(entity.getIconClass());
-        existing.setSystemCategory(entity.isSystemCategory());
-        existing.setInfrastructure(entity.isInfrastructure());
-        // Note: code is immutable after creation
-        // Note: properties and componentTypes are preserved
-
-        return repository.save(existing);
+    public ComponentCategoryTo createFromDto(ComponentCategoryTo dto) {
+        return mapper.toTo(repository.save(mapper.toEntity(dto)));
     }
 
     /**
@@ -80,7 +51,7 @@ public class ComponentCategoryService implements UpdatableCrudService<ComponentC
      */
     @Override
     @Transactional
-    public ComponentCategoryEntity updateFromDto(UUID id, PartialUpdate<ComponentCategoryTo> update) {
+    public ComponentCategoryTo updateFromDto(UUID id, PartialUpdate<? extends ComponentCategoryTo> update) {
         ComponentCategoryTo dto = update.dto();
 
         // 1. Load existing entity with all associations
@@ -93,8 +64,8 @@ public class ComponentCategoryService implements UpdatableCrudService<ComponentC
         // 3. Clear what the request sent as null, which the mapper's IGNORE strategy skipped
         update.applyNulls(existing);
 
-        // 4. Save and return
-        return repository.save(existing);
+        // 4. Save and map back inside the transaction that loaded the associations
+        return mapper.toTo(repository.save(existing));
     }
 
     @Override

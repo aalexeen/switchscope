@@ -9,7 +9,7 @@ import net.switchscope.error.NotFoundException;
 import net.switchscope.mapper.location.catalog.LocationTypeMapper;
 import net.switchscope.model.location.catalog.LocationTypeEntity;
 import net.switchscope.repository.location.LocationTypeRepository;
-import net.switchscope.service.UpdatableCrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.location.catalog.LocationTypeTo;
 import net.switchscope.web.payload.PartialUpdate;
 
@@ -21,7 +21,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class LocationTypeService implements UpdatableCrudService<LocationTypeEntity, LocationTypeTo> {
+public class LocationTypeService implements DtoCrudService<LocationTypeEntity, LocationTypeTo> {
 
     private final LocationTypeRepository repository;
     private final LocationTypeMapper mapper;
@@ -64,28 +64,13 @@ public class LocationTypeService implements UpdatableCrudService<LocationTypeEnt
 
     @Override
     @Transactional
-    public LocationTypeEntity create(LocationTypeEntity entity) {
-        // TODO: implement validation
-        return repository.save(entity);
-    }
-
-    @Override
-    @Transactional
-    public LocationTypeEntity update(UUID id, LocationTypeEntity entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
-    }
-
-    @Override
-    @Transactional
-    public LocationTypeEntity updateFromDto(UUID id, PartialUpdate<LocationTypeTo> update) {
+    public LocationTypeTo updateFromDto(UUID id, PartialUpdate<? extends LocationTypeTo> update) {
         LocationTypeEntity existing = repository.findByIdWithAssociations(id)
                 .orElseThrow(() -> new NotFoundException("Location type with id=" + id + " not found"));
         mapper.updateFromTo(existing, update.dto());
         applyAllowedChildTypes(existing, update.dto());
         update.applyNulls(existing);
-        return repository.save(existing);
+        return mapper.toTo(repository.save(existing));
     }
 
     /**
@@ -96,6 +81,7 @@ public class LocationTypeService implements UpdatableCrudService<LocationTypeEnt
      * @param dto the location type to create
      * @return the stored location type
      */
+    @Override
     @Transactional
     public LocationTypeTo createFromDto(LocationTypeTo dto) {
         LocationTypeEntity entity = mapper.toEntity(dto);
@@ -127,15 +113,6 @@ public class LocationTypeService implements UpdatableCrudService<LocationTypeEnt
         }
         entity.getAllowedChildTypes().clear();
         entity.getAllowedChildTypes().addAll(children);
-    }
-
-    /**
-     * Update location type and return DTO (mapping within transaction to avoid LazyInitializationException).
-     */
-    @Transactional
-    public LocationTypeTo updateAndMapToDto(UUID id, PartialUpdate<LocationTypeTo> update) {
-        LocationTypeEntity saved = updateFromDto(id, update);
-        return mapper.toTo(saved);
     }
 
     @Override

@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.installation.catalog.InstallableTypeMapper;
-import net.switchscope.model.installation.catalog.InstallableTypeEntity;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.installation.InstallableTypeService;
@@ -62,9 +61,7 @@ public class InstallableTypeController {
     @ResponseStatus(HttpStatus.CREATED)
     public InstallableTypeTo create(@Valid @RequestBody InstallableTypeTo dto) {
         log.info("create installable type {}", dto);
-        InstallableTypeEntity entity = mapper.toEntity(dto);
-        InstallableTypeEntity created = service.create(entity);
-        return mapper.toTo(created);
+        return service.createFromDto(dto);
     }
 
     /**
@@ -76,8 +73,7 @@ public class InstallableTypeController {
     public InstallableTypeTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update installable type with id={}", id);
         PartialUpdate<InstallableTypeTo> update = partialUpdateReader.read(jsonPayload, InstallableTypeTo.class);
-        InstallableTypeEntity updated = service.updateFromDto(id, update);
-        return mapper.toTo(updated);
+        return service.updateFromDto(id, update);
     }
 
     @RequiresPermission("delete")

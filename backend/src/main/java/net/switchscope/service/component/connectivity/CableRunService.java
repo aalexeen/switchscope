@@ -92,7 +92,7 @@ public class CableRunService implements DtoCrudService<CableRun, CableRunTo> {
      */
     @Override
     @Transactional
-    public CableRunTo updateFromDto(UUID id, PartialUpdate<CableRunTo> update) {
+    public CableRunTo updateFromDto(UUID id, PartialUpdate<? extends CableRunTo> update) {
         CableRunTo dto = update.dto();
         CableRun existing = getById(id);
         mapper.updateFromTo(existing, dto);
@@ -111,27 +111,6 @@ public class CableRunService implements DtoCrudService<CableRun, CableRunTo> {
                 entity::setEndLocation, "endLocationId");
         resolver.applyCollection(dto.getLocationIds(), locationRepository::findById,
                 entity.getLocations(), "locationIds");
-    }
-
-    /**
-     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
-     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public CableRun create(CableRun entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over every
-     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
-     * {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public CableRun update(UUID id, CableRun entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

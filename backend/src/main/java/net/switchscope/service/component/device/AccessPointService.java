@@ -90,7 +90,7 @@ public class AccessPointService implements DtoCrudService<AccessPoint, AccessPoi
      */
     @Override
     @Transactional
-    public AccessPointTo updateFromDto(UUID id, PartialUpdate<AccessPointTo> update) {
+    public AccessPointTo updateFromDto(UUID id, PartialUpdate<? extends AccessPointTo> update) {
         AccessPointTo dto = update.dto();
         AccessPoint existing = getById(id);
         mapper.updateFromTo(existing, dto);
@@ -101,27 +101,6 @@ public class AccessPointService implements DtoCrudService<AccessPoint, AccessPoi
 
     private void applyReferences(AccessPoint entity, AccessPointTo dto) {
         resolver.applyCommonReferences(entity, dto);
-    }
-
-    /**
-     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
-     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public AccessPoint create(AccessPoint entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over every
-     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
-     * {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public AccessPoint update(UUID id, AccessPoint entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

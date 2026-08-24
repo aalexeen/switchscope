@@ -17,7 +17,7 @@ import net.switchscope.model.port.Port;
 import net.switchscope.repository.component.ComponentRepository;
 import net.switchscope.repository.component.device.DeviceRepository;
 import net.switchscope.repository.port.PortRepository;
-import net.switchscope.service.CrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.port.EthernetPortTo;
 import net.switchscope.to.port.FiberPortTo;
 import net.switchscope.to.port.PortTo;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PortService implements CrudService<Port> {
+public class PortService implements DtoCrudService<Port, PortTo> {
 
     private final PortRepository repository;
     private final DeviceRepository deviceRepository;
@@ -148,26 +148,6 @@ public class PortService implements CrudService<Port> {
             throw new IllegalRequestDataException("Port type mismatch: entity="
                     + port.getClass().getSimpleName() + ", to=" + dto.getClass().getSimpleName());
         }
-    }
-
-    /**
-     * @deprecated the entity-level call cannot resolve the DTO's foreign keys; use
-     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Port create(Port entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving a detached entity merges nulls over the associations the mapper ignores;
-     * use {@link #updateFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Port update(UUID id, Port entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

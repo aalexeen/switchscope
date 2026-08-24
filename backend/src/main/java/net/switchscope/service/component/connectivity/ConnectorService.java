@@ -90,7 +90,7 @@ public class ConnectorService implements DtoCrudService<Connector, ConnectorTo> 
      */
     @Override
     @Transactional
-    public ConnectorTo updateFromDto(UUID id, PartialUpdate<ConnectorTo> update) {
+    public ConnectorTo updateFromDto(UUID id, PartialUpdate<? extends ConnectorTo> update) {
         ConnectorTo dto = update.dto();
         Connector existing = getById(id);
         mapper.updateFromTo(existing, dto);
@@ -107,27 +107,6 @@ public class ConnectorService implements DtoCrudService<Connector, ConnectorTo> 
                 entity::setCableRun, "cableRunId");
         resolver.applyReference(dto.getPortId(), portRepository::findById,
                 entity::setPort, "portId");
-    }
-
-    /**
-     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
-     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Connector create(Connector entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over every
-     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
-     * {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Connector update(UUID id, Connector entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

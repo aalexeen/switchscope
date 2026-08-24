@@ -85,7 +85,7 @@ public class RouterService implements DtoCrudService<Router, RouterTo> {
      */
     @Override
     @Transactional
-    public RouterTo updateFromDto(UUID id, PartialUpdate<RouterTo> update) {
+    public RouterTo updateFromDto(UUID id, PartialUpdate<? extends RouterTo> update) {
         RouterTo dto = update.dto();
         Router existing = getById(id);
         mapper.updateFromTo(existing, dto);
@@ -96,27 +96,6 @@ public class RouterService implements DtoCrudService<Router, RouterTo> {
 
     private void applyReferences(Router entity, RouterTo dto) {
         resolver.applyCommonReferences(entity, dto);
-    }
-
-    /**
-     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
-     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Router create(Router entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over every
-     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
-     * {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Router update(UUID id, Router entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

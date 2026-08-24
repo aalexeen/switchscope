@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.installation.catalog.InstallationStatusMapper;
-import net.switchscope.model.installation.catalog.InstallationStatusEntity;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.installation.InstallationStatusService;
@@ -62,9 +61,7 @@ public class InstallationStatusController {
     @ResponseStatus(HttpStatus.CREATED)
     public InstallationStatusTo create(@Valid @RequestBody InstallationStatusTo dto) {
         log.info("create installation status {}", dto);
-        InstallationStatusEntity entity = mapper.toEntity(dto);
-        InstallationStatusEntity created = service.create(entity);
-        return mapper.toTo(created);
+        return service.createFromDto(dto);
     }
 
     /**
@@ -76,8 +73,7 @@ public class InstallationStatusController {
     public InstallationStatusTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
         log.info("update installation status with id={}", id);
         PartialUpdate<InstallationStatusTo> update = partialUpdateReader.read(jsonPayload, InstallationStatusTo.class);
-        InstallationStatusEntity updated = service.updateFromDto(id, update);
-        return mapper.toTo(updated);
+        return service.updateFromDto(id, update);
     }
 
     @RequiresPermission("delete")

@@ -70,7 +70,7 @@ public class InstallationService implements DtoCrudService<Installation, Install
      */
     @Override
     @Transactional
-    public InstallationTo updateFromDto(UUID id, PartialUpdate<InstallationTo> update) {
+    public InstallationTo updateFromDto(UUID id, PartialUpdate<? extends InstallationTo> update) {
         InstallationTo dto = update.dto();
         Installation existing = repository.findByIdWithRelationships(id)
                 .orElseThrow(() -> new NotFoundException("Installation with id=" + id + " not found"));
@@ -125,27 +125,6 @@ public class InstallationService implements DtoCrudService<Installation, Install
         if (entity.getInstalledItemId() == null) {
             throw new IllegalRequestDataException("installedItemId is required");
         }
-    }
-
-    /**
-     * @deprecated entity-level create cannot resolve the DTO's foreign keys; use
-     * {@link #createFromDto}. Kept only to satisfy {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Installation create(Installation entity) {
-        throw new UnsupportedOperationException("Use createFromDto(dto)");
-    }
-
-    /**
-     * @deprecated saving the detached entity built by the mapper merges nulls over every
-     * association the mapper ignores; use {@link #updateFromDto}. Kept only to satisfy
-     * {@code CrudService}.
-     */
-    @Override
-    @Deprecated
-    public Installation update(UUID id, Installation entity) {
-        throw new UnsupportedOperationException("Use updateFromDto(id, dto)");
     }
 
     @Override

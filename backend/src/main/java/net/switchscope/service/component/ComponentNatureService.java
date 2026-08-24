@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import net.switchscope.mapper.component.catalog.ComponentNatureMapper;
 import net.switchscope.model.component.ComponentNatureEntity;
 import net.switchscope.repository.component.ComponentNatureRepository;
-import net.switchscope.service.UpdatableCrudService;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.catalog.ComponentNatureTo;
 import net.switchscope.web.payload.PartialUpdate;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ComponentNatureService implements UpdatableCrudService<ComponentNatureEntity, ComponentNatureTo> {
+public class ComponentNatureService implements DtoCrudService<ComponentNatureEntity, ComponentNatureTo> {
 
     private final ComponentNatureRepository repository;
     private final ComponentNatureMapper mapper;
@@ -33,26 +33,17 @@ public class ComponentNatureService implements UpdatableCrudService<ComponentNat
 
     @Override
     @Transactional
-    public ComponentNatureEntity create(ComponentNatureEntity entity) {
-        // TODO: implement validation
-        return repository.save(entity);
+    public ComponentNatureTo createFromDto(ComponentNatureTo dto) {
+        return mapper.toTo(repository.save(mapper.toEntity(dto)));
     }
 
     @Override
     @Transactional
-    public ComponentNatureEntity update(UUID id, ComponentNatureEntity entity) {
-        repository.getExisted(id);
-        entity.setId(id);
-        return repository.save(entity);
-    }
-
-    @Override
-    @Transactional
-    public ComponentNatureEntity updateFromDto(UUID id, PartialUpdate<ComponentNatureTo> update) {
+    public ComponentNatureTo updateFromDto(UUID id, PartialUpdate<? extends ComponentNatureTo> update) {
         ComponentNatureEntity existing = repository.getExisted(id);
         mapper.updateFromTo(existing, update.dto());
         update.applyNulls(existing);
-        return repository.save(existing);
+        return mapper.toTo(repository.save(existing));
     }
 
     @Override

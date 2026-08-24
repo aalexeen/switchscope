@@ -19,6 +19,15 @@ import java.util.UUID;
  * one. Mapping back to the DTO happens inside the same transaction, so lazy associations are still
  * reachable.
  *
+ * <p>
+ * This is the only write contract in the project. It replaced {@code UpdatableCrudService}, which
+ * differed from it in one thing - returning the entity instead of the DTO - and thereby made every
+ * controller map the answer itself, outside the transaction that had loaded it. The update takes
+ * {@code PartialUpdate<? extends T>} rather than {@code PartialUpdate<T>} so that a service for a
+ * polymorphic family can serve its subtypes: {@code ComponentService} is handed a
+ * {@code PartialUpdate<RackTo>} for a rack, and a {@code PartialUpdate<RackTo>} is not a
+ * {@code PartialUpdate<ComponentTo>}.
+ *
  * @param <E> the entity type
  * @param <T> the DTO (Transfer Object) type
  */
@@ -45,5 +54,5 @@ public interface DtoCrudService<E, T extends BaseTo> extends CrudService<E> {
      * @param update the values to apply, and which of them the request carried
      * @return the updated entity as a DTO
      */
-    T updateFromDto(UUID id, PartialUpdate<T> update);
+    T updateFromDto(UUID id, PartialUpdate<? extends T> update);
 }
