@@ -1,86 +1,55 @@
 package net.switchscope.web.catalog;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.installation.catalog.InstallableTypeMapper;
+import net.switchscope.model.installation.catalog.InstallableTypeEntity;
 import net.switchscope.security.permission.PermissionResource;
-import net.switchscope.security.permission.RequiresPermission;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.installation.InstallableTypeService;
 import net.switchscope.to.installation.catalog.InstallableTypeTo;
-import net.switchscope.web.payload.PartialUpdate;
-import net.switchscope.web.payload.PartialUpdateReader;
-import org.springframework.http.HttpStatus;
+import net.switchscope.web.AbstractCrudController;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.UUID;
-
 /**
- * Controller for InstallableType catalog entities.
- * Custom implementation to support role-based field access validation.
+ * Installable types catalog entries.
+ * <p>
+ * Everything this route does is what {@link AbstractCrudController} does: the five endpoints were
+ * written out here once per catalog and differed only in the type names and the words in their log
+ * lines. What used to justify the copies - reading a raw body so that an explicit null could be
+ * told from an omitted field - moved into the base class when the nine component routes needed the
+ * same thing.
  */
-@Slf4j
 @RestController
 @RequestMapping(value = InstallableTypeController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @PermissionResource("catalog.installable-type")
-public class InstallableTypeController {
+public class InstallableTypeController extends AbstractCrudController<InstallableTypeEntity, InstallableTypeTo> {
 
     static final String REST_URL = "/api/catalogs/installable-types";
 
     private final InstallableTypeService service;
     private final InstallableTypeMapper mapper;
-    private final PartialUpdateReader partialUpdateReader;
 
-    @RequiresPermission("read")
-    @GetMapping
-    public List<InstallableTypeTo> getAll() {
-        log.info("getAll installable types");
-        return mapper.toToList(service.getAll());
+    @Override
+    protected DtoCrudService<InstallableTypeEntity, InstallableTypeTo> getService() {
+        return service;
     }
 
-    @RequiresPermission("read")
-    @GetMapping("/{id}")
-    public InstallableTypeTo get(@PathVariable UUID id) {
-        log.info("get installable type {}", id);
-        return mapper.toTo(service.getById(id));
+    @Override
+    protected BaseMapper<InstallableTypeEntity, InstallableTypeTo> getMapper() {
+        return mapper;
     }
 
-    @RequiresPermission("create")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public InstallableTypeTo create(@Valid @RequestBody InstallableTypeTo dto) {
-        log.info("create installable type {}", dto);
-        return service.createFromDto(dto);
+    @Override
+    protected String getEntityName() {
+        return "installable type";
     }
 
-    /**
-     * Update installable type with role-based field access validation.
-     * Validates field nullification against update policy before applying changes.
-     */
-    @RequiresPermission("update")
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public InstallableTypeTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
-        log.info("update installable type with id={}", id);
-        PartialUpdate<InstallableTypeTo> update = partialUpdateReader.read(jsonPayload, InstallableTypeTo.class);
-        return service.updateFromDto(id, update);
-    }
-
-    @RequiresPermission("delete")
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID id) {
-        log.info("delete installable type {}", id);
-        service.delete(id);
+    @Override
+    protected Class<InstallableTypeTo> getDtoClass() {
+        return InstallableTypeTo.class;
     }
 }

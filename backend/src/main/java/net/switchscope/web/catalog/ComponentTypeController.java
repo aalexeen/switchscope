@@ -1,62 +1,79 @@
 package net.switchscope.web.catalog;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.catalog.ComponentTypeMapper;
+import net.switchscope.model.component.ComponentTypeEntity;
 import net.switchscope.security.permission.PermissionResource;
-import net.switchscope.security.permission.RequiresPermission;
+import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.ComponentTypeService;
 import net.switchscope.service.component.InstallableComponentRegistry;
 import net.switchscope.to.component.catalog.ComponentTypeTo;
-import net.switchscope.web.payload.PartialUpdate;
-import net.switchscope.web.payload.PartialUpdateReader;
-import org.springframework.http.HttpStatus;
+import net.switchscope.web.AbstractCrudController;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Controller for ComponentType catalog entities.
- * Custom implementation to support role-based field access validation.
+ * Component types, which are read with one thing added that the mapper cannot know.
+ * <p>
+ * The five endpoints are {@link AbstractCrudController}'s. Only the two reads are overridden, to
+ * mark which entries can actually be instantiated - see {@link #markImplementation}. A create is
+ * deliberately not marked: it answers with what was stored, exactly as it did before this
+ * controller was a subclass.
  */
 @Slf4j
 @RestController
 @RequestMapping(value = ComponentTypeController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @PermissionResource("catalog.component-type")
-public class ComponentTypeController {
+public class ComponentTypeController extends AbstractCrudController<ComponentTypeEntity, ComponentTypeTo> {
 
     static final String REST_URL = "/api/catalogs/component-types";
 
     private final ComponentTypeService service;
     private final ComponentTypeMapper mapper;
     private final InstallableComponentRegistry registry;
-    private final PartialUpdateReader partialUpdateReader;
 
-    @RequiresPermission("read")
+    @Override
+    protected DtoCrudService<ComponentTypeEntity, ComponentTypeTo> getService() {
+        return service;
+    }
+
+    @Override
+    protected BaseMapper<ComponentTypeEntity, ComponentTypeTo> getMapper() {
+        return mapper;
+    }
+
+    @Override
+    protected String getEntityName() {
+        return "component type";
+    }
+
+    @Override
+    protected Class<ComponentTypeTo> getDtoClass() {
+        return ComponentTypeTo.class;
+    }
+
+    @Override
     @GetMapping
     public List<ComponentTypeTo> getAll() {
-        log.info("getAll component types");
+        log.info("getAll {}", getEntityName());
         List<ComponentTypeTo> tos = mapper.toToList(service.getAll());
         tos.forEach(this::markImplementation);
         return tos;
     }
 
-    @RequiresPermission("read")
+    @Override
     @GetMapping("/{id}")
     public ComponentTypeTo get(@PathVariable UUID id) {
-        log.info("get component type {}", id);
+        log.info("get {} {}", getEntityName(), id);
         return markImplementation(mapper.toTo(service.getById(id)));
     }
 
@@ -71,33 +88,5 @@ public class ComponentTypeController {
         to.setImplemented(implemented);
         to.setComponentClass(implemented ? to.getCode() : null);
         return to;
-    }
-
-    @RequiresPermission("create")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ComponentTypeTo create(@Valid @RequestBody ComponentTypeTo dto) {
-        log.info("create component type {}", dto);
-        return service.createFromDto(dto);
-    }
-
-    /**
-     * Update component type with role-based field access validation.
-     * Validates field nullification against update policy before applying changes.
-     */
-    @RequiresPermission("update")
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ComponentTypeTo update(@PathVariable UUID id, @RequestBody String jsonPayload) {
-        log.info("update component type with id={}", id);
-        PartialUpdate<ComponentTypeTo> update = partialUpdateReader.read(jsonPayload, ComponentTypeTo.class);
-        return service.updateFromDto(id, update);
-    }
-
-    @RequiresPermission("delete")
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID id) {
-        log.info("delete component type {}", id);
-        service.delete(id);
     }
 }
