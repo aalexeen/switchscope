@@ -2,21 +2,30 @@ package net.switchscope.web.page;
 
 import net.switchscope.error.IllegalRequestDataException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * What a list route was asked for: which page, how large, and in what order.
+ * What a list route was asked for: which page, how large, in what order, and of which rows.
  * <p>
- * Bound from the query string as a model attribute, so the three parameters are declared once here
- * instead of on each of the twenty list routes. A request that carries none of them is
- * {@link #isPlain()}, and such a request is answered exactly as it was before this class existed -
- * the whole collection, as a bare array. That is the reason the parameters are all optional: a page
- * is something a client asks for, never something the server starts imposing on readers that were
- * written against the old answer.
+ * Built from the whole query string by {@link ListQueryArgumentResolver}, not bound field by field,
+ * because the filters are the parameters this class does <em>not</em> know the names of: a filter
+ * is any parameter that is not one of the five reserved names, and a bound object cannot be handed
+ * what it has no field for. Reading the parameter map is also what makes a mistyped parameter
+ * name reachable at all - it arrives as a filter on a field the row does not have, and is refused
+ * by name rather than dropped.
  * <p>
- * The values are validated where they are read rather than by bean validation, because the messages
- * matter: "size must be between 1 and 200" tells the caller what to send next, whereas a rejected
- * request with no reason sends them to the source.
+ * A request that carries none of them is {@link #isPlain()}, and such a request is answered exactly
+ * as it was before this class existed - the whole collection, as a bare array. That is why every
+ * parameter is optional: a page is something a client asks for, never something the server starts
+ * imposing on readers written against the old answer.
+ * <p>
+ * A parameter with an empty value counts as absent. A cleared search box sends {@code ?search=},
+ * and reading that as "rows whose text is the empty string" would answer nothing to a UI that
+ * meant to ask for everything.
  */
 public class ListQuery {
 
@@ -30,35 +39,63 @@ public class ListQuery {
      */
     public static final int MAX_SIZE = 200;
 
+    /** The parameters that mean something to every route, and are therefore never filters. */
+    static final List<String> RESERVED = List.of("page", "size", "sort", "search", "searchIn");
+
     /** The separator between a sort field and its direction: {@code name:desc}. */
     private static final String DIRECTION_SEPARATOR = ":";
 
-    private Integer page;
-    private Integer size;
-    private List<String> sort = List.of();
+    private final Integer page;
+    private final Integer size;
+    private final List<String> sort;
+    private final String search;
+    private final List<String> searchIn;
+    private final Map<String, List<String>> filters;
+
+    ListQuery(Integer page, Integer size, List<String> sort, String search, List<String> searchIn,
+              Map<String, List<String>> filters) {
+        this.page = page;
+        this.size = size;
+        this.sort = sort;
+        this.search = search;
+        this.searchIn = searchIn;
+        this.filters = filters;
+    }
+
+    /** A request that asked for nothing, used where no query string is involved. */
+    public static ListQuery whole() {
+        return new ListQuery(null, null, List.of(), null, List.of(), Map.of());
+    }
 
     public Integer getPage() {
         return page;
-    }
-
-    public void setPage(Integer page) {
-        this.page = page;
     }
 
     public Integer getSize() {
         return size;
     }
 
-    public void setSize(Integer size) {
-        this.size = size;
-    }
-
     public List<String> getSort() {
         return sort;
     }
 
-    public void setSort(List<String> sort) {
-        this.sort = sort == null ? List.of() : sort;
+    public String getSearch() {
+        return search;
+    }
+
+    public List<String> getSearchIn() {
+        return searchIn;
+    }
+
+    /**
+     * Every parameter that is not one of the reserved names, as field to values. Deliberately not a
+     * JavaBean getter: springdoc documents this object's properties as query parameters, and
+     * "filters" is not one - the fields a route accepts are the fields its row has.
+     *
+     * @return the filters asked for, empty when none were
+     */
+    Map<String, List<String>> filters() {
+        return filters;
     }
 
     /** @return whether the caller asked for a page rather than the whole collection */
@@ -68,7 +105,7 @@ public class ListQuery {
 
     /** @return whether the caller asked for nothing at all, and gets the answer the route always gave */
     public boolean isPlain() {
-        return !isPaged() && sort.isEmpty();
+        return !isPaged() && sort.isEmpty() && search == null && filters.isEmpty();
     }
 
     /** @return the zero-based page index, defaulting to the first page */
@@ -98,10 +135,9 @@ public class ListQuery {
      * The requested ordering, in the order it was given, as {@code field} and direction pairs.
      * <p>
      * The direction is written after a colon ({@code sort=name:desc}) rather than after a comma,
-     * which is the more usual spelling, because Spring splits a repeated query parameter on commas:
-     * {@code sort=name,desc} arrives as two values, and the second one would be read as a field
-     * named "desc". Colon-separated, one parameter is one ordering, and several orderings can still
-     * be written either as repeated parameters or comma-separated.
+     * which is the more usual spelling, because a comma already separates one ordering from the
+     * next: {@code sort=name:desc,code} is two of them. Written the usual way, {@code sort=name,desc}
+     * asks to order by a field named "desc" and is refused as one.
      *
      * @return the orderings asked for, empty when the caller asked for none
      */
@@ -128,9 +164,92 @@ public class ListQuery {
         };
     }
 
+    /**
+     * Reads the query string. Values that are empty are dropped first, so a parameter left blank by
+     * a form is the same as a parameter not sent.
+     *
+     * @param parameters the request's parameter map
+     * @return what the request asked for
+     */
+    static ListQuery of(Map<String, String[]> parameters) {
+        Map<String, List<String>> given = new LinkedHashMap<>();
+        parameters.forEach((name, values) -> {
+            List<String> present = Arrays.stream(values).filter(value -> !value.isBlank()).toList();
+            if (!present.isEmpty()) {
+                given.put(name, present);
+            }
+        });
+
+        Map<String, List<String>> filters = new LinkedHashMap<>(given);
+        RESERVED.forEach(filters::remove);
+
+        return new ListQuery(
+                number(given, "page"),
+                number(given, "size"),
+                commaSeparated(given, "sort"),
+                single(given, "search"),
+                commaSeparated(given, "searchIn"),
+                Map.copyOf(filters));
+    }
+
+    private static Integer number(Map<String, List<String>> given, String name) {
+        String value = single(given, name);
+        if (value == null) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(value.trim());
+        } catch (NumberFormatException notANumber) {
+            throw new IllegalRequestDataException(name + " must be a whole number, got '" + value + "'");
+        }
+    }
+
+    private static String single(Map<String, List<String>> given, String name) {
+        List<String> values = given.get(name);
+        return values == null ? null : values.get(values.size() - 1);
+    }
+
+    /**
+     * Several values, whether written as repeated parameters or separated by commas. Used for the
+     * two parameters whose values are field names, which never contain a comma; a filter's value
+     * may, so filters are not split.
+     */
+    private static List<String> commaSeparated(Map<String, List<String>> given, String name) {
+        List<String> values = given.get(name);
+        if (values == null) {
+            return List.of();
+        }
+        List<String> split = new ArrayList<>();
+        for (String value : values) {
+            for (String part : value.split(",")) {
+                if (!part.isBlank()) {
+                    split.add(part.trim());
+                }
+            }
+        }
+        return List.copyOf(split);
+    }
+
     @Override
     public String toString() {
-        return isPlain() ? "whole list" : "page=" + page + " size=" + size + " sort=" + sort;
+        if (isPlain()) {
+            return "whole list";
+        }
+        StringBuilder said = new StringBuilder();
+        if (isPaged()) {
+            said.append("page=").append(page).append(" size=").append(size).append(' ');
+        }
+        if (!sort.isEmpty()) {
+            said.append("sort=").append(sort).append(' ');
+        }
+        if (search != null) {
+            said.append("search='").append(search).append('\'')
+                    .append(searchIn.isEmpty() ? "" : " in " + searchIn).append(' ');
+        }
+        if (!filters.isEmpty()) {
+            said.append("where ").append(filters);
+        }
+        return said.toString().trim();
     }
 
     /**

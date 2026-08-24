@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.hibernate.Hibernate;
 import net.switchscope.error.IllegalRequestDataException;
@@ -47,13 +48,19 @@ public class PageReader {
     /** Appended to every ordering, because the fields above are not unique and the id is. */
     private static final String TIEBREAKER = "id";
 
-    private final SortPaths sortPaths;
+    /**
+     * What escapes a wildcard inside a searched-for text. Without it {@code ?search=%} matches
+     * every row, and a caller searching for a per-cent sign gets the whole table instead.
+     */
+    private static final char LIKE_ESCAPE = '\\';
+
+    private final QueryPaths queryPaths;
 
     @PersistenceContext
     private EntityManager em;
 
-    public PageReader(SortPaths sortPaths) {
-        this.sortPaths = sortPaths;
+    public PageReader(QueryPaths queryPaths) {
+        this.queryPaths = queryPaths;
     }
 
     /**
@@ -91,8 +98,9 @@ public class PageReader {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<E> select = cb.createQuery(rowType);
         Root<E> root = select.from(rowType);
-        if (where != null) {
-            select.where(where.toPredicate(root, cb));
+        Predicate[] restrictions = restrictions(root, cb, where, query);
+        if (restrictions.length > 0) {
+            select.where(restrictions);
         }
         select.select(root).orderBy(orderBy(root, cb, query));
         TypedQuery<E> rows = em.createQuery(select);
@@ -108,7 +116,7 @@ public class PageReader {
                     + " starts past any collection this API can hold");
         }
         List<T> content = map(rows.setFirstResult((int) offset).setMaxResults(size).getResultList(), toDto);
-        long total = count(rowType, where);
+        long total = count(rowType, where, query);
         return new PageTo<>(content, page, size, total, (int) ((total + size - 1) / size));
     }
 
@@ -137,21 +145,80 @@ public class PageReader {
      * says nothing about how many rows there are, and a join added for it could only make the
      * count harder to trust.
      */
-    private <E> long count(Class<E> rowType, Restriction<E> where) {
+    private <E> long count(Class<E> rowType, Restriction<E> where, ListQuery query) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> select = cb.createQuery(Long.class);
         Root<E> root = select.from(rowType);
         select.select(cb.count(root));
-        if (where != null) {
-            select.where(where.toPredicate(root, cb));
+        Predicate[] restrictions = restrictions(root, cb, where, query);
+        if (restrictions.length > 0) {
+            select.where(restrictions);
         }
         return em.createQuery(select).getSingleResult();
+    }
+
+    /**
+     * What the route is about and what the caller asked for, together. The two are the same kind of
+     * thing - rows this answer is not about - and are applied to the count as well as to the page,
+     * because a filtered page whose total counts the unfiltered table would send a client paging
+     * through pages that do not exist.
+     */
+    private <E> Predicate[] restrictions(Root<E> root, CriteriaBuilder cb, Restriction<E> where,
+                                         ListQuery query) {
+        List<Predicate> restrictions = new ArrayList<>();
+        if (where != null) {
+            restrictions.add(where.toPredicate(root, cb));
+        }
+        query.filters().forEach((field, values) -> restrictions.add(matches(root, cb, field, values)));
+        if (query.getSearch() != null) {
+            restrictions.add(contains(root, cb, query));
+        }
+        return restrictions.toArray(new Predicate[0]);
+    }
+
+    /**
+     * One filter. Repeating a parameter asks for any of its values - {@code ?code=RACK&code=ROUTER}
+     * - which is the only sense a repeated equality could have; a single value is compared as
+     * equal, so the SQL says what the request said.
+     */
+    private <E> Predicate matches(Root<E> root, CriteriaBuilder cb, String field, List<String> values) {
+        Path<?> path = queryPaths.filterPath(root, field);
+        List<Object> wanted = values.stream()
+                .map(value -> FilterValues.of(path.getJavaType(), field, value))
+                .toList();
+        return wanted.size() == 1 ? cb.equal(path, wanted.get(0)) : path.in(wanted);
+    }
+
+    /**
+     * A search: the text appears somewhere in one of the fields, case ignored. The fields are the
+     * ones the caller named, or every text value of the row when they named none - the same set the
+     * client-side search covers, taken from the mapping rather than from a list kept per screen.
+     */
+    private <E> Predicate contains(Root<E> root, CriteriaBuilder cb, ListQuery query) {
+        List<String> fields = query.getSearchIn().isEmpty()
+                ? queryPaths.textFields(root)
+                : query.getSearchIn();
+        if (fields.isEmpty()) {
+            throw new IllegalRequestDataException("cannot search "
+                    + root.getModel().getJavaType().getSimpleName() + ": it holds no text; name a"
+                    + " field with searchIn, or filter by a value instead");
+        }
+        String pattern = "%" + escapeWildcards(query.getSearch().toLowerCase()) + "%";
+        Predicate[] matches = fields.stream()
+                .map(field -> cb.like(cb.lower(queryPaths.searchPath(root, field).as(String.class)),
+                        pattern, LIKE_ESCAPE))
+                .toArray(Predicate[]::new);
+        return cb.or(matches);
+    }
+
+    private static String escapeWildcards(String text) {
+        return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
     private List<Order> orderBy(Root<?> root, CriteriaBuilder cb, ListQuery query) {
         List<Order> orders = new ArrayList<>();
         for (ListQuery.Ordering ordering : query.orderings()) {
-            Path<?> path = sortPaths.path(root, ordering.field());
+            Path<?> path = queryPaths.sortPath(root, ordering.field());
             orders.add(ordering.ascending() ? cb.asc(path) : cb.desc(path));
         }
         if (orders.isEmpty()) {
@@ -165,7 +232,7 @@ public class PageReader {
 
     private Path<?> defaultPath(Root<?> root) {
         for (String candidate : DEFAULT_ORDER) {
-            Path<?> path = sortPaths.pathOrNull(root, candidate);
+            Path<?> path = queryPaths.pathOrNull(root, candidate);
             if (path != null) {
                 return path;
             }
