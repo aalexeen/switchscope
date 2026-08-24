@@ -174,6 +174,17 @@ public class QueryPaths {
         return root.join(attribute, JoinType.LEFT);
     }
 
+    /**
+     * The associations that hold at most one row, which are the ones a query may fetch without
+     * giving up on {@code LIMIT}.
+     *
+     * @param root the query root
+     * @return the names of the row's to-one associations
+     */
+    public List<String> toOneNames(Root<?> root) {
+        return toOneAssociations(root.getModel()).stream().map(Attribute::getName).sorted().toList();
+    }
+
     /** Longest name first, so {@code parentComponentName} is read as the parent's name, not the parent of "ComponentName". */
     private static List<Attribute<?, ?>> toOneAssociations(ManagedType<?> type) {
         List<Attribute<?, ?>> found = new ArrayList<>();

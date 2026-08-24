@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -103,6 +104,7 @@ public class PageReader {
             select.where(restrictions);
         }
         select.select(root).orderBy(orderBy(root, cb, query));
+        fetchToOneAssociations(root);
         TypedQuery<E> rows = em.createQuery(select);
 
         if (!query.isPaged()) {
@@ -131,6 +133,23 @@ public class PageReader {
      * with {@code instanceof}, so the row that came back is a component of no known kind, and
      * {@code GET /api/components?page=0} answered 422 until this line existed.
      */
+    /**
+     * Loads what the row points at, in the same query, the way the plain finders do with
+     * {@code LEFT JOIN FETCH}. To-one only: a collection joined here would take the {@code LIMIT}
+     * away from the database and leave it to be applied in memory.
+     * <p>
+     * Without this the page came back holding proxies, and a proxy is initialised by Hibernate's
+     * load-by-id, which puts every eagerly-mapped association of that entity into a single select.
+     * For a component that is seven joined collections at once - the type's properties, its allowed
+     * child types and categories, the category's properties, the status's properties and its
+     * allowed transitions - which is a Cartesian product, and one such load took
+     * <b>thirteen seconds</b>. The whole unpaged list took half of one, because it fetches its
+     * associations explicitly and never initialises a proxy at all. A page has to do the same.
+     */
+    private void fetchToOneAssociations(Root<?> root) {
+        queryPaths.toOneNames(root).forEach(association -> root.fetch(association, JoinType.LEFT));
+    }
+
     private static <E, T> List<T> map(List<E> rows, Function<E, T> toDto) {
         return rows.stream().map(PageReader::<E>unproxy).map(toDto).toList();
     }
