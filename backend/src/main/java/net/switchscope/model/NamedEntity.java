@@ -25,7 +25,7 @@ public abstract class NamedEntity extends BaseEntity {
     @NoHtml
     protected String name;
 
-    @Size(max = 512)
+    @Size(max = 1024)
     @Column(name = "description")
     @NoHtml
     private String description;

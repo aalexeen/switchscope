@@ -494,8 +494,17 @@ raw JSON → ObjectNode → пин дискриминатора → treeToValue 
       адреса читалось как захват чужого. Один и тот же `PUT /api/profile` спотыкался об оба,
       поэтому и лечатся одним коммитом; `ProfileUpdateEndpointTest` — 3 теста, до правки первый
       падал (422 вместо 204), остальные два стерегут, что проверки не исчезли
-- [ ] Расхождения `@Size` DTO ↔ сущность ↔ DDL (`NamedTo.description` 1024 vs `NamedEntity` 512).
-      Теперь, когда `@Valid` работает, значение 513–1024 пройдёт валидацию и упадёт на flush
+- [x] Расхождения `@Size` DTO ↔ сущность ↔ DDL (`NamedTo.description` 1024 vs `NamedEntity` 512).
+      Теперь, когда `@Valid` работает, значение 513–1024 пройдёт валидацию и упадёт на flush.
+      **Сделано.** Сверены все три слоя разом, а не только названный случай. `description`:
+      колонка везде `TEXT`, поэтому поднята сущность до 1024, а не опущен DTO. Настоящих
+      расхождений «валидация слабее хранилища» нашлось ещё пять, все в `Installation`:
+      `installedBy` / `removedBy` (DTO 255, сущность без `@Size`, колонка `VARCHAR(128)`),
+      `cableManagement` (512 против 256), `statusChangedBy` (без ограничения вовсе),
+      `positionDescription` (255 против 256) — плюс пять полей портов без `@Size` над
+      `VARCHAR(16…256)`. Везде проставлено ограничение по длине колонки на сущности и приведён
+      DTO. Мнимые расхождения (`wifiStandard` 64 против 32, `formFactor`, `iconClass`) — разные
+      таблицы или API строже колонки, не трогал. `SizeLimitTest`, 3 теста
 - [ ] Коллекционные ассоциации не разрешаются: `CableRunTo.locationIds` / `connectorIds`,
       `PatchPanelTo.cableRunIds`, `LocationTypeTo.allowed*TypeIds`, `ComponentCategoryTo.componentTypeIds`
 - [ ] `Installation.isValidLocationInstallation()` → `canContainComponent(null)` всегда false;
@@ -532,6 +541,14 @@ raw JSON → ObjectNode → пин дискриминатора → treeToValue 
       симметричной поломкой: до неё PUT тоже отвечал 500 `InvalidTypeIdException`. Лечится тем же
       приёмом, но затрагивает bean validation, которую типизированный `@RequestBody` даёт даром, —
       поэтому отдельным пунктом, а не попутно
+- [ ] **Новое, найдено при сверке `@Size`:** PUT **не прогоняет bean validation по DTO вообще.**
+      С раздела 1.2 тело читается как строка (`PartialUpdateReader`), `@Valid` там нет и быть не
+      может в прежнем виде: отсутствующие поля обнуляются, и `@NotBlank name` завалил бы любой
+      частичный запрос. Сейчас единственный рубеж на PUT — валидация сущности при flush, то есть
+      ограничения, которых нет на сущности (`@NoHtml`, `@Email`, DTO-only `@Size`), на обновлении
+      не проверяются никем. Лечится валидацией **только присутствующих** полей
+      (`Validator.validateProperty` по `presentFields`) — отдельным пунктом, потому что это
+      поведение, а не описка
 - [ ] `AbstractCatalogController` — мёртвый код в проде: **ни один боевой контроллер его не
       наследует**, его пять маппингов не попадают в `RequestMappingHandlerMapping` и в скан
       Этапа 1. Но просто удалить нельзя: его наследует тестовый

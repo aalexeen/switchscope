@@ -1,6 +1,7 @@
 package net.switchscope.model.port;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,12 +22,14 @@ import java.util.UUID;
 @NoArgsConstructor
 public class FiberPort extends Port {
 
+    @Size(max = 32)
     @Column(name = "fiber_type")
     private String fiberType; // SINGLE_MODE, MULTI_MODE
 
     @Column(name = "wavelength_nm")
     private Integer wavelengthNm; // Wavelength in nanometers
 
+    @Size(max = 64)
     @Column(name = "fiber_standard")
     private String fiberStandard; // 1000BASE-SX, 1000BASE-LX, 10GBASE-SR, etc.
 

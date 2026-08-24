@@ -92,7 +92,7 @@ public class InstallationTo extends BaseTo {
     @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private Integer rackUnitHeight;
 
-    @Size(max = 255)
+    @Size(max = 256)
     @NoHtml
     @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private String positionDescription;
@@ -110,12 +110,12 @@ public class InstallationTo extends BaseTo {
     private LocalDateTime lastStatusChange;
 
     // Who did the installation
-    @Size(max = 255)
+    @Size(max = 128)
     @NoHtml
     @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private String installedBy;
 
-    @Size(max = 255)
+    @Size(max = 128)
     @NoHtml
     @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private String removedBy;
@@ -130,7 +130,7 @@ public class InstallationTo extends BaseTo {
     @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private String installationNotes;
 
-    @Size(max = 512)
+    @Size(max = 256)
     @NoHtml
     @FieldAccess(FieldAccessLevel.USER_WRITABLE)
     private String cableManagement;

@@ -1,6 +1,7 @@
 package net.switchscope.model.port;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,15 +22,18 @@ import java.util.UUID;
 @NoArgsConstructor
 public class EthernetPort extends Port {
 
+    @Size(max = 64)
     @Column(name = "ethernet_standard")
     private String ethernetStandard; // 10BASE-T, 100BASE-TX, 1000BASE-T, etc.
 
+    @Size(max = 16)
     @Column(name = "mdi_mdix_mode")
     private String mdiMdixMode; // MDI, MDIX, AUTO
 
     @Column(name = "cable_length_meters")
     private Integer cableLengthMeters;
 
+    @Size(max = 256)
     @Column(name = "link_partner_info")
     private String linkPartnerInfo;
 

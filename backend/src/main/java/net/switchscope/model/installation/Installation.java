@@ -1,6 +1,7 @@
 package net.switchscope.model.installation;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -59,6 +60,7 @@ public class Installation extends BaseEntity {
     @Column(name = "rack_unit_height")
     private Integer rackUnitHeight;
 
+    @Size(max = 256)
     @Column(name = "position_description")
     private String positionDescription;
 
@@ -75,12 +77,15 @@ public class Installation extends BaseEntity {
     private LocalDateTime lastStatusChange = LocalDateTime.now();
 
     // Who did the installation
+    @Size(max = 128)
     @Column(name = "installed_by")
     private String installedBy;
 
+    @Size(max = 128)
     @Column(name = "removed_by")
     private String removedBy;
 
+    @Size(max = 128)
     @Column(name = "status_changed_by")
     private String statusChangedBy;
 
@@ -88,6 +93,7 @@ public class Installation extends BaseEntity {
     @Column(name = "installation_notes")
     private String installationNotes;
 
+    @Size(max = 256)
     @Column(name = "cable_management")
     private String cableManagement;
 
