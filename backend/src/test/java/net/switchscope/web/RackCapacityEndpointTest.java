@@ -103,7 +103,11 @@ class RackCapacityEndpointTest {
     @DisplayName("clearing the capacity is refused as impossible, not as forbidden")
     void clearingTheCapacityIsRefused() throws Exception {
         JsonNode rackType = aRackTypeWithACapacityOtherThanTheFlatDefault();
-        UUID id = create(rackBody(rackType.get("id").asText()));
+        Map<String, Object> body = rackBody(rackType.get("id").asText());
+        // a capacity that is neither the flat default nor the type's, so that finding it afterwards
+        // means the value was left alone rather than cleared and supplied again
+        body.put("rackUnitsTotal", 8);
+        UUID id = create(body);
         try {
             putAs(id, "{\"rackUnitsTotal\": null}")
                     .andExpect(status().isUnprocessableEntity())
@@ -112,7 +116,7 @@ class RackCapacityEndpointTest {
             assertThat(read(id).get("rackUnitsTotal").asInt())
                     .as("a refused clear must not have applied half of itself - and a rack whose"
                             + " capacity was cleared could not be read back at all")
-                    .isEqualTo(FLAT_DEFAULT);
+                    .isEqualTo(8);
         } finally {
             remove(id);
         }
