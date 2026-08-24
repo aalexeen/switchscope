@@ -160,8 +160,14 @@ public class NetworkSwitch extends HasPortsImpl {
             return 0;
         }
 
+        // isPoePowered rather than isPoeCapable: the second only asks whether PoE is switched on,
+        // and poe_power_watts is the current reading, which is nullable and absent on a port that
+        // has never reported one - Port.enablePoe leaves exactly that state behind. Unboxing it
+        // turned availablePoeBudget, which every switch response carries, into a 500 for the whole
+        // switch. A port drawing an unknown amount is counted as drawing nothing, which is what
+        // summing over the powered ones already meant.
         double usedPower = ports.stream()
-                             .filter(Port::isPoeCapable)
+                             .filter(Port::isPoePowered)
                              .mapToDouble(Port::getPoePowerWatts)
                              .sum();
 
