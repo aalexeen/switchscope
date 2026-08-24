@@ -1,6 +1,5 @@
 package net.switchscope.web;
 
-import net.switchscope.model.Role;
 import net.switchscope.model.User;
 import lombok.Getter;
 import org.springframework.lang.NonNull;
@@ -15,13 +14,14 @@ import java.util.stream.Collectors;
 @Getter
 public class AuthUser extends org.springframework.security.core.userdetails.User {
 
-    private static final String ROLE_PREFIX = "ROLE_";
+    /**
+     * How a role becomes an authority. Written once, because two places depend on the same answer:
+     * {@link net.switchscope.config.SecurityConfig} builds authorities with it and
+     * {@link #permissions()} tells the two kinds apart by it.
+     */
+    public static final String ROLE_PREFIX = "ROLE_";
 
     private final User user;
-
-    public AuthUser(@NonNull User user) {
-        this(user, user.getRoles());
-    }
 
     /**
      * @param authorities the roles as {@code ROLE_*} plus, since stage 2, the permission codes the
@@ -39,14 +39,14 @@ public class AuthUser extends org.springframework.security.core.userdetails.User
         return user.getId();
     }
 
-    public boolean hasRole(Role role) {
-        return user.hasRole(role);
+    public boolean hasRole(String code) {
+        return user.hasRole(code);
     }
 
     /**
      * The permission half of {@link #getAuthorities()} - every authority that is not a
-     * {@code ROLE_*} one, which is exactly what {@link Role#getAuthority()} produces and nothing
-     * else does.
+     * {@code ROLE_*} one, which is exactly what {@link net.switchscope.config.SecurityConfig}
+     * builds a role into and nothing else does.
      * <p>
      * This is the collection the authorization advisor matches against, so a client reading it
      * back learns what the server will actually allow. Recomputing the same set from

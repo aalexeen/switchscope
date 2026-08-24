@@ -1,0 +1,62 @@
+databaseChangeLog:
+  - changeSet:
+      id: drop-user-role-role
+      author: AALEXEEN
+      comment: >
+        Second half of the user_role migration, and the reason stage 4 exists: the Role enum is
+        gone from the code, so the VARCHAR column it was stored in is no longer read by anything.
+        role_id becomes the identity of the row - not null, unique per user - and the old column
+        and its constraint go with the enum. Included after fill/06, which is what puts a value in
+        role_id; on a fresh database the order matters, since fill/02 still inserts the old column.
+      preConditions:
+        - onFail: MARK_RAN
+          columnExists:
+            tableName: user_role
+            columnName: role
+      changes:
+        - sql:
+            comment: A row the application inserted after fill/06 has no role_id; point it at its role.
+            splitStatements: false
+            sql: >
+              UPDATE user_role ur SET role_id = r.id FROM roles r
+              WHERE ur.role_id IS NULL AND r.code = ur.role;
+        - addNotNullConstraint:
+            tableName: user_role
+            columnName: role_id
+            columnDataType: UUID
+        - addUniqueConstraint:
+            tableName: user_role
+            columnNames: user_id, role_id
+            constraintName: uk_user_role_role_id
+        - dropUniqueConstraint:
+            tableName: user_role
+            constraintName: uk_user_role
+        - dropColumn:
+            tableName: user_role
+            columnName: role
+      rollback:
+        - addColumn:
+            tableName: user_role
+            columns:
+              - column:
+                  name: role
+                  type: VARCHAR(32)
+        - sql:
+            splitStatements: false
+            sql: >
+              UPDATE user_role ur SET role = r.code FROM roles r WHERE r.id = ur.role_id;
+        - addNotNullConstraint:
+            tableName: user_role
+            columnName: role
+            columnDataType: VARCHAR(32)
+        - addUniqueConstraint:
+            tableName: user_role
+            columnNames: user_id, role
+            constraintName: uk_user_role
+        - dropUniqueConstraint:
+            tableName: user_role
+            constraintName: uk_user_role_role_id
+        - dropNotNullConstraint:
+            tableName: user_role
+            columnName: role_id
+            columnDataType: UUID

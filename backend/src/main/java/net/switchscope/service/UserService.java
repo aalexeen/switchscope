@@ -7,10 +7,13 @@ import org.springframework.util.Assert;
 import net.switchscope.error.DataConflictException;
 import net.switchscope.mapper.UserMapper;
 import net.switchscope.model.User;
+import net.switchscope.model.security.RoleEntity;
 import net.switchscope.repository.UserRepository;
+import net.switchscope.repository.security.RoleRepository;
 import net.switchscope.to.UserTo;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -20,6 +23,7 @@ public class UserService {
 
     private final UserRepository repository;
     private final UserMapper mapper;
+    private final RoleRepository roleRepository;
 
     public List<User> getAll() {
         return repository.findAll();
@@ -33,12 +37,29 @@ public class UserService {
         return repository.getExistedByEmail(email);
     }
 
+    /**
+     * Creates a user, granting the default role when the caller named none.
+     * <p>
+     * Registration is the only path here, and a self-registered account must not choose what it
+     * is: the role comes from the {@code roles} table, by the code the seed guarantees. An empty
+     * set means "not stated" rather than "no roles" - a user with no role at all can authenticate
+     * and do nothing, which is a state worth being unable to reach by omission.
+     */
     @Transactional
     public User create(User user) {
         Assert.notNull(user, "user must not be null");
         Assert.isNull(user.getId(), "user must be new (id must be null)");
         checkEmailUnique(user);
+        if (user.getRoles().isEmpty()) {
+            user.setRoles(Set.of(defaultRole()));
+        }
         return repository.prepareAndSave(user);
+    }
+
+    private RoleEntity defaultRole() {
+        return roleRepository.findByCode(RoleEntity.USER_CODE)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Role '" + RoleEntity.USER_CODE + "' is missing from the roles table"));
     }
 
     @Transactional

@@ -37,6 +37,15 @@ import java.util.Set;
 public class RoleEntity extends BaseCodedEntity {
 
     /**
+     * The two roles the application names in code. Everything else about a role is data; these two
+     * are referenced because {@code /api/admin/**} is gated by role and because a registration has
+     * to become something. They are codes, not an enum: the difference is that a third role needs
+     * no constant here.
+     */
+    public static final String ADMIN_CODE = "ADMIN";
+    public static final String USER_CODE = "USER";
+
+    /**
      * A role the application itself relies on ({@code ADMIN}, {@code USER}); it may be re-granted
      * but not deleted.
      */

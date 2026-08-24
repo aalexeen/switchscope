@@ -1,6 +1,6 @@
 package net.switchscope.security.policy;
 
-import net.switchscope.model.Role;
+import net.switchscope.model.security.RoleEntity;
 import net.switchscope.web.AuthUtil;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ public class UpdatePolicyResolver {
      */
     public UpdatePolicy resolve() {
         var authUser = AuthUtil.safeGet();
-        if (authUser != null && authUser.hasRole(Role.ADMIN)) {
+        if (authUser != null && authUser.hasRole(RoleEntity.ADMIN_CODE)) {
             return ADMIN_POLICY;
         }
         return USER_POLICY;

@@ -1,6 +1,8 @@
 package net.switchscope.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -13,9 +15,11 @@ import lombok.Setter;
 import org.springframework.lang.NonNull;
 import net.switchscope.HasIdAndEmail;
 import net.switchscope.mapper.Default;
+import net.switchscope.model.security.RoleEntity;
 import net.switchscope.validation.NoHtml;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -46,24 +50,38 @@ public class User extends NamedEntity implements HasIdAndEmail {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date registered = new Date();
 
-    @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "user_role",
+    /**
+     * The roles held, as rows rather than as enum constants.
+     * <p>
+     * Eager because authentication is stateless: every request loads the user, and every request
+     * needs to know what they may do. The join column is {@code role_id}; the {@code role} string
+     * this used to map was dropped with the enum.
+     * <p>
+     * It still <em>serialises</em> as {@code ["ADMIN"]}, because this entity is what
+     * {@code /api/profile} answers with and the frontend does {@code roles.includes('ADMIN')} on
+     * that shape. The rows carry a display name, a sort order and their permissions; none of that
+     * is the client's business, and turning the wire shape into objects would have broken the
+     * role gate on {@code /users/**} silently.
+     */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
-            uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "role"}, name = "uk_user_role"))
-    @Column(name = "role")
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<Role> roles = EnumSet.noneOf(Role.class);
+            inverseJoinColumns = @JoinColumn(name = "role_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "role_id"},
+                    name = "uk_user_role_role_id"))
+    @JsonSerialize(contentConverter = RoleCode.class)
+    private Set<RoleEntity> roles = new HashSet<>();
 
     public User(User u) {
         this(u.id, u.name, u.email, u.password, u.enabled, u.registered, u.roles);
     }
 
     @Default
-    public User(UUID id, String name, String email, String password, Role... roles) {
-        this(id, name, email, password, true, new Date(), Arrays.asList(roles));
+    public User(UUID id, String name, String email, String password) {
+        this(id, name, email, password, true, new Date(), Set.of());
     }
 
-    public User(UUID id, String name, String email, String password, boolean enabled, Date registered, @NonNull Collection<Role> roles) {
+    public User(UUID id, String name, String email, String password, boolean enabled, Date registered, @NonNull Collection<RoleEntity> roles) {
         super(id, name);
         this.email = email;
         this.password = password;
@@ -72,12 +90,25 @@ public class User extends NamedEntity implements HasIdAndEmail {
         setRoles(roles);
     }
 
-    public void setRoles(Collection<Role> roles) {
-        this.roles = roles.isEmpty() ? EnumSet.noneOf(Role.class) : EnumSet.copyOf(roles);
+    public void setRoles(Collection<RoleEntity> roles) {
+        this.roles = new HashSet<>(roles);
     }
 
-    public boolean hasRole(Role role) {
-        return roles.contains(role);
+    /** The codes, which is what everything outside the model asks for: authorities, JSON, gates. */
+    public Set<String> roleCodes() {
+        return roles.stream().map(RoleEntity::getCode).collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    public boolean hasRole(String code) {
+        return roles.stream().anyMatch(role -> code.equals(role.getCode()));
+    }
+
+    /** Keeps the JSON a list of codes without a second property to keep in step with the first. */
+    static final class RoleCode extends StdConverter<RoleEntity, String> {
+        @Override
+        public String convert(RoleEntity role) {
+            return role.getCode();
+        }
     }
 
     @Override

@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
  *   <li>it contains no user data and no password hash, unlike a cached {@code UserDetails}, which
  *       {@code CachingUserDetailsService} can only do with {@code eraseCredentials(false)};</li>
  *   <li>a user's own roles stay fresh: they are read on every request anyway, because
- *       {@code user_role} is already an eager {@code @ElementCollection}. So no extra table is read
- *       per request at all;</li>
+ *       {@code user_role} is joined eagerly to the user. So no extra table is read per request at
+ *       all;</li>
  *   <li>it invalidates as one thing, which matters because it is exactly the table an administrator
  *       edits.</li>
  * </ul>

@@ -2,8 +2,8 @@ package net.switchscope.config;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.switchscope.model.Role;
 import net.switchscope.model.User;
+import net.switchscope.model.security.RoleEntity;
 import net.switchscope.repository.UserRepository;
 import net.switchscope.service.security.RolePermissionCatalog;
 import net.switchscope.web.AuthUser;
@@ -66,15 +66,17 @@ public class SecurityConfig {
      * stateless Basic authentication would read {@code roles} and {@code role_permissions} on every
      * single request, since there is no session to remember them in.
      * <p>
-     * The role name is the join key: {@link Role#ADMIN} to the {@code roles} row coded
-     * {@code ADMIN}. That is deliberate duplication for now - the enum column is still the
-     * authoritative one and only stage 4 drops it.
+     * Since stage 4 the role code is the only join key there is: the enum that used to be both an
+     * authority and a column value is gone, so a role is a row, its code is its name, and this is
+     * the one place that turns that code into a Spring Security authority.
      */
     private List<GrantedAuthority> authoritiesOf(User user) {
         Map<String, Set<String>> grants = rolePermissionCatalog.byRole();
-        List<GrantedAuthority> authorities = new ArrayList<>(user.getRoles());
-        user.getRoles().stream()
-                .map(Role::name)
+        Set<String> codes = user.roleCodes();
+        List<GrantedAuthority> authorities = new ArrayList<>(codes.stream()
+                .map(code -> (GrantedAuthority) new SimpleGrantedAuthority(AuthUser.ROLE_PREFIX + code))
+                .toList());
+        codes.stream()
                 .map(code -> grants.getOrDefault(code, Set.of()))
                 .flatMap(Set::stream)
                 .distinct()
@@ -109,8 +111,13 @@ public class SecurityConfig {
                       // another account is not the case this opens, and 403 for them would be a
                       // new refusal rather than the fix.
                       .requestMatchers(HttpMethod.POST, "/api/profile").permitAll()
-                      .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name()) // Admin-only endpoints
-                      .requestMatchers("/api/**").authenticated()) // All other API endpoints require authentication
+                      .requestMatchers("/api/admin/**").hasRole(RoleEntity.ADMIN_CODE) // Admin-only endpoints
+                      .requestMatchers("/api/**").authenticated() // All other API endpoints require authentication
+                      // Everything not named above is refused. Spring Security refuses an
+                      // unmatched request anyway; saying so is the point - what this chain does
+                      // with a path nobody thought about should be a decision in the file, not a
+                      // default of the version in the pom.
+                      .anyRequest().denyAll())
             .httpBasic(hbc -> hbc.authenticationEntryPoint(authenticationEntryPoint))
             .sessionManagement(smc -> smc.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .csrf(AbstractHttpConfigurer::disable);

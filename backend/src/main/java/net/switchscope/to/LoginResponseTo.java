@@ -3,7 +3,6 @@ package net.switchscope.to;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import net.switchscope.HasIdAndEmail;
-import net.switchscope.model.Role;
 
 import java.util.Set;
 import java.util.UUID;
@@ -16,15 +15,18 @@ import java.util.UUID;
  * on. It is additive on purpose - {@code roles} keeps serialising as {@code ["ADMIN"]}, because
  * {@code services/auth.js} and {@code UserAccount.vue} read it that way and the client-side gate is
  * a convenience, not the boundary: the server refuses regardless of what the client chose to show.
+ * <p>
+ * Since stage 4 those role names are codes read off {@code roles} rows rather than enum constants.
+ * The wire shape did not change, which is the whole reason they are strings here.
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class LoginResponseTo extends NamedTo implements HasIdAndEmail {
     String email;
-    Set<Role> roles;
+    Set<String> roles;
     Set<String> permissions;
 
-    public LoginResponseTo(UUID id, String name, String email, Set<Role> roles, Set<String> permissions) {
+    public LoginResponseTo(UUID id, String name, String email, Set<String> roles, Set<String> permissions) {
         super(id, name);
         this.email = email;
         this.roles = roles;

@@ -53,7 +53,7 @@ public class AuthController extends AbstractUserController {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getRoles(),
+                user.roleCodes(),
                 authUser.permissions()
         );
     }
