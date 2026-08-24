@@ -16,6 +16,8 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -156,6 +158,25 @@ class ListPagingEndpointTest {
                 .as("a row seen twice, or never, means the pages are cut from a query that selects"
                         + " other rows than the list does, or orders them only partially")
                 .containsExactlyInAnyOrderElementsOf(all);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("listRoutes")
+    @DisplayName("a row on a page is the row the list returns, field for field")
+    void aPagedRowIsTheRowTheListReturns(String route) throws Exception {
+        Map<String, JsonNode> listed = new HashMap<>();
+        read(route).forEach(row -> listed.put(row.get("id").asText(), row));
+
+        JsonNode page = read(route + "?page=0&size=" + WALK);
+
+        assertThat(page.get("content")).isNotEmpty();
+        for (JsonNode row : page.get("content")) {
+            assertThat(row)
+                    .as("which rows come back is only half of it: a paged read maps them by its own"
+                            + " path, and for eight of these routes that path runs somewhere else"
+                            + " than the list's does")
+                    .isEqualTo(listed.get(row.get("id").asText()));
+        }
     }
 
     @ParameterizedTest(name = "{0}")
