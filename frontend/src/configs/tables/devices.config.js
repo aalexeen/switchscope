@@ -5,7 +5,11 @@
  * Devices are active network equipment that can be managed.
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.devices,
+
   entityName: 'Device',
   entityNamePlural: 'Devices',
   entityKey: 'device',

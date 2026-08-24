@@ -3,7 +3,11 @@
  * Defines structure, columns, and behavior for ports table
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.ports,
+
   // Entity metadata
   entityName: 'Port',
   entityNamePlural: 'Ports',

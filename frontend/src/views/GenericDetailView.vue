@@ -56,6 +56,7 @@
                   {{ item.active ? 'Active' : 'Inactive' }}
                 </span>
                 <button
+                  v-if="canUpdate"
                   @click="enterEditMode"
                   class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors"
                 >
@@ -286,7 +287,9 @@ import GenericListingsTable from '@/components/table/GenericListingsTable.vue';
 import RelatedItemsBadges from '@/components/detail/RelatedItemsBadges.vue';
 import EditFieldRenderer from '@/components/form/EditFieldRenderer.vue';
 import { detailViewRegistry } from '@/configs/details/detailViewRegistry';
-import { composableRegistry } from '@/configs/tables/tableRegistry';
+import { composableRegistry, tableRegistry } from '@/configs/tables/tableRegistry';
+import { usePermissions } from '@/composables/usePermissions';
+import { update } from '@/configs/permissions';
 
 const route = useRoute();
 const router = useRouter();
@@ -310,6 +313,19 @@ const config = computed(() => {
     return {};
   }
   return detailViewRegistry[configKey] || {};
+});
+
+const { can } = usePermissions();
+
+/**
+ * Whether to offer editing at all. The detail config names its table, the table config names the
+ * permission resource, so this page and the row it was opened from ask the same question of the
+ * same string - and a page reached with `?edit=true` from a row whose edit button was hidden does
+ * not quietly become an editor.
+ */
+const canUpdate = computed(() => {
+  const resource = tableRegistry[config.value.tableKey]?.permissionResource;
+  return !resource || can(update(resource));
 });
 
 // Get composable from composableRegistry
@@ -476,7 +492,7 @@ const loadItem = async () => {
     }
 
     // Check for edit mode from query param
-    if (route.query.edit === 'true' && item.value) {
+    if (route.query.edit === 'true' && item.value && canUpdate.value) {
       enterEditMode();
     }
   } catch (err) {

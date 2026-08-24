@@ -2,7 +2,11 @@
  * Table Configuration for Component Models
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.componentModels,
+
   entityName: 'Component Model',
   entityNamePlural: 'Component Models',
   entityKey: 'model',

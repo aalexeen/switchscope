@@ -3,7 +3,11 @@
  * Defines structure, columns, and behavior for cable runs table
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.cableRuns,
+
   // Entity metadata
   entityName: 'Cable Run',
   entityNamePlural: 'Cable Runs',

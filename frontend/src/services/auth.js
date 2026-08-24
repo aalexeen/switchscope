@@ -13,6 +13,17 @@ const authService = {
     return userData ? JSON.parse(userData) : null;
   },
 
+  // Store the identity the server just answered with: id, name, email, roles and permissions
+  storeUser(user) {
+    localStorage.setItem("user", JSON.stringify(user));
+  },
+
+  // Get the permission codes this session holds
+  getPermissions() {
+    const user = this.getUser();
+    return user?.permissions || [];
+  },
+
   // Get user roles
   getUserRoles() {
     const user = this.getUser();
@@ -87,7 +98,7 @@ const authService = {
 
       // Store authentication data using the response from LoginResponseTo
       localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("user", JSON.stringify(response.data));
+      this.storeUser(response.data);
       localStorage.setItem("email", credentials.email);
       localStorage.setItem("password", credentials.password);
 
@@ -116,8 +127,8 @@ const authService = {
       // Call the check endpoint
       const response = await api.authentication.checkAuth();
       
-      // Update stored user data with fresh data from server (including roles)
-      localStorage.setItem("user", JSON.stringify(response.data));
+      // Update stored user data with fresh data from server (roles and permissions both)
+      this.storeUser(response.data);
       localStorage.setItem("isAuthenticated", "true");
 
       return { 
@@ -147,9 +158,12 @@ const authService = {
 
       // Call the profile endpoint
       const response = await api.authentication.getProfile();
-      
-      // Update stored user data (including roles)
-      localStorage.setItem("user", JSON.stringify(response.data));
+
+      // Merge, do not replace: /api/profile answers with the User entity, which carries no
+      // permissions. It is the same person, not the same answer, and overwriting the identity with
+      // it would empty every permission gate in the app until the next check - which happens on
+      // startup, so the buttons would come back and nobody would know why they left.
+      this.storeUser({ ...this.getUser(), ...response.data });
 
       return response.data;
     } catch (error) {

@@ -85,6 +85,7 @@ const getColumnValue = (item, key) => {
         :config="col"
         :is-expanded="isExpanded"
         :edit-enabled="editEnabled"
+        :permission-resource="config.permissionResource"
         @toggle="toggleExpand"
         @view="$emit('view', item)"
         @edit="$emit('edit', item)"

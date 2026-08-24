@@ -1,5 +1,7 @@
 <script setup>
 import { computed } from 'vue';
+import { usePermissions } from '@/composables/usePermissions';
+import { update, remove } from '@/configs/permissions';
 
 const props = defineProps({
   item: {
@@ -13,16 +15,44 @@ const props = defineProps({
   editEnabled: {
     type: Boolean,
     default: true
+  },
+  /**
+   * The permission resource of the table this row belongs to, e.g. `component.rack`. Comes from
+   * the table config, not the column config in `config` - the actions belong to the entity, not to
+   * the cell. Absent means "no table said", and an ungated button is what this component did
+   * before permissions existed: the server refuses either way.
+   */
+  permissionResource: {
+    type: String,
+    default: null
   }
 });
 
 const emit = defineEmits(['view', 'edit', 'delete']);
 
+const { can } = usePermissions();
+
 // Determine which actions to show
 const showView = computed(() => props.config.actions?.includes('view') ?? true);
-const showEdit = computed(() => props.config.actions?.includes('edit') ?? true);
-const showDelete = computed(() => props.config.actions?.includes('delete') ?? true);
+const showEdit = computed(() =>
+  (props.config.actions?.includes('edit') ?? true) && allowed(update)
+);
+const showDelete = computed(() =>
+  (props.config.actions?.includes('delete') ?? true) && allowed(remove)
+);
 const editDisabled = computed(() => !props.editEnabled);
+
+/**
+ * Whether the caller holds the permission an action needs.
+ *
+ * Viewing is not asked about: reaching this page at all took the read permission, and the guard in
+ * the router already asked.
+ *
+ * @param {Function} action - a code builder from `configs/permissions.js`
+ */
+function allowed(action) {
+  return props.permissionResource === null || can(action(props.permissionResource));
+}
 
 /**
  * Handle delete action with confirmation

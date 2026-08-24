@@ -3,7 +3,11 @@
  * Defines structure, columns, and behavior for network switches table
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.networkSwitches,
+
   // Entity metadata
   entityName: 'Network Switch',
   entityNamePlural: 'Network Switches',

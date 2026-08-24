@@ -3,7 +3,11 @@
  * Defines structure, columns, and behavior for racks table
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.racks,
+
   // Entity metadata
   entityName: 'Rack',
   entityNamePlural: 'Racks',

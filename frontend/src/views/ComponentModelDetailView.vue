@@ -55,6 +55,7 @@
               <!-- View Mode Buttons -->
               <template v-if="!isEditMode">
                 <button
+                  v-if="canUpdate"
                   @click="enterEditMode"
                   class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors"
                 >
@@ -187,6 +188,10 @@ import rackModelConfig from '@/configs/details/componentModels/rackModel.detail'
 // Import composable
 import { useComponentModels } from '@/composables/useComponentModels';
 
+// Permissions
+import { usePermissions } from '@/composables/usePermissions';
+import { RESOURCE, update } from '@/configs/permissions';
+
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
@@ -195,6 +200,11 @@ const model = ref(null);
 const isLoading = ref(false);
 const error = ref(null);
 const collapsedSections = reactive({});
+
+const { can } = usePermissions();
+
+/** This page is always a component model, so the resource is fixed rather than looked up. */
+const canUpdate = computed(() => can(update(RESOURCE.componentModels)));
 
 // Edit mode state
 const isEditMode = ref(false);
@@ -433,7 +443,7 @@ const getLifecycleStatusClass = (status) => {
 
 // Watch for edit query param
 watch(() => route.query.edit, (newEdit) => {
-  if (newEdit === 'true' && !isEditMode.value && model.value) {
+  if (newEdit === 'true' && !isEditMode.value && model.value && canUpdate.value) {
     enterEditMode();
   } else if (newEdit !== 'true' && isEditMode.value) {
     isEditMode.value = false;

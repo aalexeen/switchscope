@@ -3,7 +3,11 @@
  * Defines structure, columns, and behavior for connectors table
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.connectors,
+
   // Entity metadata
   entityName: 'Connector',
   entityNamePlural: 'Connectors',

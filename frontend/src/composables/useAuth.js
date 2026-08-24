@@ -84,8 +84,9 @@ export const useAuth = () => {
     try {
       const profile = await authService.getProfile();
 
-      // Update user data
-      user.value = profile;
+      // Update user data from what was stored, not from the response: the service merges the
+      // profile into the identity, and the identity is what the permission gates read
+      user.value = authService.getUser();
 
       return profile;
     } catch (error) {

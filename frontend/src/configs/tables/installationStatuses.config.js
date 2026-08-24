@@ -2,7 +2,11 @@
  * Table Configuration for Installation Statuses
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.installationStatuses,
+
   entityName: 'Installation Status',
   entityNamePlural: 'Installation Statuses',
   entityKey: 'status',

@@ -5,7 +5,11 @@
  * for the Component Natures catalog table.
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.componentNatures,
+
   // Entity Metadata
   entityName: 'Component Nature',
   entityNamePlural: 'Component Natures',

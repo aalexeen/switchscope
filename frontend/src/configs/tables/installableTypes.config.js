@@ -2,7 +2,11 @@
  * Table Configuration for Installable Types
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.installableTypes,
+
   entityName: 'Installable Type',
   entityNamePlural: 'Installable Types',
   entityKey: 'type',

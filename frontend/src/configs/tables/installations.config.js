@@ -3,7 +3,11 @@
  * Defines structure, columns, and behavior for installations table
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.installations,
+
   // Entity metadata
   entityName: 'Installation',
   entityNamePlural: 'Installations',

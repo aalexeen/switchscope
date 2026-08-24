@@ -3,7 +3,11 @@
  * Defines structure, columns, and behavior for access points table
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.accessPoints,
+
   // Entity metadata
   entityName: 'Access Point',
   entityNamePlural: 'Access Points',

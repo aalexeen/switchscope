@@ -3,7 +3,11 @@
  * Defines structure, columns, and behavior for routers table
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.routers,
+
   // Entity metadata
   entityName: 'Router',
   entityNamePlural: 'Routers',

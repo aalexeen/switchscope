@@ -2,7 +2,11 @@
  * Table Configuration for Component Types
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.componentTypes,
+
   entityName: 'Component Type',
   entityNamePlural: 'Component Types',
   entityKey: 'type',

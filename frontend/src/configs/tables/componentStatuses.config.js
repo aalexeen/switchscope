@@ -2,7 +2,11 @@
  * Table Configuration for Component Statuses
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.componentStatuses,
+
   entityName: 'Component Status',
   entityNamePlural: 'Component Statuses',
   entityKey: 'status',

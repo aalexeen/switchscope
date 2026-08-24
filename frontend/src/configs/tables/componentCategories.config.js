@@ -2,7 +2,11 @@
  * Table Configuration for Component Categories
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.componentCategories,
+
   entityName: 'Component Category',
   entityNamePlural: 'Component Categories',
   entityKey: 'category',

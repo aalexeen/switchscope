@@ -3,7 +3,11 @@
  * Defines structure, columns, and behavior for locations table
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.locations,
+
   // Entity metadata
   entityName: 'Location',
   entityNamePlural: 'Locations',

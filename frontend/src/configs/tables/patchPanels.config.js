@@ -3,7 +3,11 @@
  * Defines structure, columns, and behavior for patch panels table
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.patchPanels,
+
   // Entity metadata
   entityName: 'Patch Panel',
   entityNamePlural: 'Patch Panels',

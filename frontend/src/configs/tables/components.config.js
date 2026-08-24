@@ -5,7 +5,11 @@
  * not to be confused with catalog entities (Component Types, Component Natures, etc.)
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.components,
+
   entityName: 'Component',
   entityNamePlural: 'Components',
   entityKey: 'component',

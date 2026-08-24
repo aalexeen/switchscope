@@ -16,6 +16,8 @@ import GenericTableView from "@/views/GenericTableView.vue";
 import GenericDetailView from "@/views/GenericDetailView.vue";
 // Specialized Component Model Detail View
 import ComponentModelDetailView from "@/views/ComponentModelDetailView.vue";
+// Permission codes, so that a route names a constant rather than a string
+import { RESOURCE, read } from "@/configs/permissions";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,7 +40,6 @@ const router = createRouter({
       component: HomeView,
       meta: { 
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'] // Both users and admins can access
       },
     },
     {
@@ -47,7 +48,6 @@ const router = createRouter({
       component: DashboardView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'] // Both users and admins can access
       },
     },
     {
@@ -56,7 +56,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.components),
         tableKey: 'components' // Tells GenericTableView which table config to use
       },
     },
@@ -66,7 +66,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.components),
         tableKey: 'components',
         detailKey: 'component'
       },
@@ -77,7 +77,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.devices),
         tableKey: 'devices' // Tells GenericTableView which table config to use
       },
     },
@@ -87,7 +87,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.devices),
         tableKey: 'devices',
         detailKey: 'device'
       },
@@ -98,7 +98,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.networkSwitches),
         tableKey: 'networkSwitches' // Tells GenericTableView which table config to use
       },
     },
@@ -108,7 +108,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.networkSwitches),
         tableKey: 'networkSwitches',
         detailKey: 'networkSwitch'
       },
@@ -119,7 +119,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.routers),
         tableKey: 'routers' // Tells GenericTableView which table config to use
       },
     },
@@ -129,7 +129,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.routers),
         tableKey: 'routers',
         detailKey: 'router'
       },
@@ -140,7 +140,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.accessPoints),
         tableKey: 'accessPoints' // Tells GenericTableView which table config to use
       },
     },
@@ -150,7 +150,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.accessPoints),
         tableKey: 'accessPoints',
         detailKey: 'accessPoint'
       },
@@ -161,7 +161,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.cableRuns),
         tableKey: 'cableRuns' // Tells GenericTableView which table config to use
       },
     },
@@ -171,7 +171,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.cableRuns),
         tableKey: 'cableRuns',
         detailKey: 'cableRun'
       },
@@ -182,7 +182,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.connectors),
         tableKey: 'connectors' // Tells GenericTableView which table config to use
       },
     },
@@ -192,7 +192,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.connectors),
         tableKey: 'connectors',
         detailKey: 'connector'
       },
@@ -203,7 +203,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.patchPanels),
         tableKey: 'patchPanels' // Tells GenericTableView which table config to use
       },
     },
@@ -213,7 +213,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.patchPanels),
         tableKey: 'patchPanels',
         detailKey: 'patchPanel'
       },
@@ -224,7 +224,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.racks),
         tableKey: 'racks' // Tells GenericTableView which table config to use
       },
     },
@@ -234,7 +234,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.racks),
         tableKey: 'racks',
         detailKey: 'rack'
       },
@@ -245,7 +245,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.installations),
         tableKey: 'installations' // Tells GenericTableView which table config to use
       },
     },
@@ -255,7 +255,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.installations),
         tableKey: 'installations',
         detailKey: 'installation'
       },
@@ -266,7 +266,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.locations),
         tableKey: 'locations' // Tells GenericTableView which table config to use
       },
     },
@@ -276,7 +276,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.locations),
         tableKey: 'locations',
         detailKey: 'location'
       },
@@ -287,7 +287,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.ports),
         tableKey: 'ports' // Tells GenericTableView which table config to use
       },
     },
@@ -297,7 +297,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.ports),
         tableKey: 'ports',
         detailKey: 'port'
       },
@@ -309,7 +309,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.componentNatures),
         tableKey: 'componentNatures' // Tells GenericTableView which table config to use
       },
     },
@@ -319,7 +319,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.componentNatures),
         detailKey: 'componentNature'
       },
     },
@@ -329,7 +329,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.componentCategories),
         tableKey: 'componentCategories'
       },
     },
@@ -339,7 +339,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.componentCategories),
         detailKey: 'componentCategory'
       },
     },
@@ -349,7 +349,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.componentTypes),
         tableKey: 'componentTypes'
       },
     },
@@ -359,7 +359,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.componentTypes),
         detailKey: 'componentType'
       },
     },
@@ -369,7 +369,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.componentStatuses),
         tableKey: 'componentStatuses'
       },
     },
@@ -379,7 +379,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.componentStatuses),
         detailKey: 'componentStatus'
       },
     },
@@ -389,7 +389,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.componentModels),
         tableKey: 'componentModels'
       },
     },
@@ -399,7 +399,7 @@ const router = createRouter({
       component: ComponentModelDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN']
+        permission: read(RESOURCE.componentModels),
       },
     },
     {
@@ -408,7 +408,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.locationTypes),
         tableKey: 'locationTypes'
       },
     },
@@ -418,7 +418,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.locationTypes),
         tableKey: 'locationTypes',
         detailKey: 'locationType'
       },
@@ -429,7 +429,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.installationStatuses),
         tableKey: 'installationStatuses'
       },
     },
@@ -439,7 +439,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.installationStatuses),
         tableKey: 'installationStatuses',
         detailKey: 'installationStatus'
       },
@@ -450,7 +450,7 @@ const router = createRouter({
       component: GenericTableView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.installableTypes),
         tableKey: 'installableTypes'
       },
     },
@@ -460,7 +460,7 @@ const router = createRouter({
       component: GenericDetailView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'],
+        permission: read(RESOURCE.installableTypes),
         tableKey: 'installableTypes',
         detailKey: 'installableType'
       },
@@ -471,7 +471,6 @@ const router = createRouter({
       component: RemoveMacView,
       meta: {
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'] // Both users and admins can access
       },
     },
     {
@@ -480,7 +479,6 @@ const router = createRouter({
       component: RemoveMacView,
       meta: { 
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'] // Both users and admins can access
       },
     },
     {
@@ -489,7 +487,6 @@ const router = createRouter({
       component: MacView,
       meta: { 
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'] // Both users and admins can access
       },
     },
     {
@@ -498,7 +495,6 @@ const router = createRouter({
       component: () => import("@/views/MyAccount.vue"),
       meta: { 
         requiresAuth: true,
-        roles: ['USER', 'ADMIN'] // Both users and admins can access their own profile
       },
     },
     {
@@ -546,9 +542,11 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  // Import the composable inside the guard to avoid circular dependencies
+  // Import the composables inside the guard to avoid circular dependencies
   const { useAuth } = await import("@/composables/useAuth");
+  const { usePermissions } = await import("@/composables/usePermissions");
   const { isLoggedIn, hasAnyRole } = useAuth();
+  const { can } = usePermissions();
 
   // Check if the route requires authentication
   if (to.meta.requiresAuth) {
@@ -561,7 +559,20 @@ router.beforeEach(async (to, from, next) => {
       return;
     }
 
-    // Check if the route requires specific roles
+    // A page that lists something is gated on the permission to read it, which is what the
+    // server would answer the page's own request with. Sending them to a page whose every
+    // request comes back 403 is not a kinder outcome than not opening it.
+    if (to.meta.permission && !can(to.meta.permission)) {
+      next({
+        name: "home",
+        query: { error: "unauthorized" }
+      });
+      return;
+    }
+
+    // Roles still gate /users/**: there is no user domain in the permission model at all - no
+    // /api/users, no user.* permission - so a code to check here would be one this frontend
+    // invented. The four routes stay on the role until the backend has an opinion.
     if (to.meta.roles && to.meta.roles.length > 0) {
       // Check if user has any of the required roles
       if (!hasAnyRole(to.meta.roles)) {

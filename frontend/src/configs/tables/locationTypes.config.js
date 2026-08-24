@@ -2,7 +2,11 @@
  * Table Configuration for Location Types
  */
 
+import { RESOURCE } from '../permissions.js';
+
 export default {
+  permissionResource: RESOURCE.locationTypes,
+
   entityName: 'Location Type',
   entityNamePlural: 'Location Types',
   entityKey: 'type',
