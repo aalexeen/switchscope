@@ -168,8 +168,13 @@ public class Installation extends BaseEntity {
             return false;
         }
 
-        // Check housing component compatibility
-        if (component != null && !component.canContainComponent(null)) { // TODO: resolve actual component
+        // The housing component must be able to contain components at all. Whether it may contain
+        // *this* one cannot be decided here: the installed item is referenced by id and by an
+        // InstallableTypeEntity, which carries no link to a ComponentTypeEntity, so the type-level
+        // check belongs to a service that can load it. What stood here asked
+        // canContainComponent(null), which is false by definition, so every installation housed in
+        // a component was invalid.
+        if (component != null && !component.canHoldOtherComponents()) {
             return false;
         }
 
@@ -206,20 +211,34 @@ public class Installation extends BaseEntity {
     }
 
     // Location validation helpers
+
+    /**
+     * Whether the unit this installation sits at exists in the location it names. An installation
+     * with no rack position is not making a claim about one, so there is nothing to refuse.
+     */
     public boolean isValidRackPosition() {
         if (!isRackMounted()) return true;
-        if (!location.isRackLike()) return false;
+        if (location == null || !location.isRackLike()) return false;
 
         int totalRackUnits = location.getTotalRackUnits();
         return rackPosition > 0 && rackPosition <= totalRackUnits;
     }
 
+    /**
+     * Whether the equipment, mounted at its position, ends within the rack.
+     * <p>
+     * A height without a position is not a claim this method can check - and it used to try:
+     * {@code rackPosition + rackUnitHeight} threw a NullPointerException on every installation that
+     * declared a height and no position, which is any item not yet placed. Whether a position is
+     * required in the first place is {@link #isValidInstallation}'s question, asked of the
+     * installed item's type.
+     */
     public boolean fitsInLocation() {
-        if (rackUnitHeight != null && location.isRackLike()) {
-            // Check if the equipment fits in the rack from the specified position
-            return (rackPosition + rackUnitHeight - 1) <= location.getTotalRackUnits();
+        if (rackUnitHeight == null || rackPosition == null || location == null
+                || !location.isRackLike()) {
+            return true;
         }
-        return true;
+        return (rackPosition + rackUnitHeight - 1) <= location.getTotalRackUnits();
     }
 
     // Status management

@@ -519,8 +519,15 @@ raw JSON → ObjectNode → пин дискриминатора → treeToValue 
       не разрешает, а контроллер отдавал ему уже собранную сущность; мёртвый после этого
       `createAndReturnDto` удалён. Тесты: `ComponentReferenceResolverCollectionTest` (5) и
       `AllowedChildTypesEndpointTest` (3, до правки падали все три — неизвестный id отвечал 200)
-- [ ] `Installation.isValidLocationInstallation()` → `canContainComponent(null)` всегда false;
-      `fitsInLocation()` — NPE при `rackPosition == null`
+- [x] `Installation.isValidLocationInstallation()` → `canContainComponent(null)` всегда false;
+      `fitsInLocation()` — NPE при `rackPosition == null`. **Сделано.** Проверка добавила третье:
+      `isValidRackPosition()` разыменовывал `location`, которую сам не проверил. Про первое:
+      проверку «а этот ли компонент можно вложить» из сущности сделать нельзя — установленный
+      предмет задан id и `InstallableTypeEntity`, ссылки на `ComponentTypeEntity` у него нет,
+      так что осталась проверка «корпус вообще может что-то содержать», а типовая отмечена как
+      работа сервисного слоя. **Важно для приёмки:** `isValidInstallation()` не вызывается
+      **ниоткуда** — весь этот куст сегодня мёртв, поэтому правились объявления, а не поведение
+      API. `InstallationValidityTest`, 5 тестов
 - [x] `Component.canHoldOtherComponents()` возвращает true когда компонент **не** может содержать
       другие (дефект именования, оба вызова компенсируют). **Сделано:** тело приведено к имени,
       оба вызова перестали компенсировать. Наружу это не видно — `spring.jackson.visibility` даёт
