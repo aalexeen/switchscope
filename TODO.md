@@ -487,8 +487,13 @@ raw JSON → ObjectNode → пин дискриминатора → treeToValue 
       `@AuthenticatedOnly` с причиной, иначе реестр считал бы эндпоинт незаанотированным.
       Заодно создание переведено на `UserService.create` — его проверка уникальности стала вторым
       рубежом на случай гонки двух запросов. `RegistrationEndpointTest`, 4 теста
-- [ ] `ValidationUtil.assureIdConsistent` — `!=` вместо `equals` на UUID → `PUT /api/profile`
-      с непустым `id` всегда 422
+- [x] `ValidationUtil.assureIdConsistent` — `!=` вместо `equals` на UUID → `PUT /api/profile`
+      с непустым `id` всегда 422. **Сделано.** Проверка нашла ту же ошибку ещё в двух местах
+      `UniqueMailValidator`: `dbId == user.getId()` и `dbId == AuthUtil.authId()`, из-за чего
+      оговорка «it is ok, if update ourselves» не срабатывала никогда и сохранение собственного
+      адреса читалось как захват чужого. Один и тот же `PUT /api/profile` спотыкался об оба,
+      поэтому и лечатся одним коммитом; `ProfileUpdateEndpointTest` — 3 теста, до правки первый
+      падал (422 вместо 204), остальные два стерегут, что проверки не исчезли
 - [ ] Расхождения `@Size` DTO ↔ сущность ↔ DDL (`NamedTo.description` 1024 vs `NamedEntity` 512).
       Теперь, когда `@Valid` работает, значение 513–1024 пройдёт валидацию и упадёт на flush
 - [ ] Коллекционные ассоциации не разрешаются: `CableRunTo.locationIds` / `connectorIds`,

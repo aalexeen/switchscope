@@ -35,12 +35,13 @@ public class UniqueMailValidator implements org.springframework.validation.Valid
                             UUID dbId = dbUser.getId();
 
                             // it is ok, if update ourselves
-                            if (user.getId() != null && dbId == user.getId()) return;
+                            if (dbId.equals(user.getId())) return;
 
                             // Workaround for update with user.id=null in request body
                             // ValidationUtil.assureIdConsistent called after this validation
                             String requestURI = request.getRequestURI();
-                            if (requestURI.endsWith("/" + dbId) || (dbId == AuthUtil.authId() && requestURI.contains("/profile")))
+                            if (requestURI.endsWith("/" + dbId)
+                                    || (dbId.equals(AuthUtil.authId()) && requestURI.contains("/profile")))
                                 return;
                         }
                         errors.rejectValue("email", "", EXCEPTION_DUPLICATE_EMAIL);
