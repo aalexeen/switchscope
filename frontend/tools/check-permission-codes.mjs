@@ -5,8 +5,9 @@
 // `backend/tools/generate_permission_seed.py --check` holds the seed to the annotations. Together
 // the two make one chain: @RequiresPermission -> 04-permissions.csv -> configs/permissions.js.
 //
-// What it cannot check is the other direction - that a page which ought to be gated is gated at
-// all. Nothing here notices a route that simply forgot `meta.permission`.
+// It also checks the other direction, as far as it can be checked mechanically: a route that names
+// a table must gate on that table's permission. What stays invisible is a page with no `tableKey`
+// at all - there is nothing to compare it against.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -17,6 +18,7 @@ import { RESOURCE } from '../src/configs/permissions.js';
 const here = dirname(fileURLToPath(import.meta.url));
 const SEED = join(here, '../../backend/src/main/resources/db/changelog/csv/04-permissions.csv');
 const TABLE_CONFIGS = join(here, '../src/configs/tables');
+const ROUTER = join(here, '../src/router/index.js');
 
 const ACTIONS = ['read', 'create', 'update', 'delete'];
 
@@ -81,13 +83,33 @@ for (const file of readdirSync(TABLE_CONFIGS).filter((name) => name.endsWith('.c
   }
 }
 
+// 4. Every route that names a table gates on that table's read permission. A route that forgot
+//    `meta.permission` opens a page whose every request will come back 403; one that names the
+//    neighbouring table's resource gates on the wrong answer, which is worse because it works.
+const routes = readFileSync(ROUTER, 'utf8').split(/(?=\n\s+path: ")/);
+for (const route of routes) {
+  const table = route.match(/tableKey:\s*'(\w+)'/);
+  if (!table) {
+    continue;
+  }
+  const name = (route.match(/name: "([^"]+)"/) || [, '?'])[1];
+  const gate = route.match(/permission:\s*\w+\(RESOURCE\.(\w+)\)/);
+  if (!gate) {
+    errors.push(`route '${name}' has tableKey '${table[1]}' and no meta.permission`);
+  } else if (gate[1] !== table[1]) {
+    errors.push(`route '${name}' shows table '${table[1]}' but gates on RESOURCE.${gate[1]}`);
+  }
+}
+
 for (const note of notes) {
   console.log(`note: ${note}`);
 }
 for (const error of errors) {
   console.error(`error: ${error}`);
 }
+const gated = routes.filter((route) => /tableKey:/.test(route)).length;
 console.log(
-  `${Object.keys(RESOURCE).length} resources named, ${seeded.size} seeded, ${errors.length} errors`
+  `${Object.keys(RESOURCE).length} resources named, ${seeded.size} seeded,`
+  + ` ${gated} table routes checked, ${errors.length} errors`
 );
 process.exit(errors.length === 0 ? 0 : 1);
