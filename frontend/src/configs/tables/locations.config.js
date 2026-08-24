@@ -29,14 +29,9 @@ export default {
   composable: 'useLocations',
 
   // Search configuration
-  searchFields: [
-    'name',
-    'typeDisplayName',
-    'address',
-    'parentLocationName',
-    'fullPath',
-    'description'
-  ],
+  // fullPath is assembled from the location's parents rather than stored; name and
+  // parentLocationName are what the server can search of it.
+  searchFields: ['name', 'typeDisplayName', 'address', 'parentLocationName', 'description'],
 
   // Theme configuration (Tailwind colors)
   theme: 'orange',

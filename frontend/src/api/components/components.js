@@ -3,8 +3,17 @@ const baseURL = "components";
 
 export default function ({components}) {
     return {
-        getAll() {
-            return components.get(baseURL);
+        /**
+         * Get all items, or one page of them.
+         * Called with nothing this is the request it always was, and the answer is the
+         * whole array. Given a query - page, size, sort, search, or a field to filter
+         * by - the same route answers with a page: content, page, size, totalElements,
+         * totalPages.
+         *
+         * @param {Object} [query] - what to ask for; omit for the whole collection
+         */
+        getAll(query) {
+            return components.get(baseURL, query ? { params: query } : undefined);
         },
         get(id) {
             return components.get(`${baseURL}/${id}`);

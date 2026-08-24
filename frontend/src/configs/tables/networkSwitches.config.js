@@ -29,16 +29,7 @@ export default {
   composable: 'useNetworkSwitches',
 
   // Search configuration
-  searchFields: [
-    'name',
-    'ipAddress',
-    'hostname',
-    'manufacturer',
-    'model',
-    'serialNumber',
-    'description',
-    'managementProtocol'
-  ],
+  searchFields: ['name', 'manufacturer', 'model', 'serialNumber', 'description'],
 
   // Theme configuration (Tailwind colors)
   theme: 'cyan',

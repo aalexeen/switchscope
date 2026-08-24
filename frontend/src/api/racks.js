@@ -9,10 +9,16 @@ export default function ({components}) {
     return {
         /**
          * Get all racks
+         * Called with nothing this is the request it always was, and the answer is the
+         * whole array. Given a query - page, size, sort, search, or a field to filter
+         * by - the same route answers with a page: content, page, size, totalElements,
+         * totalPages.
+         *
+         * @param {Object} [query] - what to ask for; omit for the whole collection
          * @returns {Promise} Axios response with racks array
          */
-        getAll() {
-            return components.get(baseURL);
+        getAll(query) {
+            return components.get(baseURL, query ? { params: query } : undefined);
         },
 
         /**

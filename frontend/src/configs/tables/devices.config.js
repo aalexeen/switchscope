@@ -27,7 +27,7 @@ export default {
   composable: 'useDevices',
 
   // Search configuration
-  searchFields: ['name', 'manufacturer', 'model', 'serialNumber', 'ipAddress', 'hostname', 'description'],
+  searchFields: ['name', 'manufacturer', 'model', 'serialNumber', 'description'],
 
   // Theme for UI
   theme: 'green',

@@ -96,8 +96,14 @@ const hiddenColumnsCount = computed(() => {
 
 /**
  * Initialize data on mount
+ *
+ * Only when nobody else is doing it: a view that passes filteredData has read the rows itself and
+ * is the one that reloads them, so fetching here as well asked for the first page twice.
  */
 onMounted(async () => {
+  if (props.filteredData !== null) {
+    return;
+  }
   try {
     await fetchData();
   } catch {

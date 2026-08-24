@@ -29,14 +29,7 @@ export default {
   composable: 'useCableRuns',
 
   // Search configuration
-  searchFields: [
-    'name',
-    'cableType',
-    'cableCategory',
-    'length',
-    'color',
-    'description'
-  ],
+  searchFields: ['name', 'cableType', 'cableCategory', 'description'],
 
   // Theme configuration (Tailwind colors)
   theme: 'teal',

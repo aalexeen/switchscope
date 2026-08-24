@@ -21,7 +21,9 @@ export default {
 
   composable: 'useInstallationStatuses',
 
-  searchFields: ['name', 'code', 'displayName', 'description', 'statusCategory', 'colorCategory'],
+  // statusCategory is computed from the status's flags rather than stored, so the server
+  // cannot search it.
+  searchFields: ['name', 'code', 'displayName', 'description', 'colorCategory'],
   theme: 'amber',
   themeIntensity: '600',
 

@@ -29,18 +29,9 @@ export default {
   composable: 'useAccessPoints',
 
   // Search configuration
-  searchFields: [
-    'name',
-    'ipAddress',
-    'hostname',
-    'manufacturer',
-    'model',
-    'serialNumber',
-    'description',
-    'managementProtocol',
-    'ssids',
-    'wirelessBands'
-  ],
+  // ssids is a collection and the other four are not on the DTO at all, so the server cannot
+  // search them - and the client search never matched them either.
+  searchFields: ['name', 'manufacturer', 'model', 'serialNumber', 'description'],
 
   // Theme configuration (Tailwind colors)
   theme: 'purple',

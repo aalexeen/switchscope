@@ -21,7 +21,18 @@ export default {
 
   composable: 'useComponentModels',
 
-  searchFields: ['name', 'manufacturer', 'modelNumber', 'modelDesignation', 'partNumber', 'sku', 'description', 'componentTypeCode', 'componentTypeDisplayName'],
+  // modelDesignation is computed from the model's fields rather than stored, so it is not
+  // something the server can search.
+  searchFields: [
+    'name',
+    'manufacturer',
+    'modelNumber',
+    'partNumber',
+    'sku',
+    'description',
+    'componentTypeCode',
+    'componentTypeDisplayName'
+  ],
   theme: 'indigo',
   themeIntensity: '500',
 

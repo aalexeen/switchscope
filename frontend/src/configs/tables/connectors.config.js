@@ -29,13 +29,7 @@ export default {
   composable: 'useConnectors',
 
   // Search configuration
-  searchFields: [
-    'name',
-    'connectorType',
-    'gender',
-    'mountingType',
-    'description'
-  ],
+  searchFields: ['name', 'connectorType', 'gender', 'description'],
 
   // Theme configuration (Tailwind colors)
   theme: 'indigo',

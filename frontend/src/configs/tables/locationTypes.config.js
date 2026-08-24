@@ -21,7 +21,9 @@ export default {
 
   composable: 'useLocationTypes',
 
-  searchFields: ['name', 'code', 'displayName', 'description', 'locationCategory'],
+  // locationCategory is computed from the type's flags rather than stored, so the server
+  // cannot search it.
+  searchFields: ['name', 'code', 'displayName', 'description'],
   theme: 'teal',
   themeIntensity: '600',
 
