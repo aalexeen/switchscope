@@ -337,7 +337,6 @@
                     <liquibaseSchemaName>switchscope</liquibaseSchemaName>
                     <outputDefaultSchema>false</outputDefaultSchema>
                     <verbose>true</verbose>
-                    <logging>debug</logging>
                     <driver>org.postgresql.Driver</driver>
                     <!-- Change Log Section -->
                     <!-- use "mvn liquibase:generateChangeLog" in Execute Maven Goal -->

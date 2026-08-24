@@ -42,7 +42,11 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
-    clear-checksums: true
+    # No clear-checksums here on purpose. It used to be true, which reset every stored checksum on
+    # every start, so "an applied changeset is never edited" was a rule nothing checked: a changed
+    # file was silently accepted and the database quietly diverged from what the changelog says was
+    # applied to it. Startup now fails on such a change, which is the report. When the edit was
+    # deliberate: ./mvnw liquibase:clearCheckSums, once, knowingly - or add a new changeset instead.
 
   # Named explicitly: see the caffeine dependency in pom.xml. Without this, Boot would pick Redis.
   # The TTL is what keeps "a row in role_permissions is the configuration" true - a grant takes
