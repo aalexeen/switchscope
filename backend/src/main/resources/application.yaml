@@ -86,28 +86,30 @@ management:
 switchscope:
   security:
     permission:
-      # AUDIT -> SHADOW -> ENFORCE. SHADOW evaluates every request and logs what it would refuse
-      # without refusing anything; grep the log for PERMISSION-SHADOW-DENY. Promote one domain at a
-      # time through enforce-domains, and roll it back by removing it from the list - no rebuild.
-      mode: SHADOW
-      # Promoted domains. role_permissions is the only gate on their routes; removing a domain from
-      # this list drops it back to shadow with no rebuild - but nothing else guards those routes, so
-      # the rollback is "stop refusing", not "restore the old rule".
+      # AUDIT -> SHADOW -> ENFORCE, and the path is walked: an operation role_permissions does not
+      # grant is refused, and startup fails on any finding the report calls an ERROR - a permission
+      # the table cannot grant, an endpoint declaring neither annotation, an endpoint AOP cannot
+      # advise - wherever it is, not only inside a promoted domain. Shadow lines
+      # (PERMISSION-SHADOW-DENY) stop appearing because nothing is observed any more; what to grep
+      # for now is "Refusing", logged at ERROR.
+      mode: ENFORCE
+      # Empty, which is not the same as "nothing is enforced": a domain named here is enforced
+      # whatever the mode says, so the list can only add to what mode already does - and with
+      # ENFORCE there is nothing left to add. Leaving the promoted five in place would make the
+      # other direction lie: dropping mode back to SHADOW would still refuse across five domains
+      # while the setting says it observes.
       #
-      # catalog also gave up a hasRole('ADMIN') when it was promoted, and so changed who may write.
-      # The other four never had one: promoting them takes routes that any authenticated caller
-      # could reach and makes them require a permission. Both roles hold all of location,
-      # installation, port and component, so no caller loses anything today - what changes is that
-      # the decision is real.
+      # So the list is the way back rather than the configuration. To watch a domain instead of
+      # refusing it, put mode on SHADOW and re-promote whatever must stay real:
       #
-      # component came last because one word covers nine controllers at once - ComponentController,
-      # DeviceController and seven of the nine AbstractCrudController subclasses (the other two are
-      # location and installation) - which is 36 of the 81 permissions, and every route the
-      # bridge-method trap lives on (see PermissionEnforcementTest).
+      #   enforce-domains: [catalog, location, installation, port, component]
       #
-      # system is the one domain still outside this list: a single permission on /api/admin/**,
-      # which SecurityConfig already gates by role. It is covered when mode itself moves to ENFORCE.
-      enforce-domains: [catalog, location, installation, port, component]
+      # That is the order stage 2 promoted them in, and it is the whole model bar one: catalog gave
+      # up a hasRole('ADMIN') when it was promoted and so changed who may write, the other four
+      # never had one and lost no caller because both roles hold all of location, installation,
+      # port and component. system was never on the list - one permission on /api/admin/**, which
+      # SecurityConfig also gates by role - and mode: ENFORCE is what finally made it real.
+      enforce-domains: []
 
 # Application-specific settings
 app:

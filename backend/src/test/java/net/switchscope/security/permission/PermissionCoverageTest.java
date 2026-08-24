@@ -3,8 +3,16 @@ package net.switchscope.security.permission;
 import net.switchscope.AbstractContextTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.Advisor;
+import org.springframework.aop.Pointcut;
+import org.springframework.aop.PointcutAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,6 +35,15 @@ class PermissionCoverageTest extends AbstractContextTest {
 
     @Autowired
     private PermissionRegistry registry;
+
+    /** By name: Spring Security publishes advisors of its own, and actuator a second handler mapping. */
+    @Autowired
+    @Qualifier("requiresPermissionAdvisor")
+    private Advisor advisor;
+
+    @Autowired
+    @Qualifier("requestMappingHandlerMapping")
+    private RequestMappingHandlerMapping handlerMapping;
 
     @Test
     @DisplayName("every served endpoint declares a permission or an explicit exemption")
@@ -75,6 +92,38 @@ class PermissionCoverageTest extends AbstractContextTest {
                         + " non-public method. The annotation reads as protection and there is none,"
                         + " which is the same silence the registry exists to break")
                 .isEmpty();
+    }
+
+    @Test
+    @DisplayName("the advisor reaches every endpoint the application serves")
+    void everyEndpointIsReachedByTheAdvisor() {
+        Pointcut pointcut = ((PointcutAdvisor) advisor).getPointcut();
+        List<HandlerMethod> served = handlerMapping.getHandlerMethods().values().stream()
+                .filter(handler -> PermissionRegistry.isOwnEndpoint(handler.getBeanType()))
+                .toList();
+        assertThat(served)
+                .as("the same endpoints the scan reports; nothing to check would make the assertion"
+                        + " below pass by having nothing to say")
+                .hasSize(registry.getReport().endpoints().size());
+
+        List<String> unreachable = served.stream()
+                .filter(handler -> !matches(pointcut, handler))
+                .map(handler -> handler.getBeanType().getSimpleName() + '#' + handler.getMethod().getName())
+                .toList();
+
+        assertThat(unreachable)
+                .as("an endpoint the pointcut does not match is never checked at all - the same"
+                        + " silence as an unproxyable one, from the other direction, and it answers"
+                        + " 200 where the permission said 403. The pointcut is narrow on purpose"
+                        + " (only this application's classes, only methods that map a request), and"
+                        + " this is what keeps 'only' from quietly becoming 'not all of them'")
+                .isEmpty();
+    }
+
+    private static boolean matches(Pointcut pointcut, HandlerMethod handler) {
+        Class<?> beanType = handler.getBeanType();
+        return pointcut.getClassFilter().matches(beanType)
+                && pointcut.getMethodMatcher().matches(handler.getMethod(), beanType);
     }
 
     @Test

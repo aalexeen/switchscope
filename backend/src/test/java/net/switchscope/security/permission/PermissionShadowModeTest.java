@@ -21,12 +21,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * The rollout mechanism itself: shadow refuses nothing, and one domain can be promoted ahead of the
  * rest.
  * <p>
- * This is the shape the application actually ships in - {@code mode: SHADOW} - so leaving it
- * untested would mean the only exercised path is the one nobody runs. The two assertions are the
- * two halves of the promise: an unpromoted domain cannot refuse anyone no matter how wrong the
- * grant table is, and a promoted one refuses for real without the others moving. That second half
- * is also the rollback: take {@code catalog} out of the list and it drops straight back to shadow,
- * with no rebuild and no code change.
+ * The application no longer ships this way - {@code mode: ENFORCE} with an empty
+ * {@code enforce-domains} is the shipping shape - which is precisely why the fixture pins its own
+ * mode and its own one-domain list. Shadow is now the way back rather than the way in, and a way
+ * back nobody exercises is not one worth having. The two assertions are the two halves of the
+ * promise: an unpromoted domain cannot refuse anyone no matter how wrong the grant table is, and a
+ * promoted one refuses for real without the others moving. That second half is what makes the
+ * rollback partial rather than all-or-nothing: drop the mode to shadow, keep in the list whatever
+ * must still refuse, with no rebuild and no code change.
  */
 @SpringBootTest(properties = {
         "spring.testcontainers.enabled=false",

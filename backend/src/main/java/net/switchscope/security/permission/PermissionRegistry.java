@@ -60,7 +60,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PermissionRegistry implements SmartInitializingSingleton {
 
-    private static final String OWN_PACKAGE = "net.switchscope";
+    /**
+     * The package the application's own controllers live in, and the edge of what this mechanism
+     * speaks for. Public because the advisor's pointcut has to draw the same line: the scan skips
+     * a handler outside it - springdoc's resources are not ours to gate - so a pointcut that did
+     * not skip it would hand the manager a handler the scan never recorded. That is
+     * {@link EndpointRequirement.Unknown}, and Unknown closes, which is how {@code mode: ENFORCE}
+     * turned {@code /v3/api-docs} and the Swagger UI into 403s.
+     */
+    public static final String OWN_PACKAGE = "net.switchscope";
 
     private final PermissionRepository permissionRepository;
     /**
@@ -175,6 +183,22 @@ public class PermissionRegistry implements SmartInitializingSingleton {
     }
 
     /**
+     * Whether this mechanism speaks for the given controller at all.
+     * <p>
+     * Only the application's own controllers are scanned, so only they can be enforced; asking the
+     * registry about anything else can produce one answer only - {@code Unknown} - and Unknown is
+     * a refusal. The pointcut in {@code PermissionEnforcementConfig} therefore asks this first, so
+     * that "not scanned" and "not enforced" are the same set by construction rather than by two
+     * copies of one string.
+     *
+     * @param beanType the concrete controller class
+     * @return whether the scan covers it
+     */
+    public static boolean isOwnEndpoint(Class<?> beanType) {
+        return beanType.getName().startsWith(OWN_PACKAGE);
+    }
+
+    /**
      * Convenience for callers that hold the MVC handler rather than an AOP invocation.
      */
     public EndpointRequirement requirementOf(HandlerMethod handlerMethod) {
@@ -210,7 +234,7 @@ public class PermissionRegistry implements SmartInitializingSingleton {
         RequestMappingHandlerMapping handlerMapping = handlerMappingProvider.getObject();
         for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMapping.getHandlerMethods().entrySet()) {
             HandlerMethod handlerMethod = entry.getValue();
-            if (!handlerMethod.getBeanType().getName().startsWith(OWN_PACKAGE)) {
+            if (!isOwnEndpoint(handlerMethod.getBeanType())) {
                 continue; // springdoc and friends are not ours to gate
             }
             endpoints.add(describe(entry.getKey(), handlerMethod, requirements));

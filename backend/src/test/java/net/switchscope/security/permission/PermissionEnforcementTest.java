@@ -15,6 +15,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -139,6 +140,41 @@ class PermissionEnforcementTest extends AbstractContextTest {
                         + " a hasRole('ADMIN') on this method would have refused it. That the"
                         + " permission alone now suffices is the whole point of the promotion:"
                         + " role_permissions decides, and it is a table rather than a rebuild")
+                .isNotEqualTo(403);
+    }
+
+    @Test
+    @DisplayName("a controller method that serves no request is not an endpoint to refuse")
+    @WithMockUser(authorities = "nothing.at:all")
+    void nonHandlerMethodIsNotRefused() throws Exception {
+        int status = mockMvc.perform(post("/api/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andReturn().getResponse().getStatus();
+        assertThat(status)
+                .as("binding this body runs AbstractUserController#initBinder, which registers a"
+                        + " validator and serves no request of its own. A pointcut that took every"
+                        + " method of a @RequestMapping class advised it too, the scan had never"
+                        + " heard of it, and Unknown closes - so under ENFORCE every POST and PUT"
+                        + " on /api/profile answered 403 during argument resolution, while GET,"
+                        + " which binds nothing, went through. The body is deliberately invalid:"
+                        + " what this asks is that the request reach validation at all")
+                .isNotEqualTo(403);
+    }
+
+    @Test
+    @DisplayName("a handler outside the application is not the application's to refuse")
+    @WithMockUser(authorities = "nothing.at:all")
+    void foreignHandlerIsNotRefused() throws Exception {
+        int status = mockMvc.perform(get("/v3/api-docs").accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse().getStatus();
+        assertThat(status)
+                .as("springdoc's resources are @RequestMapping handlers like any other, so a"
+                        + " pointcut that matches every handler reaches them too - but the scan"
+                        + " skips everything outside net.switchscope, which leaves them Unknown,"
+                        + " and Unknown closes. Under ENFORCE that answered 403 for /v3/api-docs,"
+                        + " /v3/api-docs/swagger-config and the Swagger UI at /. What the scan"
+                        + " does not gate, enforcement must not refuse")
                 .isNotEqualTo(403);
     }
 
