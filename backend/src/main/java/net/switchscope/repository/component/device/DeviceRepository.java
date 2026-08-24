@@ -1,7 +1,7 @@
 package net.switchscope.repository.component.device;
 
 import net.switchscope.model.component.device.Device;
-import net.switchscope.repository.PolymorphicRepository;
+import net.switchscope.repository.component.ComponentTreeRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +15,7 @@ import java.util.UUID;
  * Supports all device types through Single Table Inheritance (NETWORK_SWITCH, ROUTER, ACCESS_POINT)
  */
 @Repository
-public interface DeviceRepository extends PolymorphicRepository<Device> {
+public interface DeviceRepository extends ComponentTreeRepository<Device> {
 
     /**
      * Find device by serial number

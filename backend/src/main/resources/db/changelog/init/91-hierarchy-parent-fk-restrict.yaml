@@ -1,0 +1,64 @@
+databaseChangeLog:
+  # ============================================================
+  # Deleting a parent no longer orphans its children.
+  #
+  # Both self-references were ON DELETE SET NULL, which is a third answer to the question the JPA
+  # mappings (cascade = ALL, orphanRemoval = true) and the delete statement (bulk JPQL, which loads
+  # no row and so runs no cascade) were also answering, differently. The application now refuses to
+  # delete a parent that still has children; these constraints say the same thing at the level where
+  # it cannot be bypassed by a statement that skips the persistence context.
+  # ============================================================
+
+  - changeSet:
+      id: locations-parent-fk-restrict
+      author: AALEXEEN
+      comment: "A location with children is not deleted; its children are not silently re-rooted"
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: locations
+            constraintName: fk_location_parent
+        - addForeignKeyConstraint:
+            baseTableName: locations
+            baseColumnNames: parent_location_id
+            constraintName: fk_location_parent
+            referencedTableName: locations
+            referencedColumnNames: id
+            onDelete: RESTRICT
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableName: locations
+            constraintName: fk_location_parent
+        - addForeignKeyConstraint:
+            baseTableName: locations
+            baseColumnNames: parent_location_id
+            constraintName: fk_location_parent
+            referencedTableName: locations
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+  - changeSet:
+      id: components-parent-fk-restrict
+      author: AALEXEEN
+      comment: "A component with children is not deleted; its children are not silently unmounted"
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: components
+            constraintName: fk_component_parent
+        - addForeignKeyConstraint:
+            baseTableName: components
+            baseColumnNames: parent_component_id
+            constraintName: fk_component_parent
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: RESTRICT
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableName: components
+            constraintName: fk_component_parent
+        - addForeignKeyConstraint:
+            baseTableName: components
+            baseColumnNames: parent_component_id
+            constraintName: fk_component_parent
+            referencedTableName: components
+            referencedColumnNames: id
+            onDelete: SET NULL

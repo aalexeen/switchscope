@@ -182,5 +182,32 @@ public interface LocationRepository extends net.switchscope.repository.BaseRepos
      */
     @Query("SELECT COUNT(l) FROM Location l WHERE l.parentLocation.id = :parentLocationId")
     long countByParentLocationId(@Param("parentLocationId") UUID parentLocationId);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * A location that has children is not deleted. Three answers to "what happens to the children"
+     * were in the tree at once: {@code Location.childLocations} declared
+     * {@code cascade = ALL, orphanRemoval = true}, the {@code parent_location_id} foreign key
+     * declared {@code ON DELETE SET NULL}, and the delete below is a bulk JPQL statement that never
+     * loads the row, so no cascade could run and the schema's answer was the one that took effect -
+     * deleting a building turned its floors into root locations without anyone asking. Refusing is
+     * the answer that destroys nothing and orphans nothing; the caller moves or deletes the
+     * children first.
+     * <p>
+     * Placed on the repository rather than in {@code LocationService.delete} for the same reason as
+     * on the component side: the delete and the rule that guards it stay together, so no future
+     * caller can reach past it.
+     */
+    @Override
+    @SuppressWarnings("all") // transaction invoked
+    default void deleteExisted(UUID id) {
+        long children = countByParentLocationId(id);
+        if (children > 0) {
+            throw new net.switchscope.error.DataConflictException("Location with id=" + id
+                    + " still holds " + children + " child location(s); move or delete them first");
+        }
+        net.switchscope.repository.BaseRepository.super.deleteExisted(id);
+    }
 }
 

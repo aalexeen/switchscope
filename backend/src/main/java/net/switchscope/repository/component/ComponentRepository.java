@@ -1,7 +1,6 @@
 package net.switchscope.repository.component;
 
 import net.switchscope.model.component.Component;
-import net.switchscope.repository.BaseRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +14,7 @@ import java.util.UUID;
  * Supports all component types through Single Table Inheritance
  */
 @Repository
-public interface ComponentRepository extends BaseRepository<Component> {
+public interface ComponentRepository extends ComponentTreeRepository<Component> {
 
     /**
      * Find component by serial number

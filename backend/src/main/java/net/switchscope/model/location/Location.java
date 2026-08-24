@@ -40,7 +40,11 @@ public class Location extends NamedEntity {
     @JsonIgnore // Avoid circular references in JSON
     private Location parentLocation;
 
-    @OneToMany(mappedBy = "parentLocation", cascade = CascadeType.ALL, orphanRemoval = true)
+    // No cascade and no orphanRemoval: deleting a parent is refused while it has children
+    // (LocationRepository.deleteExisted), so there is nothing for a cascade to do and nothing to
+    // orphan. What the two used to promise never happened either - deletion is a bulk JPQL
+    // statement that never loads the row - and the schema said the opposite of both.
+    @OneToMany(mappedBy = "parentLocation")
     private List<Location> childLocations = new ArrayList<>();
 
     // Additional location-specific fields

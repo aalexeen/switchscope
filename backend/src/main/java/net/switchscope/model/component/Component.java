@@ -83,7 +83,9 @@ public abstract class Component extends NamedEntity {
     @JoinColumn(name = "parent_component_id")
     private Component parentComponent;
 
-    @OneToMany(mappedBy = "parentComponent", cascade = CascadeType.ALL, orphanRemoval = true)
+    // See Location.childLocations: a parent with children is refused, so the cascade and the
+    // orphanRemoval that never ran are gone rather than made to run.
+    @OneToMany(mappedBy = "parentComponent")
     private List<Component> childComponents = new ArrayList<>();
 
     // Constructors

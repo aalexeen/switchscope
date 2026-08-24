@@ -117,6 +117,9 @@ databaseChangeLog:
   - include:
       file: init/90-installation-component-fk.yaml
       relativeToChangelogFile: true
+  - include:
+      file: init/91-hierarchy-parent-fk-restrict.yaml
+      relativeToChangelogFile: true
 
   # Fill - populate tables in numeric order
   - include:

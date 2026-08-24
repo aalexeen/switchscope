@@ -1,7 +1,7 @@
 package net.switchscope.repository.component.connectivity;
 
 import net.switchscope.model.component.Component;
-import net.switchscope.repository.PolymorphicRepository;
+import net.switchscope.repository.component.ComponentTreeRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +15,7 @@ import java.util.UUID;
  * Supports PatchPanel, Connector, and CableRun through Single Table Inheritance
  */
 @Repository
-public interface ConnectivityRepository extends PolymorphicRepository<Component> {
+public interface ConnectivityRepository extends ComponentTreeRepository<Component> {
 
     /**
      * Find component by serial number
