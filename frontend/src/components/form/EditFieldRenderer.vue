@@ -107,6 +107,8 @@
       :model-value="modelValue"
       @update:model-value="$emit('update:modelValue', $event)"
       :options="relationOptions"
+      :search="relationApi ? searchRelation : null"
+      :selected-option="selectedRelation"
       :value-key="field.relation?.valueKey || 'id'"
       :label-key="field.relation?.labelKey || 'displayName'"
       :search-fields="field.relation?.searchFields || ['name', 'displayName', 'code']"
@@ -194,6 +196,7 @@
 import { computed, ref, watch, onMounted } from 'vue';
 import SearchableDropdown from './SearchableDropdown.vue';
 import { composableRegistry } from '@/configs/tables/tableRegistry';
+import api from '@/api';
 
 const props = defineProps({
   modelValue: {
@@ -265,6 +268,47 @@ const iconPresets = [
 // Relation data loading
 const relationOptions = ref([]);
 const isLoadingRelation = ref(false);
+const selectedRelation = ref(null);
+
+/** How many matches a dropdown shows at once. */
+const RELATION_MATCHES = 20;
+
+/**
+ * The API module behind this relation, if there is one. The dataKey a relation names is the key
+ * both registries use, so it is also the key of the API module - and when it is one, the dropdown
+ * asks the server for matches instead of holding the whole catalog to filter twenty of it.
+ */
+const relationApi = computed(() => api[props.field.relation?.dataKey] ?? null);
+
+/** Passed to the dropdown; each keystroke it debounces arrives here. */
+const searchRelation = async (query) => {
+  const asked = { size: RELATION_MATCHES };
+  const term = query?.trim();
+  if (term) {
+    asked.search = term;
+  }
+  const { data } = await relationApi.value.getAll(asked);
+  return data.content;
+};
+
+/**
+ * The row the stored value stands for. Read by id rather than looked for among the matches: the
+ * matches are one page of a catalog and the selected row need not be on it, and a dropdown that
+ * cannot name what is selected shows its placeholder instead - which reads as "nothing chosen".
+ */
+const loadSelectedRelation = async () => {
+  if (!props.modelValue || !relationApi.value) {
+    selectedRelation.value = null;
+    return;
+  }
+  try {
+    const { data } = await relationApi.value.get(props.modelValue);
+    selectedRelation.value = data;
+  } catch (err) {
+    console.error('Failed to read the selected relation:', err);
+    selectedRelation.value = null;
+  }
+};
 
 // Load relation options for searchable-select
 const loadRelationOptions = async () => {
@@ -306,7 +350,11 @@ const loadRelationOptions = async () => {
 // Load relation data on mount
 onMounted(() => {
   if (editType.value === 'searchable-select') {
-    loadRelationOptions();
+    if (relationApi.value) {
+      loadSelectedRelation();
+    } else {
+      loadRelationOptions();
+    }
   }
 });
 

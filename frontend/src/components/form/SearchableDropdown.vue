@@ -70,13 +70,13 @@
           role="listbox"
         >
           <!-- Loading State -->
-          <div v-if="loading" class="px-3 py-4 text-center text-gray-500">
+          <div v-if="loading || isSearching" class="px-3 py-4 text-center text-gray-500">
             <i class="pi pi-spinner pi-spin mr-2"></i>
             Loading...
           </div>
 
           <!-- Empty State -->
-          <div v-else-if="filteredOptions.length === 0" class="px-3 py-4 text-center text-gray-500">
+          <div v-else-if="visibleOptions.length === 0" class="px-3 py-4 text-center text-gray-500">
             <i class="pi pi-search mr-2"></i>
             {{ searchQuery ? 'No matches found' : 'No options available' }}
           </div>
@@ -96,7 +96,7 @@
 
             <!-- Option Items -->
             <button
-              v-for="(option, index) in filteredOptions"
+              v-for="(option, index) in visibleOptions"
               :key="option[valueKey]"
               type="button"
               @click="selectOption(option)"
@@ -127,10 +127,10 @@
 
         <!-- Footer (optional, for showing count) -->
         <div
-          v-if="!loading && filteredOptions.length > 0"
+          v-if="!loading && !isSearching && visibleOptions.length > 0"
           class="px-3 py-1.5 text-xs text-gray-500 bg-gray-50 border-t border-gray-200"
         >
-          {{ filteredOptions.length }} of {{ options.length }} items
+          {{ search ? `${visibleOptions.length} shown` : `${visibleOptions.length} of ${options.length} items` }}
         </div>
       </div>
     </Transition>
@@ -180,6 +180,29 @@ const props = defineProps({
   clearable: {
     type: Boolean,
     default: true
+  },
+  /**
+   * Where the options come from, when they do not all fit in the browser.
+   *
+   * Given a function, this dropdown stops filtering a list it was handed and asks the server
+   * instead: the catalog behind a relation can be any size, and loading all of it to show twenty
+   * matches is the same request whether the user types or not. Without one, nothing changes - the
+   * options prop is filtered here as before.
+   *
+   * @type {?(query: string) => Promise<Object[]>}
+   */
+  search: {
+    type: Function,
+    default: null
+  },
+  /**
+   * The row the current value stands for, when the server has not sent it in this page of matches.
+   * A dropdown that cannot name what is selected shows a placeholder over a set value, which reads
+   * as "nothing chosen".
+   */
+  selectedOption: {
+    type: Object,
+    default: null
   }
 });
 
@@ -190,13 +213,34 @@ const searchInputRef = ref(null);
 const isOpen = ref(false);
 const searchQuery = ref('');
 const highlightedIndex = ref(-1);
+const found = ref([]);
+const isSearching = ref(false);
+let pendingSearch = null;
+
+/** How long to wait after a keystroke before asking the server. */
+const SEARCH_DELAY_MS = 300;
+
+const askServer = async (query) => {
+  isSearching.value = true;
+  try {
+    found.value = await props.search(query) ?? [];
+  } catch {
+    found.value = [];
+  } finally {
+    isSearching.value = false;
+  }
+};
 
 // Find selected label
 const selectedLabel = computed(() => {
   if (!props.modelValue) return null;
-  const selected = props.options.find(opt => opt[props.valueKey] === props.modelValue);
+  const known = [...props.options, ...found.value, props.selectedOption].filter(Boolean);
+  const selected = known.find(opt => opt[props.valueKey] === props.modelValue);
   return selected ? selected[props.labelKey] : null;
 });
+
+/** What the list shows: the server's answer when there is one, the filtered prop otherwise. */
+const visibleOptions = computed(() => (props.search ? found.value : filteredOptions.value));
 
 // Filter options based on search query
 const filteredOptions = computed(() => {
@@ -217,12 +261,6 @@ const filteredOptions = computed(() => {
 const toggleDropdown = () => {
   if (props.disabled) return;
   isOpen.value = !isOpen.value;
-};
-
-// Open dropdown
-const openDropdown = () => {
-  if (props.disabled) return;
-  isOpen.value = true;
 };
 
 // Close dropdown
@@ -254,7 +292,7 @@ const clearSelection = () => {
 
 // Keyboard navigation
 const highlightNext = () => {
-  if (highlightedIndex.value < filteredOptions.value.length - 1) {
+  if (highlightedIndex.value < visibleOptions.value.length - 1) {
     highlightedIndex.value++;
   }
 };
@@ -266,20 +304,25 @@ const highlightPrev = () => {
 };
 
 const selectHighlighted = () => {
-  if (highlightedIndex.value >= 0 && highlightedIndex.value < filteredOptions.value.length) {
-    selectOption(filteredOptions.value[highlightedIndex.value]);
+  if (highlightedIndex.value >= 0 && highlightedIndex.value < visibleOptions.value.length) {
+    selectOption(visibleOptions.value[highlightedIndex.value]);
   }
 };
 
 // Focus search input when dropdown opens
 watch(isOpen, async (newValue) => {
   if (newValue) {
+    // Opening is the first thing that needs options at all; before that, a form with ten of these
+    // on it would have made ten requests for lists nobody looked at.
+    if (props.search && found.value.length === 0) {
+      askServer(searchQuery.value);
+    }
     await nextTick();
     searchInputRef.value?.focus();
 
     // Highlight current selection
     if (props.modelValue) {
-      const index = filteredOptions.value.findIndex(
+      const index = visibleOptions.value.findIndex(
         opt => opt[props.valueKey] === props.modelValue
       );
       if (index >= 0) {
@@ -289,10 +332,17 @@ watch(isOpen, async (newValue) => {
   }
 });
 
-// Reset highlight when search changes
-watch(searchQuery, () => {
-  highlightedIndex.value = filteredOptions.value.length > 0 ? 0 : -1;
+// Reset highlight when search changes, and ask the server when it is the one filtering
+watch(searchQuery, (query) => {
+  highlightedIndex.value = visibleOptions.value.length > 0 ? 0 : -1;
+  if (!props.search) {
+    return;
+  }
+  clearTimeout(pendingSearch);
+  pendingSearch = setTimeout(() => askServer(query), SEARCH_DELAY_MS);
 });
+
+onUnmounted(() => clearTimeout(pendingSearch));
 
 // Click outside handler
 const handleClickOutside = (event) => {
