@@ -102,8 +102,13 @@ public class SecurityConfig {
                     ac.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow all OPTIONS requests (CORS preflight)
                       .requestMatchers("/favicon.ico").permitAll()
                       .requestMatchers("/", "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                      // Future: registration endpoint (currently no controller exists)
-                      // .requestMatchers(HttpMethod.POST, "/api/auth/register").anonymous()
+                      // Registration: the one API route an unauthenticated caller may reach.
+                      // The frontend offers it from the login screen (Login.vue -> /register),
+                      // and until now the only way to get an account was to already have one.
+                      // permitAll rather than anonymous(): an authenticated caller creating
+                      // another account is not the case this opens, and 403 for them would be a
+                      // new refusal rather than the fix.
+                      .requestMatchers(HttpMethod.POST, "/api/profile").permitAll()
                       .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name()) // Admin-only endpoints
                       .requestMatchers("/api/**").authenticated()) // All other API endpoints require authentication
             .httpBasic(hbc -> hbc.authenticationEntryPoint(authenticationEntryPoint))

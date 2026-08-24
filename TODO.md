@@ -475,8 +475,18 @@ raw JSON → ObjectNode → пин дискриминатора → treeToValue 
       `org.springframework.security.access.AccessDeniedException` → 403 отдаётся как 500.
       Уточнение: `AuthorizationDeniedException` (метод-секьюрити) в карте уже был отмаплен на 403,
       так что дефект бил только по `AccessDeniedException` из filter-цепочки
-- [ ] `POST /api/profile` недоступен анонимному пользователю — зарегистрироваться может только
-      уже вошедший; плюс регистрация минует `UserService.create` и проверку уникальности e-mail
+- [x] `POST /api/profile` недоступен анонимному пользователю — зарегистрироваться может только
+      уже вошедший; плюс регистрация минует `UserService.create` и проверку уникальности e-mail.
+      **Сделано,** но проверка поправила формулировку: **уникальность e-mail работала и раньше** —
+      `UniqueMailValidator` зарегистрирован через `@InitBinder` в `AbstractUserController`, и
+      Spring применяет такие валидаторы и к `@RequestBody`. Проверено тестом: регистрация на
+      занятый адрес — 422 с текстом `EXCEPTION_DUPLICATE_EMAIL`. Настоящей была первая половина:
+      маршрут закрывало `requestMatchers("/api/**").authenticated()`, тогда как фронтенд отдаёт
+      `/register` со страницы входа. Открыт ровно POST (`permitAll`, не `anonymous()`: отказывать
+      вошедшему — это новый отказ, а не исправление); `register` получил свою
+      `@AuthenticatedOnly` с причиной, иначе реестр считал бы эндпоинт незаанотированным.
+      Заодно создание переведено на `UserService.create` — его проверка уникальности стала вторым
+      рубежом на случай гонки двух запросов. `RegistrationEndpointTest`, 4 теста
 - [ ] `ValidationUtil.assureIdConsistent` — `!=` вместо `equals` на UUID → `PUT /api/profile`
       с непустым `id` всегда 422
 - [ ] Расхождения `@Size` DTO ↔ сущность ↔ DDL (`NamedTo.description` 1024 vs `NamedEntity` 512).
