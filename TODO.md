@@ -521,8 +521,11 @@ raw JSON → ObjectNode → пин дискриминатора → treeToValue 
       `AllowedChildTypesEndpointTest` (3, до правки падали все три — неизвестный id отвечал 200)
 - [ ] `Installation.isValidLocationInstallation()` → `canContainComponent(null)` всегда false;
       `fitsInLocation()` — NPE при `rackPosition == null`
-- [ ] `Component.canHoldOtherComponents()` возвращает true когда компонент **не** может содержать
-      другие (дефект именования, оба вызова компенсируют)
+- [x] `Component.canHoldOtherComponents()` возвращает true когда компонент **не** может содержать
+      другие (дефект именования, оба вызова компенсируют). **Сделано:** тело приведено к имени,
+      оба вызова перестали компенсировать. Наружу это не видно — `spring.jackson.visibility` даёт
+      Jackson только поля, так что предикат никогда не попадал в JSON. `ContainmentPredicatesTest`
+      закрепляет и имя, и прежние ответы `canContainComponent`
 - [ ] Bulk-delete обходит `cascade`/`orphanRemoval`: удаление здания не удалит этажи, а сделает
       их корневыми (FK `ON DELETE SET NULL`)
 - [x] Типобезопасность удаления: `ConnectivityRepository`/`HousingRepository` типизированы как

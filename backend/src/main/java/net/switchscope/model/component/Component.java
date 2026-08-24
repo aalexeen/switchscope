@@ -129,8 +129,18 @@ public abstract class Component extends NamedEntity {
     }
 
     // Methods delegating to ComponentTypeEntity
+
+    /**
+     * Whether this component's type allows it to contain other components at all, before any
+     * question of which ones.
+     * <p>
+     * The body used to be the negation of the name - true when the component could <em>not</em>
+     * hold anything - and both callers negated it back, so the answer was right and only the
+     * reading of it was wrong. Left as it was, the first caller to trust the name would have got
+     * the opposite of what it asked for.
+     */
     public boolean canHoldOtherComponents() {
-        return componentType == null || !componentType.isCanContainComponents();
+        return componentType != null && componentType.isCanContainComponents();
     }
 
 /*    public boolean requiresPhysicalSpace() {
@@ -270,7 +280,7 @@ public abstract class Component extends NamedEntity {
 
     // Enhanced containment logic
     public boolean canContainComponent(Component child) {
-        if (canHoldOtherComponents() || child == null || child.getComponentType() == null) {
+        if (!canHoldOtherComponents() || child == null || child.getComponentType() == null) {
             return false;
         }
 
@@ -278,7 +288,7 @@ public abstract class Component extends NamedEntity {
     }
 
     public boolean canContainComponentType(ComponentTypeEntity childType) {
-        if (canHoldOtherComponents() || childType == null) {
+        if (!canHoldOtherComponents() || childType == null) {
             return false;
         }
 
