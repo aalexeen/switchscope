@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
-import net.switchscope.error.IllegalRequestDataException;
+import net.switchscope.error.MalformedRequestException;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.stereotype.Component;
@@ -43,17 +43,17 @@ public class JsonPayload {
      *
      * @param json the raw request body
      * @return the parsed object node
-     * @throws IllegalRequestDataException if the body is not parseable or is not an object
+     * @throws MalformedRequestException if the body is not parseable or is not an object
      */
     public ObjectNode asObject(String json) {
         JsonNode root;
         try {
             root = objectMapper.readTree(json);
         } catch (JsonProcessingException e) {
-            throw new IllegalRequestDataException("Request body is not valid JSON: " + e.getOriginalMessage());
+            throw new MalformedRequestException("Request body is not valid JSON: " + e.getOriginalMessage());
         }
         if (!(root instanceof ObjectNode objectNode)) {
-            throw new IllegalRequestDataException("Request body must be a JSON object");
+            throw new MalformedRequestException("Request body must be a JSON object");
         }
         return objectNode;
     }
@@ -122,14 +122,14 @@ public class JsonPayload {
      * @param targetType the DTO type to bind to
      * @param <T>        the DTO type
      * @return the bound DTO
-     * @throws IllegalRequestDataException if the payload does not fit the target type
+     * @throws MalformedRequestException if the payload does not fit the target type
      */
     public <T> T bind(ObjectNode root, Class<T> targetType) {
         pinDiscriminator(root, targetType);
         try {
             return objectMapper.treeToValue(root, targetType);
         } catch (JsonProcessingException e) {
-            throw new IllegalRequestDataException("Request body does not bind to "
+            throw new MalformedRequestException("Request body does not bind to "
                     + targetType.getSimpleName() + ": " + e.getOriginalMessage());
         }
     }

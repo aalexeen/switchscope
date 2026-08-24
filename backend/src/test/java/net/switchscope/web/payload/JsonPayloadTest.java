@@ -1,7 +1,7 @@
 package net.switchscope.web.payload;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.switchscope.error.IllegalRequestDataException;
+import net.switchscope.error.MalformedRequestException;
 import net.switchscope.mapper.component.device.AccessPointMapper;
 import net.switchscope.model.component.device.AccessPoint;
 import net.switchscope.to.component.device.AccessPointTo;
@@ -133,13 +133,13 @@ class JsonPayloadTest {
     }
 
     @Test
-    @DisplayName("a body that is not a JSON object is a client error, not a 500")
+    @DisplayName("a body that is not a JSON object is 400 - unreadable, not merely refused")
     void rejectsNonObjectBodies() {
         assertThatThrownBy(() -> json.asObject("[1, 2, 3]"))
-                .isInstanceOf(IllegalRequestDataException.class)
+                .isInstanceOf(MalformedRequestException.class)
                 .hasMessageContaining("JSON object");
         assertThatThrownBy(() -> json.asObject("{not json"))
-                .isInstanceOf(IllegalRequestDataException.class)
+                .isInstanceOf(MalformedRequestException.class)
                 .hasMessageContaining("valid JSON");
     }
 }

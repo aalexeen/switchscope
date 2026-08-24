@@ -13,6 +13,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -56,6 +57,10 @@ public class RestExceptionHandler {
             put(DataIntegrityViolationException.class, DATA_CONFLICT);
             put(IllegalArgumentException.class, BAD_DATA);
             put(ValidationException.class, BAD_REQUEST);
+            // A body Spring could not read is the caller's mistake, not the server's: without this
+            // entry the root cause was looked up instead (InvalidTypeIdException, JsonParseException),
+            // matched nothing, and a POST with a body of {} was answered 500 Application error.
+            put(HttpMessageNotReadableException.class, MALFORMED_REQUEST);
             put(HttpRequestMethodNotSupportedException.class, BAD_REQUEST);
             put(ServletRequestBindingException.class, BAD_REQUEST);
             put(RequestRejectedException.class, BAD_REQUEST);

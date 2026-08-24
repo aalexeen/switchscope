@@ -5,6 +5,9 @@ import org.springframework.http.HttpStatus;
 public enum ErrorType {
     APP_ERROR("Application error", HttpStatus.INTERNAL_SERVER_ERROR),
     BAD_DATA("Wrong data", HttpStatus.UNPROCESSABLE_ENTITY),
+    // A body the server could not read at all, as opposed to one it read and then rejected:
+    // BAD_REQUEST and BAD_DATA are both 422 and both presuppose that the payload was understood.
+    MALFORMED_REQUEST("Malformed request", HttpStatus.BAD_REQUEST),
     BAD_REQUEST("Bad request", HttpStatus.UNPROCESSABLE_ENTITY),
     DATA_CONFLICT("DataBase conflict", HttpStatus.CONFLICT),
     NOT_FOUND("Resource not found", HttpStatus.NOT_FOUND),
