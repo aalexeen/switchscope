@@ -148,8 +148,9 @@ class RawBodyValidationTest {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("name", "raw-body-test-" + UUID.randomUUID());
         body.put("manufacturer", "test");
-        // Not optional in practice: Rack's computed getters dereference it, so a rack created
-        // without it answers 500 from the mapping back - the same before this change as after.
+        // Sent although a create no longer needs it: this fixture stands for the discriminator and
+        // validation cases, and where the value comes from when it is absent is asserted in
+        // RackCapacityEndpointTest, against a rack that is committed rather than rolled back.
         body.put("rackUnitsTotal", 42);
         body.put("componentTypeId", componentTypeId("RACK"));
         body.put("componentStatusId", firstId("/api/catalogs/component-statuses"));

@@ -27,8 +27,16 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class Rack extends Component {
 
+    /** What a rack holds when neither the request nor its type says otherwise. */
+    public static final int DEFAULT_RACK_UNITS_TOTAL = 42;
+
+    // The column is nullable because one table holds every component class and a router has no rack
+    // units. For a rack the value is mandatory, and @Basic is where that can be said without
+    // claiming the column is NOT NULL: EntityNullability reads the mapping, so this is what makes a
+    // request to clear the field answer 422 instead of storing a rack nothing can read back.
     @Column(name = "rack_units_total")
-    private Integer rackUnitsTotal = 42; // Standard 42U rack
+    @Basic(optional = false)
+    private Integer rackUnitsTotal = DEFAULT_RACK_UNITS_TOTAL;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rack_type_id", nullable = false)
@@ -192,6 +200,30 @@ public class Rack extends Component {
             if (coolingType == null) {
                 coolingType = rackType.getCoolingType();
             }
+        }
+    }
+
+    /**
+     * Gives a rack the capacity its request did not carry.
+     * <p>
+     * The field initializer cannot do it. The generated create mapping assigns every property
+     * unconditionally - {@code NullValuePropertyMappingStrategy.IGNORE} governs update methods only
+     * - so a payload without {@code rackUnitsTotal} writes null over the default, and mapping the
+     * answer back unboxes it in {@link #getAvailableRackUnits()}, {@link #getUtilizationPercentage()}
+     * and {@link #hasAvailableSpace()}: the create answered 500. The constructors have
+     * {@link #initializeFromRackType()} for this reason, and nothing on the mapper path calls it;
+     * calling the whole of it here would overwrite the door, lock and cooling values a payload did
+     * supply.
+     * <p>
+     * On persist rather than in the service, so that it covers every create path, and on persist
+     * rather than on flush, because a create maps its answer back before anything is flushed.
+     */
+    @PrePersist
+    void supplyRackUnitsTotal() {
+        if (rackUnitsTotal == null) {
+            rackUnitsTotal = rackType != null && rackType.getTypicalCapacityU() != null
+                    ? rackType.getTypicalCapacityU()
+                    : DEFAULT_RACK_UNITS_TOTAL;
         }
     }
 
