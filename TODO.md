@@ -489,8 +489,17 @@ raw JSON → ObjectNode → пин дискриминатора → treeToValue 
       другие (дефект именования, оба вызова компенсируют)
 - [ ] Bulk-delete обходит `cascade`/`orphanRemoval`: удаление здания не удалит этажи, а сделает
       их корневыми (FK `ON DELETE SET NULL`)
-- [ ] Типобезопасность удаления: `ConnectivityRepository`/`HousingRepository` типизированы как
-      `BaseRepository<Component>` → `DELETE /api/racks/{id}` удалит коммутатор по его id
+- [x] Типобезопасность удаления: `ConnectivityRepository`/`HousingRepository` типизированы как
+      `BaseRepository<Component>` → `DELETE /api/racks/{id}` удалит коммутатор по его id.
+      **Сделано.** Проверка перед правкой расширила пункт: та же беда у `DeviceRepository`
+      (`BaseRepository<Device>` — роутер удаляется через маршрут коммутаторов), а `getExisted`
+      на чужом id давал не 404, а `ClassCastException` в сервисе, то есть 500. Введён
+      `PolymorphicRepository<T>` с парой `getExisted(id, type)` / `deleteExisted(id, type)`
+      (`TYPE(e) = :type` в JPQL); на неё переведены семь сервисов. Нетипизированная пара
+      оставлена: `/api/devices` и `/api/components` служат корню и значат ровно
+      «строка с этим id». Дефект воспроизведён тестом до правки: нетипизированный
+      `deleteExisted` на `HousingRepository` действительно удалял коммутатор
+      (`PolymorphicRepositoryTest`, 5 тестов, прогон в откатываемой транзакции)
 - [x] `application.yaml:51` — `net.switchscope.backend: INFO`, а пакет `net.switchscope`;
       при `root: WARN` весь `log.info` подавлен. Вытащено вперёд: отчёт реестра — это `log.info`,
       без этой правки его не было бы видно

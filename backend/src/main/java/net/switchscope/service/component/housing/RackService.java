@@ -34,7 +34,7 @@ public class RackService implements DtoCrudService<Rack, RackTo> {
 
     @Override
     public Rack getById(UUID id) {
-        Rack rack = (Rack) repository.getExisted(id);
+        Rack rack = repository.getExisted(id, Rack.class);
         Hibernate.initialize(rack.getRackType());
         return rack;
     }
@@ -57,7 +57,7 @@ public class RackService implements DtoCrudService<Rack, RackTo> {
      * @return rack DTO
      */
     public RackTo getByIdAsDto(UUID id) {
-        Rack rack = (Rack) repository.getExisted(id);
+        Rack rack = repository.getExisted(id, Rack.class);
         Hibernate.initialize(rack.getRackType());
         return mapper.toTo(rack);
     }
@@ -122,6 +122,6 @@ public class RackService implements DtoCrudService<Rack, RackTo> {
     @Override
     @Transactional
     public void delete(UUID id) {
-        repository.deleteExisted(id);
+        repository.deleteExisted(id, Rack.class);
     }
 }

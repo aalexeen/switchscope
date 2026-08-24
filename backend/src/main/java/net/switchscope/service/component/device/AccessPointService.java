@@ -33,7 +33,7 @@ public class AccessPointService implements DtoCrudService<AccessPoint, AccessPoi
 
     @Override
     public AccessPoint getById(UUID id) {
-        AccessPoint ap = (AccessPoint) repository.getExisted(id);
+        AccessPoint ap = repository.getExisted(id, AccessPoint.class);
         Hibernate.initialize(ap.getPorts());
         Hibernate.initialize(ap.getSsids());
         return ap;
@@ -63,7 +63,7 @@ public class AccessPointService implements DtoCrudService<AccessPoint, AccessPoi
      * @return access point DTO
      */
     public AccessPointTo getByIdAsDto(UUID id) {
-        AccessPoint ap = (AccessPoint) repository.getExisted(id);
+        AccessPoint ap = repository.getExisted(id, AccessPoint.class);
         Hibernate.initialize(ap.getPorts());
         Hibernate.initialize(ap.getSsids());
         return mapper.toTo(ap);
@@ -127,6 +127,6 @@ public class AccessPointService implements DtoCrudService<AccessPoint, AccessPoi
     @Override
     @Transactional
     public void delete(UUID id) {
-        repository.deleteExisted(id);
+        repository.deleteExisted(id, AccessPoint.class);
     }
 }

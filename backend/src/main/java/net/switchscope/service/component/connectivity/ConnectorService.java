@@ -37,7 +37,7 @@ public class ConnectorService implements DtoCrudService<Connector, ConnectorTo> 
 
     @Override
     public Connector getById(UUID id) {
-        Connector connector = (Connector) repository.getExisted(id);
+        Connector connector = repository.getExisted(id, Connector.class);
         Hibernate.initialize(connector.getConnectorModel());
         Hibernate.initialize(connector.getCableRun());
         Hibernate.initialize(connector.getPort());
@@ -62,7 +62,7 @@ public class ConnectorService implements DtoCrudService<Connector, ConnectorTo> 
      * @return connector DTO
      */
     public ConnectorTo getByIdAsDto(UUID id) {
-        Connector connector = (Connector) repository.getExisted(id);
+        Connector connector = repository.getExisted(id, Connector.class);
         Hibernate.initialize(connector.getConnectorModel());
         Hibernate.initialize(connector.getCableRun());
         Hibernate.initialize(connector.getPort());
@@ -133,6 +133,6 @@ public class ConnectorService implements DtoCrudService<Connector, ConnectorTo> 
     @Override
     @Transactional
     public void delete(UUID id) {
-        repository.deleteExisted(id);
+        repository.deleteExisted(id, Connector.class);
     }
 }

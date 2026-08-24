@@ -34,7 +34,7 @@ public class PatchPanelService implements DtoCrudService<PatchPanel, PatchPanelT
 
     @Override
     public PatchPanel getById(UUID id) {
-        PatchPanel patchPanel = (PatchPanel) repository.getExisted(id);
+        PatchPanel patchPanel = repository.getExisted(id, PatchPanel.class);
         Hibernate.initialize(patchPanel.getCableRuns());
         Hibernate.initialize(patchPanel.getPorts());
         return patchPanel;
@@ -63,7 +63,7 @@ public class PatchPanelService implements DtoCrudService<PatchPanel, PatchPanelT
      * @return patch panel DTO
      */
     public PatchPanelTo getByIdAsDto(UUID id) {
-        PatchPanel patchPanel = (PatchPanel) repository.getExisted(id);
+        PatchPanel patchPanel = repository.getExisted(id, PatchPanel.class);
         Hibernate.initialize(patchPanel.getCableRuns());
         Hibernate.initialize(patchPanel.getPorts());
         return mapper.toTo(patchPanel);
@@ -129,6 +129,6 @@ public class PatchPanelService implements DtoCrudService<PatchPanel, PatchPanelT
     @Override
     @Transactional
     public void delete(UUID id) {
-        repository.deleteExisted(id);
+        repository.deleteExisted(id, PatchPanel.class);
     }
 }

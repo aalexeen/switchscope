@@ -33,7 +33,7 @@ public class RouterService implements DtoCrudService<Router, RouterTo> {
 
     @Override
     public Router getById(UUID id) {
-        Router router = (Router) repository.getExisted(id);
+        Router router = repository.getExisted(id, Router.class);
         Hibernate.initialize(router.getPorts());
         return router;
     }
@@ -59,7 +59,7 @@ public class RouterService implements DtoCrudService<Router, RouterTo> {
      * @return router DTO
      */
     public RouterTo getByIdAsDto(UUID id) {
-        Router router = (Router) repository.getExisted(id);
+        Router router = repository.getExisted(id, Router.class);
         Hibernate.initialize(router.getPorts());
         return mapper.toTo(router);
     }
@@ -122,6 +122,6 @@ public class RouterService implements DtoCrudService<Router, RouterTo> {
     @Override
     @Transactional
     public void delete(UUID id) {
-        repository.deleteExisted(id);
+        repository.deleteExisted(id, Router.class);
     }
 }

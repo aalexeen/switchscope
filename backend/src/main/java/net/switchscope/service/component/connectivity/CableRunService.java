@@ -36,7 +36,7 @@ public class CableRunService implements DtoCrudService<CableRun, CableRunTo> {
 
     @Override
     public CableRun getById(UUID id) {
-        CableRun cableRun = (CableRun) repository.getExisted(id);
+        CableRun cableRun = repository.getExisted(id, CableRun.class);
         initializeLazyCollections(cableRun);
         return cableRun;
     }
@@ -61,7 +61,7 @@ public class CableRunService implements DtoCrudService<CableRun, CableRunTo> {
      * @return cable run DTO
      */
     public CableRunTo getByIdAsDto(UUID id) {
-        CableRun cableRun = (CableRun) repository.getExisted(id);
+        CableRun cableRun = repository.getExisted(id, CableRun.class);
         initializeLazyCollections(cableRun);
         return mapper.toTo(cableRun);
     }
@@ -135,6 +135,6 @@ public class CableRunService implements DtoCrudService<CableRun, CableRunTo> {
     @Override
     @Transactional
     public void delete(UUID id) {
-        repository.deleteExisted(id);
+        repository.deleteExisted(id, CableRun.class);
     }
 }

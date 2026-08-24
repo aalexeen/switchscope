@@ -34,7 +34,7 @@ public class NetworkSwitchService implements DtoCrudService<NetworkSwitch, Netwo
 
     @Override
     public NetworkSwitch getById(UUID id) {
-        NetworkSwitch sw = (NetworkSwitch) repository.getExisted(id);
+        NetworkSwitch sw = repository.getExisted(id, NetworkSwitch.class);
         Hibernate.initialize(sw.getSwitchModel());
         Hibernate.initialize(sw.getPorts());
         return sw;
@@ -61,7 +61,7 @@ public class NetworkSwitchService implements DtoCrudService<NetworkSwitch, Netwo
      * @return network switch DTO
      */
     public NetworkSwitchTo getByIdAsDto(UUID id) {
-        NetworkSwitch sw = (NetworkSwitch) repository.getExisted(id);
+        NetworkSwitch sw = repository.getExisted(id, NetworkSwitch.class);
         Hibernate.initialize(sw.getSwitchModel());
         Hibernate.initialize(sw.getPorts());
         return mapper.toTo(sw);
@@ -127,6 +127,6 @@ public class NetworkSwitchService implements DtoCrudService<NetworkSwitch, Netwo
     @Override
     @Transactional
     public void delete(UUID id) {
-        repository.deleteExisted(id);
+        repository.deleteExisted(id, NetworkSwitch.class);
     }
 }
