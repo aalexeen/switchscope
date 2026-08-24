@@ -1,5 +1,6 @@
 package net.switchscope.web.catalog;
 
+import org.springdoc.core.annotations.ParameterObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.switchscope.mapper.BaseMapper;
@@ -10,13 +11,14 @@ import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.location.LocationTypeService;
 import net.switchscope.to.location.catalog.LocationTypeTo;
 import net.switchscope.web.AbstractCrudController;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.ListResponse;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -61,9 +63,9 @@ public class LocationTypeController extends AbstractCrudController<LocationTypeE
 
     @Override
     @GetMapping
-    public List<LocationTypeTo> getAll() {
-        log.info("getAll {}", getEntityName());
-        return service.getAllAsDto();
+    public Object getAll(@ParameterObject ListQuery query) {
+        log.info("getAll {} ({})", getEntityName(), query);
+        return ListResponse.of(query, service::getAllAsDto, () -> service.getPage(query));
     }
 
     @Override

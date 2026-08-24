@@ -17,6 +17,9 @@ import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.connectivity.PatchPanelTo;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +29,21 @@ public class PatchPanelService implements DtoCrudService<PatchPanel, PatchPanelT
     private final ConnectivityRepository repository;
     private final PatchPanelMapper mapper;
     private final ComponentReferenceResolver resolver;
+    private final PageReader pageReader;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<PatchPanel> getAll() {
         return (List<PatchPanel>) (List<?>) repository.findPatchPanels();
+    }
+
+    @Override
+    public PageTo<PatchPanelTo> getPage(ListQuery query) {
+        return pageReader.read(PatchPanel.class, query, patchPanel -> {
+            Hibernate.initialize(patchPanel.getCableRuns());
+            Hibernate.initialize(patchPanel.getPorts());
+            return mapper.toTo(patchPanel);
+        });
     }
 
     @Override

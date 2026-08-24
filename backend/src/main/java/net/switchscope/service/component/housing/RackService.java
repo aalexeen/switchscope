@@ -13,6 +13,9 @@ import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.housing.RackTo;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,11 +28,21 @@ public class RackService implements DtoCrudService<Rack, RackTo> {
     private final HousingRepository repository;
     private final RackMapper mapper;
     private final ComponentReferenceResolver resolver;
+    private final PageReader pageReader;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Rack> getAll() {
         return (List<Rack>) (List<?>) repository.findRacks();
+    }
+
+    /**
+     * Rooted at {@code Rack} rather than at the repository's domain type, so the page holds
+     * racks only - the components table holds every class of component.
+     */
+    @Override
+    public PageTo<RackTo> getPage(ListQuery query) {
+        return pageReader.read(Rack.class, query, mapper::toTo);
     }
 
     @Override

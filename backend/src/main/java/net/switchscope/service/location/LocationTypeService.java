@@ -12,6 +12,9 @@ import net.switchscope.repository.location.LocationTypeRepository;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.location.catalog.LocationTypeTo;
 import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -25,10 +28,25 @@ public class LocationTypeService implements DtoCrudService<LocationTypeEntity, L
 
     private final LocationTypeRepository repository;
     private final LocationTypeMapper mapper;
+    private final PageReader pageReader;
 
     @Override
     public List<LocationTypeEntity> getAll() {
         return repository.findAllWithChildTypes();
+    }
+
+    /**
+     * Both hierarchies are initialised per row rather than fetched by the query: fetching two
+     * collections at once is a Cartesian product, and fetching either of them at all would
+     * put the page back in memory.
+     */
+    @Override
+    public PageTo<LocationTypeTo> getPage(ListQuery query) {
+        return pageReader.read(LocationTypeEntity.class, query, entity -> {
+            Hibernate.initialize(entity.getAllowedChildTypes());
+            Hibernate.initialize(entity.getAllowedParentTypes());
+            return mapper.toTo(entity);
+        });
     }
 
     @Override

@@ -9,6 +9,9 @@ import net.switchscope.repository.component.ComponentStatusRepository;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.catalog.ComponentStatusTo;
 import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +23,16 @@ public class ComponentStatusService implements DtoCrudService<ComponentStatusEnt
 
     private final ComponentStatusRepository repository;
     private final ComponentStatusMapper mapper;
+    private final PageReader pageReader;
 
     @Override
     public List<ComponentStatusEntity> getAll() {
         return repository.findAllWithAssociations();
+    }
+
+    @Override
+    public PageTo<ComponentStatusTo> getPage(ListQuery query) {
+        return pageReader.read(ComponentStatusEntity.class, query, mapper::toTo);
     }
 
     @Override

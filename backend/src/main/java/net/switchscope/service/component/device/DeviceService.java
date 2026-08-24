@@ -10,10 +10,15 @@ import net.switchscope.model.component.device.NetworkSwitch;
 import net.switchscope.model.component.device.Router;
 import net.switchscope.repository.component.device.DeviceRepository;
 import net.switchscope.service.CrudService;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
+import net.switchscope.web.page.Restriction;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 @Service
@@ -21,7 +26,16 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class DeviceService implements CrudService<Device> {
 
+    /**
+     * The three classes this route is about. A patch panel is a {@code Device} in the model and
+     * deliberately not one here: the whole list says so by unioning three queries, and a page has
+     * to say the same thing or it would hold rows the list never returned.
+     */
+    private static final Restriction<Device> DEVICE_CLASSES = (root, cb) ->
+            root.type().in(NetworkSwitch.class, Router.class, AccessPoint.class);
+
     private final DeviceRepository repository;
+    private final PageReader pageReader;
 
     @Override
     public List<Device> getAll() {
@@ -36,6 +50,26 @@ public class DeviceService implements CrudService<Device> {
 
         devices.forEach(this::initializeForMapping);
         return devices;
+    }
+
+    /**
+     * One page of devices, mapped by the caller's own function while this transaction is open.
+     * <p>
+     * The mapping is handed in rather than done here because a device's DTO is chosen by its class
+     * and the three mappers that do the choosing belong to the controller. Running the function
+     * here is what keeps that choice legal: made in the controller, executed where the row is still
+     * attached.
+     *
+     * @param query which page was asked for, in what order
+     * @param toDto how one device becomes its DTO
+     * @param <T>   the DTO type the caller produces
+     * @return the requested page
+     */
+    public <T> PageTo<T> getPage(ListQuery query, Function<Device, T> toDto) {
+        return pageReader.read(Device.class, DEVICE_CLASSES, query, device -> {
+            initializeForMapping(device);
+            return toDto.apply(device);
+        });
     }
 
     @Override

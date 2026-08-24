@@ -14,6 +14,9 @@ import net.switchscope.repository.location.LocationTypeRepository;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.location.LocationTo;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +29,7 @@ public class LocationService implements DtoCrudService<Location, LocationTo> {
     private final LocationRepository repository;
     private final LocationTypeRepository locationTypeRepository;
     private final LocationMapper mapper;
+    private final PageReader pageReader;
 
     @Override
     public List<Location> getAll() {
@@ -47,6 +51,19 @@ public class LocationService implements DtoCrudService<Location, LocationTo> {
     public List<LocationTo> getAllAsDto() {
         List<Location> locations = repository.findAllWithAllRelationships();
         return mapper.toToList(locations);
+    }
+
+    /**
+     * One page of locations, mapped inside this transaction.
+     * <p>
+     * Not served by {@code findAllWithAllRelationships}: that query fetches {@code childLocations},
+     * and a collection fetch join is the one thing a page cannot be built on - Hibernate would load
+     * every location and slice the list in memory. The children are loaded while each row is
+     * mapped instead.
+     */
+    @Override
+    public PageTo<LocationTo> getPage(ListQuery query) {
+        return pageReader.read(Location.class, query, mapper::toTo);
     }
 
     /**

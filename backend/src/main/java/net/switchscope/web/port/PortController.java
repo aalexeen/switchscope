@@ -2,6 +2,7 @@ package net.switchscope.web.port;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,9 @@ import net.switchscope.to.port.FiberPortTo;
 import net.switchscope.to.port.PortTo;
 import net.switchscope.web.payload.JsonPayload;
 import net.switchscope.web.payload.PartialUpdateReader;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.ListResponse;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -36,9 +38,9 @@ public class PortController {
 
     @RequiresPermission("read")
     @GetMapping
-    public List<PortTo> getAll() {
-        log.info("getAll ports");
-        return service.getAllAsDto();
+    public Object getAll(@ParameterObject ListQuery query) {
+        log.info("getAll ports ({})", query);
+        return ListResponse.of(query, service::getAllAsDto, () -> service.getPage(query));
     }
 
     @RequiresPermission("read")

@@ -22,6 +22,9 @@ import net.switchscope.to.port.EthernetPortTo;
 import net.switchscope.to.port.FiberPortTo;
 import net.switchscope.to.port.PortTo;
 import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,10 +40,16 @@ public class PortService implements DtoCrudService<Port, PortTo> {
     private final ComponentRepository componentRepository;
     private final EthernetPortMapper ethernetPortMapper;
     private final FiberPortMapper fiberPortMapper;
+    private final PageReader pageReader;
 
     @Override
     public List<Port> getAll() {
         return repository.findAllWithRelationships();
+    }
+
+    @Override
+    public PageTo<PortTo> getPage(ListQuery query) {
+        return pageReader.read(Port.class, query, this::mapToDto);
     }
 
     @Override

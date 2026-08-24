@@ -1,5 +1,6 @@
 package net.switchscope.web.component.device;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +27,9 @@ import net.switchscope.to.component.device.NetworkSwitchTo;
 import net.switchscope.to.component.device.RouterTo;
 import net.switchscope.web.component.ComponentPayloadReader;
 import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.ListResponse;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -56,11 +58,11 @@ public class DeviceController {
 
     @RequiresPermission("read")
     @GetMapping
-    public List<DeviceTo> getAll() {
-        log.info("getAll devices");
-        return service.getAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Object getAll(@ParameterObject ListQuery query) {
+        log.info("getAll devices ({})", query);
+        return ListResponse.of(query,
+                () -> service.getAll().stream().map(this::mapToDto).collect(Collectors.toList()),
+                () -> service.getPage(query, this::mapToDto));
     }
 
     @RequiresPermission("read")

@@ -8,6 +8,9 @@ import net.switchscope.repository.component.ComponentCategoryRepository;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.catalog.ComponentCategoryTo;
 import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +27,16 @@ public class ComponentCategoryService implements DtoCrudService<ComponentCategor
 
     private final ComponentCategoryRepository repository;
     private final ComponentCategoryMapper mapper;
+    private final PageReader pageReader;
 
     @Override
     public List<ComponentCategoryEntity> getAll() {
         return repository.findAllWithAssociations();
+    }
+
+    @Override
+    public PageTo<ComponentCategoryTo> getPage(ListQuery query) {
+        return pageReader.read(ComponentCategoryEntity.class, query, mapper::toTo);
     }
 
     @Override

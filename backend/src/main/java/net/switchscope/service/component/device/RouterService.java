@@ -12,6 +12,9 @@ import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.device.RouterTo;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,11 +27,20 @@ public class RouterService implements DtoCrudService<Router, RouterTo> {
     private final DeviceRepository repository;
     private final RouterMapper mapper;
     private final ComponentReferenceResolver resolver;
+    private final PageReader pageReader;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Router> getAll() {
         return (List<Router>) (List<?>) repository.findRouters();
+    }
+
+    @Override
+    public PageTo<RouterTo> getPage(ListQuery query) {
+        return pageReader.read(Router.class, query, router -> {
+            Hibernate.initialize(router.getPorts());
+            return mapper.toTo(router);
+        });
     }
 
     @Override

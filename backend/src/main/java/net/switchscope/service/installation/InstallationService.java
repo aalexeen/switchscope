@@ -16,6 +16,9 @@ import net.switchscope.repository.location.LocationRepository;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.installation.InstallationTo;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +34,7 @@ public class InstallationService implements DtoCrudService<Installation, Install
     private final InstallableTypeRepository installableTypeRepository;
     private final InstallationStatusRepository installationStatusRepository;
     private final ComponentRepository componentRepository;
+    private final PageReader pageReader;
 
     @Override
     public List<Installation> getAll() {
@@ -38,6 +42,14 @@ public class InstallationService implements DtoCrudService<Installation, Install
         // Initialize required associations while the transactional session is open
         installations.forEach(this::initializeForMapping);
         return installations;
+    }
+
+    @Override
+    public PageTo<InstallationTo> getPage(ListQuery query) {
+        return pageReader.read(Installation.class, query, installation -> {
+            initializeForMapping(installation);
+            return mapper.toTo(installation);
+        });
     }
 
     @Override

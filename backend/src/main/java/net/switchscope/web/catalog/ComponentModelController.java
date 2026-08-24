@@ -27,11 +27,13 @@ import net.switchscope.to.component.catalog.ComponentModelTo;
 import net.switchscope.web.payload.JsonPayload;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.web.payload.PartialUpdateReader;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.ListResponse;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -64,11 +66,11 @@ public class ComponentModelController {
 
     @RequiresPermission("read")
     @GetMapping
-    public List<ComponentModelTo> getAll() {
-        log.info("getAll component models");
-        return service.getAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Object getAll(@ParameterObject ListQuery query) {
+        log.info("getAll component models ({})", query);
+        return ListResponse.of(query,
+                () -> service.getAll().stream().map(this::mapToDto).collect(Collectors.toList()),
+                () -> service.getPage(query, this::mapToDto));
     }
 
     @RequiresPermission("read")

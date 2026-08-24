@@ -10,6 +10,9 @@ import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.InstallableComponentRegistry;
 import net.switchscope.to.installation.catalog.InstallableTypeTo;
 import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,12 +25,26 @@ public class InstallableTypeService implements DtoCrudService<InstallableTypeEnt
     private final InstallableTypeRepository repository;
     private final InstallableTypeMapper mapper;
     private final InstallableComponentRegistry registry;
+    private final PageReader pageReader;
 
     @Override
     public List<InstallableTypeEntity> getAll() {
         List<InstallableTypeEntity> entities = repository.findAllWithAssociations();
         entities.forEach(entity -> entity.setRegistry(registry));
         return entities;
+    }
+
+    /**
+     * Each row is handed the registry before it is mapped, exactly as the whole list is: the
+     * DTO reports whether the type can actually be instantiated, and a row without the
+     * registry cannot answer that.
+     */
+    @Override
+    public PageTo<InstallableTypeTo> getPage(ListQuery query) {
+        return pageReader.read(InstallableTypeEntity.class, query, entity -> {
+            entity.setRegistry(registry);
+            return mapper.toTo(entity);
+        });
     }
 
     @Override

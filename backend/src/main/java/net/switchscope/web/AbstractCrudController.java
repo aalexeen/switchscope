@@ -3,6 +3,7 @@ package net.switchscope.web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
@@ -10,12 +11,14 @@ import net.switchscope.mapper.BaseMapper;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.BaseTo;
+import net.switchscope.to.PageTo;
 import net.switchscope.web.payload.JsonPayload;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.web.payload.PartialUpdateReader;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.ListResponse;
 import net.switchscope.web.payload.PayloadValidator;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -71,12 +74,24 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
      */
     protected abstract Class<T> getDtoClass();
 
+    /**
+     * The whole collection, or one page of it.
+     * <p>
+     * Which of the two comes back is decided by the request and by nothing else - see
+     * {@link ListResponse}. A caller that sends no parameters gets the array this route has always
+     * returned, produced by the same query as before; a caller that asks for a page gets a
+     * {@link PageTo}. That is why the return type is {@code Object}: the shape is chosen per
+     * request, so there is no single type to declare, and the alternative - making every reader of
+     * this API unwrap an envelope from today on - would have been a breaking change dressed up as
+     * a feature.
+     */
     @RequiresPermission("read")
     @GetMapping
-    public List<T> getAll() {
-        log.info("getAll {}", getEntityName());
-        List<E> entities = getService().getAll();
-        return getMapper().toToList(entities);
+    public Object getAll(@ParameterObject ListQuery query) {
+        log.info("getAll {} ({})", getEntityName(), query);
+        return ListResponse.of(query,
+                () -> getMapper().toToList(getService().getAll()),
+                () -> getService().getPage(query));
     }
 
     @RequiresPermission("read")

@@ -1,5 +1,6 @@
 package net.switchscope.web.component;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +27,9 @@ import net.switchscope.to.component.device.NetworkSwitchTo;
 import net.switchscope.to.component.device.RouterTo;
 import net.switchscope.to.component.housing.RackTo;
 import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.ListResponse;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -50,9 +52,9 @@ public class ComponentController {
 
     @RequiresPermission("read")
     @GetMapping
-    public List<ComponentTo> getAll() {
-        log.info("getAll components");
-        return service.getAllAsDto();
+    public Object getAll(@ParameterObject ListQuery query) {
+        log.info("getAll components ({})", query);
+        return ListResponse.of(query, service::getAllAsDto, () -> service.getPage(query));
     }
 
     @RequiresPermission("read")

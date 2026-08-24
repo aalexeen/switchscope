@@ -1,6 +1,8 @@
 package net.switchscope.service;
 
 import net.switchscope.to.BaseTo;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
 import net.switchscope.web.payload.PartialUpdate;
 
 import java.util.UUID;
@@ -39,6 +41,25 @@ public interface DtoCrudService<E, T extends BaseTo> extends CrudService<E> {
      * @param dto the values to create from; its {@code id} is ignored
      * @return the created entity as a DTO
      */
+    /**
+     * One page of this service's rows, mapped to DTOs inside the read transaction.
+     * <p>
+     * Declared here rather than beside {@code getAll} in {@link CrudService} because the answer is
+     * a DTO, and for the same reason {@code createFromDto} returns one: the mapping has to happen
+     * while the transaction that loaded the row is open. A page handed back as entities would be
+     * mapped by the controller after it closed, which is a {@code LazyInitializationException} on
+     * the first association the DTO carries.
+     * <p>
+     * Every implementation is one call to {@link net.switchscope.web.page.PageReader}, differing in
+     * three things and only three: which entity the page is rooted at, which rows of that entity
+     * belong to this route, and what a row needs before it can be mapped. Those are what a service
+     * knows and a shared reader cannot.
+     *
+     * @param query which page was asked for, in what order
+     * @return the requested page
+     */
+    PageTo<T> getPage(ListQuery query);
+
     T createFromDto(T dto);
 
     /**

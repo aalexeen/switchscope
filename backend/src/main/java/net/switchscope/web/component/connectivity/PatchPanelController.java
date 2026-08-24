@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springdoc.core.annotations.ParameterObject;
 import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.BaseMapper;
 import net.switchscope.mapper.component.connectivity.PatchPanelMapper;
@@ -21,8 +22,9 @@ import net.switchscope.service.DtoCrudService;
 import net.switchscope.service.component.connectivity.PatchPanelService;
 import net.switchscope.to.component.connectivity.PatchPanelTo;
 import net.switchscope.web.AbstractCrudController;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.ListResponse;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -62,9 +64,9 @@ public class PatchPanelController extends AbstractCrudController<PatchPanel, Pat
      */
     @Override
     @GetMapping
-    public List<PatchPanelTo> getAll() {
-        log.info("getAll {}", getEntityName());
-        return service.getAllAsDto();
+    public Object getAll(@ParameterObject ListQuery query) {
+        log.info("getAll {} ({})", getEntityName(), query);
+        return ListResponse.of(query, service::getAllAsDto, () -> service.getPage(query));
     }
 
     /**

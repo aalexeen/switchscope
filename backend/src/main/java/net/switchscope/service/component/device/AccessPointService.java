@@ -12,6 +12,9 @@ import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.device.AccessPointTo;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,11 +27,21 @@ public class AccessPointService implements DtoCrudService<AccessPoint, AccessPoi
     private final DeviceRepository repository;
     private final AccessPointMapper mapper;
     private final ComponentReferenceResolver resolver;
+    private final PageReader pageReader;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<AccessPoint> getAll() {
         return (List<AccessPoint>) (List<?>) repository.findAccessPoints();
+    }
+
+    @Override
+    public PageTo<AccessPointTo> getPage(ListQuery query) {
+        return pageReader.read(AccessPoint.class, query, accessPoint -> {
+            Hibernate.initialize(accessPoint.getPorts());
+            Hibernate.initialize(accessPoint.getSsids());
+            return mapper.toTo(accessPoint);
+        });
     }
 
     @Override

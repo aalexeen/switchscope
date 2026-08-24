@@ -15,6 +15,9 @@ import net.switchscope.security.policy.UpdatePolicy;
 import net.switchscope.security.policy.UpdatePolicyResolver;
 import net.switchscope.security.policy.UpdatePolicyValidator;
 import net.switchscope.service.CrudService;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 import net.switchscope.to.component.catalog.ComponentModelTo;
 import net.switchscope.web.payload.PartialUpdate;
 
@@ -23,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @Slf4j
 @Service
@@ -34,10 +38,25 @@ public class ComponentModelService implements CrudService<ComponentModel> {
     private final ComponentTypeRepository componentTypeRepository;
     private final UpdatePolicyResolver policyResolver;
     private final UpdatePolicyValidator policyValidator;
+    private final PageReader pageReader;
 
     @Override
     public List<ComponentModel> getAll() {
         return repository.findAllWithAssociations();
+    }
+
+    /**
+     * One page of catalog models of every class, mapped by the caller's own function while this
+     * transaction is open - the mappers that pick a DTO per model class belong to the controller,
+     * as they do for devices.
+     *
+     * @param query which page was asked for, in what order
+     * @param toDto how one model becomes its DTO
+     * @param <T>   the DTO type the caller produces
+     * @return the requested page
+     */
+    public <T> PageTo<T> getPage(ListQuery query, Function<ComponentModel, T> toDto) {
+        return pageReader.read(ComponentModel.class, query, toDto);
     }
 
     @Override

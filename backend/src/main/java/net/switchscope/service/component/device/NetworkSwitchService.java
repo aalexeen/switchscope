@@ -13,6 +13,9 @@ import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.device.NetworkSwitchTo;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,11 +28,20 @@ public class NetworkSwitchService implements DtoCrudService<NetworkSwitch, Netwo
     private final DeviceRepository repository;
     private final NetworkSwitchMapper mapper;
     private final ComponentReferenceResolver resolver;
+    private final PageReader pageReader;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<NetworkSwitch> getAll() {
         return (List<NetworkSwitch>) (List<?>) repository.findNetworkSwitchesWithModel();
+    }
+
+    @Override
+    public PageTo<NetworkSwitchTo> getPage(ListQuery query) {
+        return pageReader.read(NetworkSwitch.class, query, networkSwitch -> {
+            Hibernate.initialize(networkSwitch.getPorts());
+            return mapper.toTo(networkSwitch);
+        });
     }
 
     @Override

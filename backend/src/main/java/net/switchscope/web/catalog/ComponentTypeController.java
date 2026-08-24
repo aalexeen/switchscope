@@ -11,6 +11,9 @@ import net.switchscope.service.component.ComponentTypeService;
 import net.switchscope.service.component.InstallableComponentRegistry;
 import net.switchscope.to.component.catalog.ComponentTypeTo;
 import net.switchscope.web.AbstractCrudController;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.ListResponse;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,8 +66,13 @@ public class ComponentTypeController extends AbstractCrudController<ComponentTyp
 
     @Override
     @GetMapping
-    public List<ComponentTypeTo> getAll() {
-        log.info("getAll {}", getEntityName());
+    public Object getAll(@ParameterObject ListQuery query) {
+        log.info("getAll {} ({})", getEntityName(), query);
+        return ListResponse.of(query, this::allMarked,
+                () -> service.getPage(query).map(this::markImplementation));
+    }
+
+    private List<ComponentTypeTo> allMarked() {
         List<ComponentTypeTo> tos = mapper.toToList(service.getAll());
         tos.forEach(this::markImplementation);
         return tos;

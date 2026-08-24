@@ -14,6 +14,9 @@ import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.connectivity.CableRunTo;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,11 +30,20 @@ public class CableRunService implements DtoCrudService<CableRun, CableRunTo> {
     private final CableRunMapper mapper;
     private final ComponentReferenceResolver resolver;
     private final LocationRepository locationRepository;
+    private final PageReader pageReader;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<CableRun> getAll() {
         return (List<CableRun>) (List<?>) repository.findCableRuns();
+    }
+
+    @Override
+    public PageTo<CableRunTo> getPage(ListQuery query) {
+        return pageReader.read(CableRun.class, query, cableRun -> {
+            initializeLazyCollections(cableRun);
+            return mapper.toTo(cableRun);
+        });
     }
 
     @Override

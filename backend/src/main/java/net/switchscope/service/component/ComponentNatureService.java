@@ -9,6 +9,9 @@ import net.switchscope.repository.component.ComponentNatureRepository;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.component.catalog.ComponentNatureTo;
 import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +23,16 @@ public class ComponentNatureService implements DtoCrudService<ComponentNatureEnt
 
     private final ComponentNatureRepository repository;
     private final ComponentNatureMapper mapper;
+    private final PageReader pageReader;
 
     @Override
     public List<ComponentNatureEntity> getAll() {
         return repository.findAllWithAssociations();
+    }
+
+    @Override
+    public PageTo<ComponentNatureTo> getPage(ListQuery query) {
+        return pageReader.read(ComponentNatureEntity.class, query, mapper::toTo);
     }
 
     @Override

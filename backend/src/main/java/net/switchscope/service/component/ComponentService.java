@@ -45,6 +45,9 @@ import net.switchscope.to.component.device.NetworkSwitchTo;
 import net.switchscope.to.component.device.RouterTo;
 import net.switchscope.to.component.housing.RackTo;
 import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.Objects;
@@ -71,10 +74,20 @@ public class ComponentService implements DtoCrudService<Component, ComponentTo> 
     private final ConnectorMapper connectorMapper;
     private final PatchPanelMapper patchPanelMapper;
     private final RackMapper rackMapper;
+    private final PageReader pageReader;
 
     @Override
     public List<Component> getAll() {
         return repository.findAllWithAssociations();
+    }
+
+    /**
+     * One page of components of every class, mapped by the same polymorphic mapper the whole
+     * list uses.
+     */
+    @Override
+    public PageTo<ComponentTo> getPage(ListQuery query) {
+        return pageReader.read(Component.class, query, this::mapToDto);
     }
 
     /**

@@ -9,6 +9,9 @@ import net.switchscope.repository.installation.InstallationStatusRepository;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.installation.catalog.InstallationStatusTo;
 import net.switchscope.web.payload.PartialUpdate;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +23,16 @@ public class InstallationStatusService implements DtoCrudService<InstallationSta
 
     private final InstallationStatusRepository repository;
     private final InstallationStatusMapper mapper;
+    private final PageReader pageReader;
 
     @Override
     public List<InstallationStatusEntity> getAll() {
         return repository.findAllWithAssociations();
+    }
+
+    @Override
+    public PageTo<InstallationStatusTo> getPage(ListQuery query) {
+        return pageReader.read(InstallationStatusEntity.class, query, mapper::toTo);
     }
 
     @Override

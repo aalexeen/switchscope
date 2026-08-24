@@ -15,6 +15,9 @@ import net.switchscope.service.component.ComponentReferenceResolver;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.to.component.connectivity.ConnectorTo;
+import net.switchscope.to.PageTo;
+import net.switchscope.web.page.ListQuery;
+import net.switchscope.web.page.PageReader;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,11 +31,17 @@ public class ConnectorService implements DtoCrudService<Connector, ConnectorTo> 
     private final ConnectorMapper mapper;
     private final ComponentReferenceResolver resolver;
     private final PortRepository portRepository;
+    private final PageReader pageReader;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Connector> getAll() {
         return (List<Connector>) (List<?>) repository.findConnectors();
+    }
+
+    @Override
+    public PageTo<ConnectorTo> getPage(ListQuery query) {
+        return pageReader.read(Connector.class, query, mapper::toTo);
     }
 
     @Override
