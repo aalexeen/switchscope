@@ -2,6 +2,7 @@ package net.switchscope.config;
 
 import net.switchscope.error.AppException;
 import net.switchscope.error.ErrorType;
+import net.switchscope.error.PayloadValidationException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ValidationException;
@@ -75,6 +76,18 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(BindException.class)
     ProblemDetail bindException(BindException ex, HttpServletRequest request) {
+        Map<String, String> invalidParams = getErrorMap(ex.getBindingResult());
+        String path = request.getRequestURI();
+        log.warn(ERR_PFX + "BindException with invalidParams {} at request {}", invalidParams, path);
+        return createProblemDetail(ex, path, BAD_REQUEST, "BindException", Map.of("invalid_params", invalidParams));
+    }
+
+    /**
+     * The same answer as {@link #bindException}, for the routes that read their body as raw JSON
+     * and therefore validate it themselves: one shape of validation error for the whole API.
+     */
+    @ExceptionHandler(PayloadValidationException.class)
+    ProblemDetail payloadValidationException(PayloadValidationException ex, HttpServletRequest request) {
         Map<String, String> invalidParams = getErrorMap(ex.getBindingResult());
         String path = request.getRequestURI();
         log.warn(ERR_PFX + "BindException with invalidParams {} at request {}", invalidParams, path);

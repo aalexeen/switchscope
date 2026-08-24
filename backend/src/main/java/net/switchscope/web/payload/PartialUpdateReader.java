@@ -19,6 +19,11 @@ import java.util.Map;
  * caller's policy - and eleven of them spelled them out, with the field collection copied verbatim
  * eight times. This is those steps once, which is also what makes it possible to say that every
  * update endpoint applies the same rules: there is one implementation of them left.
+ * <p>
+ * The fifth step is bean validation over the fields the body carried. It belongs here for the same
+ * reason: reading the body as a string is what took {@code @Valid} away from every PUT in the
+ * project, so putting the replacement anywhere else would mean twenty places that have to remember
+ * it.
  */
 @Slf4j
 @Component
@@ -26,6 +31,7 @@ import java.util.Map;
 public class PartialUpdateReader {
 
     private final JsonPayload json;
+    private final PayloadValidator payloadValidator;
     private final UpdatePolicyResolver policyResolver;
     private final NullFieldApplier nullFieldApplier;
 
@@ -59,6 +65,11 @@ public class PartialUpdateReader {
         Map<String, JsonNode> presentFields = json.presentFields(root);
         T dto = json.bind(root, dtoClass);
         json.blankAbsentProperties(dto, presentFields.keySet());
+
+        // Bean validation, which a raw body does not get from @Valid. Only over the fields the
+        // payload carried and only where it carried a value - see PayloadValidator for why the
+        // nulls are left to the field-access layer.
+        payloadValidator.validatePresent(dto, presentFields.keySet());
 
         UpdatePolicy policy = policyResolver.resolve();
         log.debug("Reading update for {} under policy {}", dtoClass.getSimpleName(), policy.getPolicyName());

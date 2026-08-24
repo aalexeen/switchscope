@@ -2,8 +2,6 @@ package net.switchscope.web.component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.error.NotFoundException;
@@ -14,11 +12,10 @@ import net.switchscope.to.component.ComponentTo;
 import net.switchscope.web.payload.JsonPayload;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.web.payload.PartialUpdateReader;
+import net.switchscope.web.payload.PayloadValidator;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Binds a component request body to the right concrete {@link ComponentTo} subtype.
@@ -51,7 +48,7 @@ public class ComponentPayloadReader {
     private final PartialUpdateReader partialUpdateReader;
     private final ComponentTypeRepository componentTypeRepository;
     private final InstallableComponentRegistry registry;
-    private final Validator validator;
+    private final PayloadValidator payloadValidator;
 
     /**
      * Binds a create payload, deriving the concrete type from {@code componentTypeId}.
@@ -73,14 +70,14 @@ public class ComponentPayloadReader {
         root.put(DISCRIMINATOR, derived);
 
         T dto = bind(root, baseType, derived);
-        validate(dto);
+        payloadValidator.validateWhole(dto);
         return dto;
     }
 
     /**
      * Binds an update payload onto the type of the stored entity, ignoring any type the payload
      * claims, and checks the fields it sends as null against the caller's field-access policy.
-     * Bean validation is not applied: updates are partial by design.
+     * Bean validation runs over the fields the body carried - see {@code PayloadValidator}.
      *
      * @param jsonPayload   the raw request body
      * @param discriminator the stored entity's discriminator
@@ -128,15 +125,5 @@ public class ComponentPayloadReader {
                     + targetType.getSimpleName().replace("To", ""));
         }
         return targetType.cast(dto);
-    }
-
-    private void validate(ComponentTo dto) {
-        Set<ConstraintViolation<ComponentTo>> violations = validator.validate(dto);
-        if (!violations.isEmpty()) {
-            throw new IllegalRequestDataException(violations.stream()
-                    .map(v -> v.getPropertyPath() + " " + v.getMessage())
-                    .sorted()
-                    .collect(Collectors.joining("; ")));
-        }
     }
 }

@@ -1,6 +1,5 @@
 package net.switchscope.web;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,8 +10,10 @@ import net.switchscope.mapper.BaseMapper;
 import net.switchscope.security.permission.RequiresPermission;
 import net.switchscope.service.DtoCrudService;
 import net.switchscope.to.BaseTo;
+import net.switchscope.web.payload.JsonPayload;
 import net.switchscope.web.payload.PartialUpdate;
 import net.switchscope.web.payload.PartialUpdateReader;
+import net.switchscope.web.payload.PayloadValidator;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,6 +50,12 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
     @Autowired
     protected PartialUpdateReader partialUpdateReader;
 
+    @Autowired
+    protected JsonPayload json;
+
+    @Autowired
+    protected PayloadValidator payloadValidator;
+
     protected abstract DtoCrudService<E, T> getService();
 
     protected abstract BaseMapper<E, T> getMapper();
@@ -80,10 +87,23 @@ public abstract class AbstractCrudController<E, T extends BaseTo> {
         return getMapper().toTo(entity);
     }
 
+    /**
+     * Create from a raw body, for the same reason {@link #update} reads one: nine of these routes
+     * serve a subtype of a polymorphic DTO, and Jackson demands the discriminator even when the URL
+     * has already said which subtype it is. {@code POST /api/housing/racks} used to require
+     * {@code {"componentClass": "RACK", ...}} and answer 500 without it, while the PUT next to it
+     * had stopped needing it. {@code JsonPayload.bind} pins the value from the target type, so the
+     * URL stays the authority on it and the body no longer has to repeat it.
+     * <p>
+     * Bean validation, which the typed {@code @Valid @RequestBody} gave for free, is done
+     * explicitly - over the whole DTO, unlike an update, because a create carries the whole object.
+     */
     @RequiresPermission("create")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public T create(@Valid @RequestBody T dto) {
+    public T create(@RequestBody String body) {
+        T dto = json.bind(json.asObject(body), getDtoClass());
+        payloadValidator.validateWhole(dto);
         log.info("create {} {}", getEntityName(), dto);
         return getService().createFromDto(dto);
     }
