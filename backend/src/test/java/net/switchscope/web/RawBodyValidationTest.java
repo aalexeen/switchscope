@@ -49,6 +49,7 @@ class RawBodyValidationTest {
 
     private static final String RACKS = "/api/housing/racks";
     private static final String INSTALLATIONS = "/api/installations";
+    private static final String LOCATIONS = "/api/locations";
 
     @Autowired
     private MockMvc mockMvc;
@@ -110,6 +111,23 @@ class RawBodyValidationTest {
 
     @Test
     @Transactional
+    @DisplayName("an update validates a constraint the DTO inherits, not only its own")
+    void updateValidatesAnInheritedConstraint() throws Exception {
+        // @Size(min = 2) sits on NamedTo, not on LocationTo. A per-property check that only saw the
+        // concrete class would pass this and leave the whole of NamedTo - name and description, the
+        // two most widely inherited constrained fields in the project, @NoHtml included - unchecked
+        // on every one of the twenty PUT routes. The invalid_params key is what says the refusal
+        // came from here and not from the entity's own constraints at flush.
+        mockMvc.perform(put(LOCATIONS + "/" + anyLocationId())
+                        .with(httpBasic("admin@gmail.com", "admin"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\": \"x\"}"))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.invalid_params.name").exists());
+    }
+
+    @Test
+    @Transactional
     @DisplayName("an update still accepts a value that violates nothing")
     void updateAcceptsAValidValue() throws Exception {
         UUID id = anyInstallationId();
@@ -139,6 +157,12 @@ class RawBodyValidationTest {
             body.put("componentClass", componentClass);
         }
         return body;
+    }
+
+    private UUID anyLocationId() throws Exception {
+        JsonNode all = objectMapper.readTree(getBody(LOCATIONS));
+        assertThat(all).as("the seeded locations are the fixture this test stands on").isNotEmpty();
+        return UUID.fromString(all.get(0).get("id").asText());
     }
 
     private UUID anyInstallationId() throws Exception {

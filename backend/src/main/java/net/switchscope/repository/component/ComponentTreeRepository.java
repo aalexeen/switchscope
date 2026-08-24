@@ -25,6 +25,10 @@ import java.util.UUID;
  * hanging. The check lives here rather than in the nine services that delete components, because a
  * service that forgets it would be back to the old behaviour with no sign of it; overriding the two
  * delete methods means the rule cannot be skipped by not calling it.
+ * <p>
+ * Both deletes are overridden, so this covers the root routes as well as the leaf ones:
+ * {@code DELETE /api/components/{id}} and {@code DELETE /api/devices/{id}} go through the untyped
+ * pair and answer 409 for a component that holds others, exactly as the leaf-type routes do.
  *
  * @param <T> the entity type this repository is declared over, a component or a subtree of them
  */

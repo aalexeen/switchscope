@@ -85,6 +85,11 @@ public class RestExceptionHandler {
     /**
      * The same answer as {@link #bindException}, for the routes that read their body as raw JSON
      * and therefore validate it themselves: one shape of validation error for the whole API.
+     * <p>
+     * The detail is the literal {@code "BindException"} on purpose, matching the handler above
+     * rather than naming this exception: these routes used to bind their body and answer with that
+     * detail, and a client that reads it should not see the string change because of where the
+     * validation now happens.
      */
     @ExceptionHandler(PayloadValidationException.class)
     ProblemDetail payloadValidationException(PayloadValidationException ex, HttpServletRequest request) {
