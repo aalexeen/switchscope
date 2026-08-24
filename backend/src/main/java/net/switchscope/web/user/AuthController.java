@@ -23,38 +23,39 @@ public class AuthController extends AbstractUserController {
     public ResponseEntity<LoginResponseTo> login(@AuthenticationPrincipal AuthUser authUser) {
         log.info("login user {}", authUser.getUser().getEmail());
         // If this method is reached, authentication was successful
-        User user = authUser.getUser();
-
-        LoginResponseTo response = new LoginResponseTo(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getRoles()
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(identityOf(authUser));
     }
 
     @GetMapping("/check")
     public ResponseEntity<LoginResponseTo> checkAuth(@AuthenticationPrincipal AuthUser authUser) {
         log.info("check auth for user {}", authUser.getUser().getEmail());
         // For checking if current session/credentials are still valid
-        User user = authUser.getUser();
-
-        LoginResponseTo response = new LoginResponseTo(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getRoles()
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(identityOf(authUser));
     }
 
     @GetMapping("/profile")
     public User getProfile(@AuthenticationPrincipal AuthUser authUser) {
         log.info("get profile for user {}", authUser.getUser().getEmail());
         return authUser.getUser();
+    }
+
+    /**
+     * Both answers are the same answer to the same question, so they are built in one place: login
+     * and check differ in when the client asks, not in what it gets back.
+     * <p>
+     * The permissions come from the authenticated principal rather than from the grant table,
+     * which is what makes them true - they are the very authorities the authorization advisor will
+     * match a request against, cache staleness and all.
+     */
+    private static LoginResponseTo identityOf(AuthUser authUser) {
+        User user = authUser.getUser();
+        return new LoginResponseTo(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRoles(),
+                authUser.permissions()
+        );
     }
 
     @PostMapping("/logout")
