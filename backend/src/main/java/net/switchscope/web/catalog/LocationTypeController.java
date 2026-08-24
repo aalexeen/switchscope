@@ -3,7 +3,6 @@ package net.switchscope.web.catalog;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.switchscope.mapper.location.catalog.LocationTypeMapper;
 import net.switchscope.model.location.catalog.LocationTypeEntity;
 import net.switchscope.security.permission.PermissionResource;
 import net.switchscope.security.permission.RequiresPermission;
@@ -40,7 +39,6 @@ public class LocationTypeController {
     static final String REST_URL = "/api/catalogs/location-types";
 
     private final LocationTypeService service;
-    private final LocationTypeMapper mapper;
     private final PartialUpdateReader partialUpdateReader;
 
     @RequiresPermission("read")
@@ -62,8 +60,7 @@ public class LocationTypeController {
     @ResponseStatus(HttpStatus.CREATED)
     public LocationTypeTo create(@Valid @RequestBody LocationTypeTo dto) {
         log.info("create location type {}", dto);
-        LocationTypeEntity entity = mapper.toEntity(dto);
-        return service.createAndReturnDto(entity);
+        return service.createFromDto(dto);
     }
 
     /**

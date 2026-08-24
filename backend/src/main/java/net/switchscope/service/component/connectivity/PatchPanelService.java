@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import net.switchscope.mapper.component.connectivity.PatchPanelMapper;
+import net.switchscope.model.component.connectivity.CableRun;
 import net.switchscope.model.component.connectivity.PatchPanel;
 import net.switchscope.repository.component.connectivity.ConnectivityRepository;
 import net.switchscope.model.component.catalog.connectiviy.PatchPanelModel;
@@ -103,6 +104,9 @@ public class PatchPanelService implements DtoCrudService<PatchPanel, PatchPanelT
         resolver.applyCommonReferences(entity, dto);
         resolver.applyModelReference(dto.getPatchPanelModelId(), PatchPanelModel.class,
                 entity::setPatchPanelModel, "patchPanelModelId");
+        resolver.applyCollection(dto.getCableRunIds(),
+                id -> repository.findByIdAndType(id, CableRun.class).map(CableRun.class::cast),
+                entity.getCableRuns(), "cableRunIds");
     }
 
     /**

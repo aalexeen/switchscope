@@ -505,8 +505,20 @@ raw JSON → ObjectNode → пин дискриминатора → treeToValue 
       `VARCHAR(16…256)`. Везде проставлено ограничение по длине колонки на сущности и приведён
       DTO. Мнимые расхождения (`wifiStandard` 64 против 32, `formFactor`, `iconClass`) — разные
       таблицы или API строже колонки, не трогал. `SizeLimitTest`, 3 теста
-- [ ] Коллекционные ассоциации не разрешаются: `CableRunTo.locationIds` / `connectorIds`,
-      `PatchPanelTo.cableRunIds`, `LocationTypeTo.allowed*TypeIds`, `ComponentCategoryTo.componentTypeIds`
+- [x] Коллекционные ассоциации не разрешаются: `CableRunTo.locationIds` / `connectorIds`,
+      `PatchPanelTo.cableRunIds`, `LocationTypeTo.allowed*TypeIds`, `ComponentCategoryTo.componentTypeIds`.
+      **Сделано,** но список сократился с шести полей до трёх. Разрешать имеет смысл только
+      **владеющие** стороны: `CableRunTo.locationIds`, `PatchPanelTo.cableRunIds`,
+      `LocationTypeTo.allowedChildTypeIds` — у каждой своя join-таблица. Остальные три
+      (`connectorIds`, `componentTypeIds`, `allowedParentTypeIds`) — обратные стороны
+      `mappedBy`, и они **уже** помечены `READ_ONLY` в `@FieldAccess` и `@Schema`, то есть
+      контракт про них не врёт; записывать их значило бы переставлять FK у чужих строк, и это
+      отдельное решение, а не забытый резолвинг. Правило то же, что у одиночных ссылок:
+      `null` (поля не было) — не трогать, пустой список — отцепить всё, неизвестный id — 404 и
+      ничего не изменено. `LocationTypeService` получил `createFromDto`, потому что маппер ids
+      не разрешает, а контроллер отдавал ему уже собранную сущность; мёртвый после этого
+      `createAndReturnDto` удалён. Тесты: `ComponentReferenceResolverCollectionTest` (5) и
+      `AllowedChildTypesEndpointTest` (3, до правки падали все три — неизвестный id отвечал 200)
 - [ ] `Installation.isValidLocationInstallation()` → `canContainComponent(null)` всегда false;
       `fitsInLocation()` — NPE при `rackPosition == null`
 - [ ] `Component.canHoldOtherComponents()` возвращает true когда компонент **не** может содержать

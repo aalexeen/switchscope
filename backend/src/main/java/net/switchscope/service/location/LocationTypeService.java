@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import net.switchscope.error.IllegalRequestDataException;
 import net.switchscope.error.NotFoundException;
 import net.switchscope.mapper.location.catalog.LocationTypeMapper;
 import net.switchscope.model.location.catalog.LocationTypeEntity;
@@ -12,7 +13,9 @@ import net.switchscope.service.UpdatableCrudService;
 import net.switchscope.to.location.catalog.LocationTypeTo;
 import net.switchscope.web.payload.PartialUpdate;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -59,18 +62,6 @@ public class LocationTypeService implements UpdatableCrudService<LocationTypeEnt
         return mapper.toTo(entity);
     }
 
-    /**
-     * Create location type and return as DTO within transaction.
-     *
-     * @param entity location type entity to create
-     * @return created location type as DTO
-     */
-    @Transactional
-    public LocationTypeTo createAndReturnDto(LocationTypeEntity entity) {
-        LocationTypeEntity saved = repository.save(entity);
-        return mapper.toTo(saved);
-    }
-
     @Override
     @Transactional
     public LocationTypeEntity create(LocationTypeEntity entity) {
@@ -89,10 +80,53 @@ public class LocationTypeService implements UpdatableCrudService<LocationTypeEnt
     @Override
     @Transactional
     public LocationTypeEntity updateFromDto(UUID id, PartialUpdate<LocationTypeTo> update) {
-        LocationTypeEntity existing = repository.getExisted(id);
+        LocationTypeEntity existing = repository.findByIdWithAssociations(id)
+                .orElseThrow(() -> new NotFoundException("Location type with id=" + id + " not found"));
         mapper.updateFromTo(existing, update.dto());
+        applyAllowedChildTypes(existing, update.dto());
         update.applyNulls(existing);
         return repository.save(existing);
+    }
+
+    /**
+     * Create from the DTO rather than from an entity the controller mapped, because the allowed
+     * child types travel as ids and the mapper cannot resolve them - it would leave a create that
+     * names them with none.
+     *
+     * @param dto the location type to create
+     * @return the stored location type
+     */
+    @Transactional
+    public LocationTypeTo createFromDto(LocationTypeTo dto) {
+        LocationTypeEntity entity = mapper.toEntity(dto);
+        applyAllowedChildTypes(entity, dto);
+        return mapper.toTo(repository.save(entity));
+    }
+
+    /**
+     * Fills the hierarchy from the ids the payload carries. A null set means the field was not
+     * mentioned and the stored hierarchy stands; an empty one means the caller asked for no allowed
+     * children. The self-reference is checked here rather than left to the database, which has no
+     * constraint against it and would store a type that may contain itself.
+     */
+    private void applyAllowedChildTypes(LocationTypeEntity entity, LocationTypeTo dto) {
+        Set<UUID> ids = dto.getAllowedChildTypeIds();
+        if (ids == null) {
+            return;
+        }
+        Set<LocationTypeEntity> children = new LinkedHashSet<>();
+        for (UUID childId : ids) {
+            if (childId == null) {
+                throw new IllegalRequestDataException("allowedChildTypeIds contains a null id");
+            }
+            if (childId.equals(entity.getId())) {
+                throw new IllegalRequestDataException("A location type cannot be its own child type");
+            }
+            children.add(repository.findById(childId).orElseThrow(() -> new NotFoundException(
+                    "allowedChildTypeIds contains id=" + childId + ", which does not exist")));
+        }
+        entity.getAllowedChildTypes().clear();
+        entity.getAllowedChildTypes().addAll(children);
     }
 
     /**

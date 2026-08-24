@@ -109,6 +109,8 @@ public class CableRunService implements DtoCrudService<CableRun, CableRunTo> {
                 entity::setStartLocation, "startLocationId");
         resolver.applyReference(dto.getEndLocationId(), locationRepository::findById,
                 entity::setEndLocation, "endLocationId");
+        resolver.applyCollection(dto.getLocationIds(), locationRepository::findById,
+                entity.getLocations(), "locationIds");
     }
 
     /**

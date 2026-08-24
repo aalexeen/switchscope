@@ -156,4 +156,43 @@ public class ComponentReferenceResolver {
         setter.accept(finder.apply(id)
                 .orElseThrow(() -> new NotFoundException(fieldName + "=" + id + " not found")));
     }
+
+    /**
+     * Fills an owned association with the entities the ids name, in the order they were given.
+     * <p>
+     * A null collection means the payload did not mention the field, and the stored association is
+     * left alone - the same rule the single references follow. An empty collection is a different
+     * request and is honoured: detach everything. Note that this is the only way to empty such an
+     * association, since a DTO field named {@code <name>Ids} has no entity property of that name
+     * for the null-clearing pass to find.
+     * <p>
+     * Every id is resolved before anything is written, so a payload naming one id that does not
+     * exist leaves the association as it was instead of half-applied. The stored collection is
+     * emptied and refilled rather than replaced, because Hibernate tracks the instance it handed
+     * out - assigning a new one loses the ordering column and, on a managed entity, the change.
+     *
+     * @param ids       the ids from the DTO, may be null
+     * @param finder    how to load one referenced entity
+     * @param target    the entity's own collection
+     * @param fieldName DTO field name, used in error messages
+     * @param <R>       the referenced type
+     */
+    public <R> void applyCollection(java.util.Collection<UUID> ids,
+            Function<UUID, java.util.Optional<R>> finder,
+            java.util.Collection<R> target, String fieldName) {
+        if (ids == null) {
+            return;
+        }
+        java.util.List<R> resolved = ids.stream()
+                .map(id -> {
+                    if (id == null) {
+                        throw new IllegalRequestDataException(fieldName + " contains a null id");
+                    }
+                    return finder.apply(id).orElseThrow(() -> new NotFoundException(
+                            fieldName + " contains id=" + id + ", which does not exist"));
+                })
+                .toList();
+        target.clear();
+        target.addAll(resolved);
+    }
 }
