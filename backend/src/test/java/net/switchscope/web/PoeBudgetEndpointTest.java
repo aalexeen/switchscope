@@ -74,14 +74,9 @@ class PoeBudgetEndpointTest {
         body.put("portNumber", 9999);
         body.put("name", "poe-budget-test-" + UUID.randomUUID());
         body.put("poeEnabled", true);
-        // status, adminStatus and operationalStatus are NOT NULL and the create mapping assigns
-        // them unconditionally, so the entity's own defaults are written over with null and the
-        // insert is refused - the same shape as the rack's capacity, with a 409 instead of a 500
-        body.put("status", "UP");
-        body.put("adminStatus", "UP");
-        body.put("operationalStatus", "UP");
-        body.put("autoNegotiation", true);
-        body.put("monitoringEnabled", true);
+        // Nothing else: the six NOT NULL fields the schema calls optional are supplied by the port
+        // itself now (Port.supplyMissingDefaults). This method used to send five of them to get
+        // past a 409, which meant the test was creating a port no client would have to.
 
         String created = mockMvc.perform(post(PORTS)
                         .with(httpBasic("admin@gmail.com", "admin"))

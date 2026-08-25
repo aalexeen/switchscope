@@ -49,21 +49,33 @@ public abstract class Port extends NamedEntity {
     @NoHtml
     private String portLabel; // Physical label on the port
 
+    /**
+     * What a port is when nothing has been said about it. Named rather than written twice, because
+     * the field initializer and {@link #supplyMissingDefaults()} have to agree: they are two halves
+     * of one answer, one for a port the code builds and one for a port a request builds.
+     */
+    private static final String DEFAULT_STATUS = "DOWN";
+    private static final String DEFAULT_ADMIN_STATUS = "UP";
+    private static final String DEFAULT_OPERATIONAL_STATUS = "DOWN";
+    private static final boolean DEFAULT_AUTO_NEGOTIATION = true;
+    private static final boolean DEFAULT_MONITORING_ENABLED = true;
+    private static final boolean DEFAULT_POE_ENABLED = false;
+
     // Port status and state
     @Column(name = "status", nullable = false)
     @Size(max = 32)
     @NoHtml
-    private String status = "DOWN"; // UP, DOWN, TESTING, DORMANT
+    private String status = DEFAULT_STATUS; // UP, DOWN, TESTING, DORMANT
 
     @Column(name = "admin_status", nullable = false)
     @Size(max = 32)
     @NoHtml
-    private String adminStatus = "UP"; // UP, DOWN, TESTING
+    private String adminStatus = DEFAULT_ADMIN_STATUS; // UP, DOWN, TESTING
 
     @Column(name = "operational_status", nullable = false)
     @Size(max = 32)
     @NoHtml
-    private String operationalStatus = "DOWN"; // UP, DOWN, TESTING, UNKNOWN, DORMANT, NOT_PRESENT, LOWER_LAYER_DOWN
+    private String operationalStatus = DEFAULT_OPERATIONAL_STATUS; // UP, DOWN, TESTING, UNKNOWN, DORMANT, NOT_PRESENT, LOWER_LAYER_DOWN
 
     // Speed and duplex
     @Column(name = "speed_mbps")
@@ -80,7 +92,7 @@ public abstract class Port extends NamedEntity {
     private String duplexMode; // FULL, HALF, AUTO
 
     @Column(name = "auto_negotiation", nullable = false)
-    private Boolean autoNegotiation = true;
+    private Boolean autoNegotiation = DEFAULT_AUTO_NEGOTIATION;
 
     // Physical characteristics
     @Column(name = "connector_type")
@@ -109,7 +121,7 @@ public abstract class Port extends NamedEntity {
 
     // Power over Ethernet
     @Column(name = "poe_enabled", nullable = false)
-    private Boolean poeEnabled = false;
+    private Boolean poeEnabled = DEFAULT_POE_ENABLED;
 
     @Column(name = "poe_class")
     @Min(0) @Max(8)
@@ -165,7 +177,43 @@ public abstract class Port extends NamedEntity {
     private String configurationNotes;
 
     @Column(name = "monitoring_enabled", nullable = false)
-    private Boolean monitoringEnabled = true;
+    private Boolean monitoringEnabled = DEFAULT_MONITORING_ENABLED;
+
+    /**
+     * Gives a port the values its request did not carry.
+     * <p>
+     * The field initializers cannot do it. The generated create mapping assigns every property
+     * unconditionally - {@code NullValuePropertyMappingStrategy.IGNORE} governs update methods only
+     * - so a payload that leaves out any of these six writes null over the default, and all six
+     * columns are NOT NULL: {@code POST /api/ports} answered <b>409</b> with the constraint's name
+     * in the detail. The schema calls none of them required, so a client reading the API
+     * description could not create a port at all.
+     * <p>
+     * On persist rather than in the service, so that it covers every create path, and on persist
+     * rather than on flush, because a create maps its answer back before anything is flushed. The
+     * same reasoning, and the same shape, as {@code Rack.supplyRackUnitsTotal}.
+     */
+    @PrePersist
+    void supplyMissingDefaults() {
+        if (status == null) {
+            status = DEFAULT_STATUS;
+        }
+        if (adminStatus == null) {
+            adminStatus = DEFAULT_ADMIN_STATUS;
+        }
+        if (operationalStatus == null) {
+            operationalStatus = DEFAULT_OPERATIONAL_STATUS;
+        }
+        if (autoNegotiation == null) {
+            autoNegotiation = DEFAULT_AUTO_NEGOTIATION;
+        }
+        if (monitoringEnabled == null) {
+            monitoringEnabled = DEFAULT_MONITORING_ENABLED;
+        }
+        if (poeEnabled == null) {
+            poeEnabled = DEFAULT_POE_ENABLED;
+        }
+    }
 
     // Constructors
     protected Port(UUID id, String name, Device device, Integer portNumber) {
