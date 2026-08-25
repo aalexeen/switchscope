@@ -24,10 +24,17 @@ import java.util.Set;
 @NoArgsConstructor
 public class LocationTypeEntity extends BaseCodedEntity {
 
+    /**
+     * Where a type sits when nothing says otherwise - the middle, so a new type is neither a
+     * campus nor a rack until someone decides. Named because the field initializer and
+     * {@link #supplyHierarchyLevel()} have to agree on it.
+     */
+    private static final int DEFAULT_HIERARCHY_LEVEL = 50;
+
     // Hierarchy characteristics
     @Column(name = "hierarchy_level", nullable = false)
     @Min(1) @Max(100)
-    private Integer hierarchyLevel = 50; // Lower numbers = higher in hierarchy
+    private Integer hierarchyLevel = DEFAULT_HIERARCHY_LEVEL; // Lower numbers = higher in hierarchy
 
     @Column(name = "can_have_children", nullable = false)
     private boolean canHaveChildren = true;
@@ -104,6 +111,25 @@ public class LocationTypeEntity extends BaseCodedEntity {
 
     @ManyToMany(mappedBy = "allowedChildTypes")
     private Set<LocationTypeEntity> allowedParentTypes = new HashSet<>();
+
+    /**
+     * Gives a location type the level its request did not carry.
+     * <p>
+     * The same shape as the rack's capacity and the port's six flags: the generated create mapping
+     * assigns every property unconditionally, so a payload without {@code hierarchyLevel} writes
+     * null over the default and the NOT NULL column refuses the insert - {@code POST
+     * /api/catalogs/location-types} answered 409 for a field its own schema calls optional.
+     * <p>
+     * Only the boxed properties are exposed to this. A primitive cannot hold null, so MapStruct
+     * guards those assignments with a null check of its own - which is why the twelve {@code
+     * boolean} flags on this class have never needed one.
+     */
+    @PrePersist
+    void supplyHierarchyLevel() {
+        if (hierarchyLevel == null) {
+            hierarchyLevel = DEFAULT_HIERARCHY_LEVEL;
+        }
+    }
 
     // Constructor
     public LocationTypeEntity(String code, String name, String displayName) {

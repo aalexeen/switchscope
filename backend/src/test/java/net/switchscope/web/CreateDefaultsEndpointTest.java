@@ -22,7 +22,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * A port created from what the schema says a port needs.
+ * A row created from what the schema says is required, keeping the defaults for everything else.
+ * <p>
+ * The trap is one trap, and it is not about ports: the generated create mapping assigns every
+ * property unconditionally - {@code NullValuePropertyMappingStrategy.IGNORE} governs update methods
+ * only - so a payload that omits a field with a NOT NULL column writes null over the entity's
+ * default and the insert is refused. Only <em>boxed</em> properties are exposed to it: a primitive
+ * cannot hold null, so MapStruct guards those assignments itself, which is why a class full of
+ * {@code boolean} flags has never needed anything. Two of these are pinned here; the rack's
+ * capacity, the same shape found first, is pinned in {@code RackCapacityEndpointTest}.
  * <p>
  * Six of its fields are NOT NULL with a default in the entity and in the column, and the schema
  * marks none of them required: {@code status}, {@code adminStatus}, {@code operationalStatus},
@@ -42,9 +50,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration,org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration"
 })
 @AutoConfigureMockMvc
-class PortDefaultsEndpointTest {
+class CreateDefaultsEndpointTest {
 
     private static final String PORTS = "/api/ports";
+    private static final String LOCATION_TYPES = "/api/catalogs/location-types";
     private static final String SWITCHES = "/api/devices/switches";
 
     @Autowired
@@ -120,6 +129,38 @@ class PortDefaultsEndpointTest {
                     .isEqualTo("DOWN");
         } finally {
             mockMvc.perform(delete(PORTS + "/" + id).with(httpBasic("admin@gmail.com", "admin")))
+                    .andExpect(status().isNoContent());
+        }
+    }
+
+    @Test
+    @DisplayName("a location type is created without the hierarchy level its schema calls optional")
+    void createsALocationTypeWithoutItsHierarchyLevel() throws Exception {
+        com.fasterxml.jackson.databind.node.ObjectNode seeded =
+                ((com.fasterxml.jackson.databind.node.ObjectNode) read(LOCATION_TYPES).get(0)).deepCopy();
+        String unique = "create-defaults-" + UUID.randomUUID();
+        seeded.remove("id");
+        seeded.remove("createdAt");
+        seeded.remove("updatedAt");
+        seeded.remove("hierarchyLevel");
+        seeded.put("name", unique);
+        seeded.put("code", unique.toUpperCase().replace('-', '_'));
+        seeded.put("displayName", unique);
+
+        String created = mockMvc.perform(post(LOCATION_TYPES)
+                        .with(httpBasic("admin@gmail.com", "admin"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(seeded)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        UUID id = UUID.fromString(objectMapper.readTree(created).get("id").asText());
+
+        try {
+            assertThat(read(LOCATION_TYPES + "/" + id).get("hierarchyLevel").asInt())
+                    .as("neither a campus nor a rack until someone says so - the middle of the range")
+                    .isEqualTo(50);
+        } finally {
+            mockMvc.perform(delete(LOCATION_TYPES + "/" + id).with(httpBasic("admin@gmail.com", "admin")))
                     .andExpect(status().isNoContent());
         }
     }
